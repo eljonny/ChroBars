@@ -1,7 +1,6 @@
 package com.ampsoft.chrobars;
 
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 
@@ -12,7 +11,7 @@ import android.view.Menu;
  */
 public class ChroBarsActivity extends Activity {
 
-	private GLSurfaceView chronos;
+	private ChroSurface chronos;
 	
 	/**
 	 * 
