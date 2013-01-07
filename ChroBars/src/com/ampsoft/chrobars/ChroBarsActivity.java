@@ -25,7 +25,9 @@ public class ChroBarsActivity extends Activity {
 		chronos = new ChroSurface(this);
 		setContentView(chronos);
 		
-		System.out.println("CHROBARS-AMPSOFT<" + ChroUtils.getTimeString() + ">: ChroSurface created and set as content view!");
+		System.out.println("CHROBARS-AMPSOFT<" +
+				ChroUtils.getTimeString() +
+				">: ChroSurface created and set as content view!");
 	}
 
 	/**
