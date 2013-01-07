@@ -37,11 +37,11 @@ public enum ChroType {
 		}
 		else {
 
-			float ftype = chroType = type;
-			float[] verts = { 0.0f + ftype, 1.0f, 0.0f,
-							  1.0f + ftype, 1.0f, 0.0f,
-							  1.0f + ftype, 0.0f, 0.0f,
-							  0.0f + ftype, 0.0f, 0.0f  };
+			chroType = type;
+			float[] verts = { 5.0f, 10.0f, -0.1f,
+							  10.0f, 10.0f, -0.1f,
+							  10.0f, 0.1f, -0.1f,
+							  5.0f, 0.1f, -0.1f  };
 			
 			System.arraycopy(verts, 0, vertices, 0, DIMENSIONS_X_VERTICES);
 		}
@@ -57,6 +57,12 @@ public enum ChroType {
 	 */
 	public float[] getTypeVertices() {
 		return vertices;
+	}
+	
+	public void setTypeVertices(float[] verts, int[] indices) {
+		
+		for(int index : indices)
+			vertices[index] = verts[index];
 	}
 	
 	/**
@@ -81,5 +87,55 @@ public enum ChroType {
 	 */
 	public byte getVertices() {
 		return VERTICES;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		
+		String description;
+		int i = 0, limit = 3;
+		
+		description = "\nType: " + chroType + "\nVertices:"
+				+ "\nUpper Left:\t( ";
+		
+		for(;i < limit;i++) {
+			description += vertices[i];
+			if(i + 1 < limit)
+				description += ", ";
+		}
+		
+		limit += 3;
+		description += ")\nUpper Right:\t( ";
+		
+		for(;i < limit;i++){
+			description += vertices[i];
+			if(i + 1 < limit)
+				description += ", ";
+		}
+
+		limit += 3;
+		description += ")\nLower Right:\t( ";
+		
+		for(;i < limit;i++) {
+			description += vertices[i];
+			if(i + 1 < limit)
+				description += ", ";
+		}
+
+		limit += 3;
+		description += ")\nLower Left:\t( ";
+		
+		for(;i < limit;i++) {
+			description += vertices[i];
+			if(i + 1 < limit)
+				description += ", ";
+		}
+		
+		description += ")\n";
+		
+		return description;
 	}
 }
