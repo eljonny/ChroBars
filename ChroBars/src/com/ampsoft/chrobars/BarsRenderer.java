@@ -25,6 +25,9 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		minutes = new ChroBar(ChroType.MINUTE, null, activityContext);
 		hours = new ChroBar(ChroType.HOUR, null, activityContext);
 		
+		if(usingMillis)
+			milliseconds = new ChroBar(ChroType.MILLIS, null, activityContext);
+		
 		// Set OpenGL Parameters:
 		// - Background of the OpenGL surface to white
 		// - Smooth GL shader model
@@ -48,11 +51,14 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-		gl.glTranslatef(0, 0, -2);
+		gl.glTranslatef(0, 0, -5);
 
 		hours.draw(gl);
 		minutes.draw(gl);
 		seconds.draw(gl);
+		
+		if(usingMillis)
+			milliseconds.draw(gl);
 		
 		gl.glLoadIdentity();
 	}
@@ -66,10 +72,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glLoadIdentity();
-		GLU.gluPerspective(gl, 45.0f,
-							((float) width)/((float) height),
-							1.0f, 50.0f);
-		gl.glViewport(0, 0, width, height);
+		GLU.gluPerspective(gl, 40.0f, ((float) width)/((float) height), 1.0f, 50.0f);
+//		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 	}
@@ -82,7 +86,14 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		activityContext = context;
 	}
+	
+	protected static boolean usingMilliseconds() {
+		return usingMillis;
+	}
+	
+	//Whether or not to draw the milliseconds bar
+	private static boolean usingMillis = true;
 
-	private ChroBar seconds, minutes, hours;
+	private ChroBar milliseconds, seconds, minutes, hours;
 	private Context activityContext;
 }

@@ -23,10 +23,10 @@ public class ChroSurface extends GLSurfaceView {
 
 		super(context);
 		getHolder().setFormat(PixelFormat.TRANSLUCENT);
-	    setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
+	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
 		rend = new BarsRenderer();
 		rend.setActivityContext(context);
 		setRenderer(rend);
-		setRenderMode(RENDERMODE_WHEN_DIRTY);
+		//setRenderMode(RENDERMODE_WHEN_DIRTY);
 	}
 }

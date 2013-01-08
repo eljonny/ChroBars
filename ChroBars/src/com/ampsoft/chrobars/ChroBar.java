@@ -5,6 +5,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -26,13 +28,15 @@ public class ChroBar {
 	private static final int SECONDS_IN_MINUTE = 60;
 	private static final int MILLIS_IN_SECOND = 1000;
 	private static final int _RGBA_COMPONENTS = 4;
+	private static final int VERTEX_COMPONENTS = 12;
+	private static final int DIMENSIONS = 3;
+	private static final int BYTES_IN_FLOAT = 4;
+	private static final int BYTES_IN_SHORT = 2;
+	private static final int VERTICES = 4;
+	private static final int VERTEX_STRIDE = 0;
 	
 	//Sequence of when to draw each vertex
 	private static final short[] vertexDrawSequence = {0, 1, 2, 0, 2, 3};
-	
-	//Constant arrays of width or height adjustment indexes.
-	private static final int[] heightAdjustIndices = {1, 10};
-	private static final int[] widthAdjustIndices = {0, 3, 6, 9};
 	
 	//Bar pixel margin, shared between all bars
 	private static float barMargin = 5.0f;
@@ -40,11 +44,9 @@ public class ChroBar {
 	//Specifies the color of this bar
 	private int barColor;
 	
-	//Vertex colors
+	//Vertex arrays
 	private float[] vertexColors;
-	
-	//Whether or not to draw the milliseconds bar
-	private boolean usingMillis = false;
+	private float[] vertices;
 	
 	//Type of data this represents
 	private ChroType barType;
@@ -59,7 +61,7 @@ public class ChroBar {
 	//Screen size for the current device is
 	//found using these objects
 	private DisplayMetrics screen = new DisplayMetrics();
-	
+	private Calendar currentTime;
 	private static WindowManager wm;
 	
 	/**
@@ -72,9 +74,11 @@ public class ChroBar {
 		
 		barType = t;
 		
-		//Set vertex colors
-		vertexColors = new float[t.getVertices()*4];
+		//Set vertex arrays
+		vertexColors = new float[VERTICES*_RGBA_COMPONENTS];
+		vertices = new float[VERTEX_COMPONENTS];
 		
+		//Set bar color
 		if(color != null)
 			barColor = color;
 		else {
@@ -102,24 +106,27 @@ public class ChroBar {
 				ChroUtils.getTimeString() +
 				">: Bar color set to " + barColor);
 		
+		//Initialize the vertex array with default values
+		//And get the current window manager
+		initVertices();
 		wm = (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE);
 		
 		//Allocate the raw vertex buffer
-		rawBuffer = ByteBuffer.allocateDirect(barType.getTypeVertices().length*4);
+		rawBuffer = ByteBuffer.allocateDirect(vertices.length*BYTES_IN_FLOAT);
 		rawBuffer.order(ByteOrder.nativeOrder());
 		verticesBuffer = rawBuffer.asFloatBuffer();
-		verticesBuffer.put(barType.getTypeVertices());
+		verticesBuffer.put(vertices);
 		verticesBuffer.position(0);
 		
 		//Allocate the raw color buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertexColors.length*4);
+		rawBuffer = ByteBuffer.allocateDirect(vertexColors.length*BYTES_IN_FLOAT);
 		rawBuffer.order(ByteOrder.nativeOrder());
 		colorBuffer = rawBuffer.asFloatBuffer();
 		colorBuffer.put(vertexColors);
 		colorBuffer.position(0);
 		
 		//Allocate the vertex draw sequence buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertexDrawSequence.length*2);
+		rawBuffer = ByteBuffer.allocateDirect(vertexDrawSequence.length*BYTES_IN_SHORT);
 		rawBuffer.order(ByteOrder.nativeOrder());
 		drawDirection = rawBuffer.asShortBuffer();
 		drawDirection.put(vertexDrawSequence);
@@ -128,13 +135,27 @@ public class ChroBar {
 
 	/**
 	 * 
+	 */
+	private void initVertices() {
+		
+		float[] verts = { -0.5f, 1.0f, 0.0f,    // Upper Left  | 0
+				  		  -0.5f, -0.9f, 0.0f,   // Lower Left  | 1
+						   0.5f, -0.9f, 0.0f,   // Lower Right | 2
+						   0.5f, 1.0f, 0.0f   };// Upper Right | 3
+
+		for(int i = 0; i < VERTEX_COMPONENTS; i++)
+			vertices[i] = verts[i];
+	}
+
+	/**
+	 * 
 	 * @param screenMetrics
 	 * @param verts2 
 	 */
-	private float[] setBarWidth(DisplayMetrics screenMetrics, float[] verts) {
+	private void setBarWidth() {
 
 		//Gather required information
-		float screenWidth = (float)screenMetrics.widthPixels;
+		float screenWidth = (float)screen.widthPixels;
 		float barTypeCode = (float)barType.getType();
 		
 		//Update the bar margin to 5px ratio of screen width
@@ -142,7 +163,7 @@ public class ChroBar {
 		barMargin *= 2.0f;
 		
 		//Perform bar width calculations
-		int numberOfBars = usingMillis  ? 4 : 3;
+		int numberOfBars = BarsRenderer.usingMilliseconds() ? 4 : 3;
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth -= barMargin*2.0f;
 		barWidth *= 2;
@@ -154,13 +175,8 @@ public class ChroBar {
 		float rightXCoordinate = leftXCoordinate + barWidth;
 		
 		//Set the width of this bar
-		verts[0] = verts[3] = leftXCoordinate;
-		verts[6] = verts[9] = rightXCoordinate;
-		
-		//Commit width settings
-		barType.setTypeVertices(verts, widthAdjustIndices);
-		
-		return verts;
+		vertices[0] = vertices[3] = leftXCoordinate;
+		vertices[6] = vertices[9] = rightXCoordinate;
 	}
 
 	/**
@@ -170,34 +186,32 @@ public class ChroBar {
 	private void adjustBarHeight(int type) {
 		
 		wm.getDefaultDisplay().getMetrics(screen);
+		currentTime = Calendar.getInstance(TimeZone.getTimeZone("GMT-0800"), Locale.US);
 		
-		float[] verts = setBarWidth(screen, barType.getTypeVertices());
+		setBarWidth();
 		
 		switch(type) {
 		
 		case 0:
-			verts[1] = verts[10] = ((((float)Calendar.HOUR_OF_DAY/(float)HOURS_IN_DAY)*2.0f)-1.0f);
+			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)HOURS_IN_DAY)*2.0f)-0.5f);
 			break;
 		case 1:
-			verts[1] = verts[10] = ((((float)Calendar.MINUTE/(float)MINUTES_IN_HOUR)*2.0f)-1.0f);
+			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.MINUTE)/(float)MINUTES_IN_HOUR)*2.0f)-0.5f);
 			break;
 		case 2:
-			verts[1] = verts[10] = ((((float)Calendar.SECOND/(float)SECONDS_IN_MINUTE)*2.0f)-1.0f);
+			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.SECOND)/(float)SECONDS_IN_MINUTE)*2.0f)-0.5f);
 			break;
 		case 3:
-			verts[1] = verts[10] = ((((float)Calendar.MILLISECOND/(float)MILLIS_IN_SECOND)*2.0f)-1.0f);
+			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.MILLISECOND)/(float)MILLIS_IN_SECOND)*2.0f)-0.5f);
 			break;
 		
 		default:
 			System.err.print("Invalid type!");
 		}
 		
-		//Commit height adjustment
-		barType.setTypeVertices(verts, heightAdjustIndices);
-		
 		//Reset the OpenGL vertices buffer with updated coordinates
-		verticesBuffer.position(0);
-		verticesBuffer.put(barType.getTypeVertices());
+		verticesBuffer.clear();
+		verticesBuffer.put(vertices);
 		verticesBuffer.position(0);
 	}
 
@@ -217,12 +231,14 @@ public class ChroBar {
 		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		
 		//Tell openGL where the vertex data is and how to use it
-		drawSurface.glVertexPointer(barType.getDimensions(), GL10.GL_FLOAT, 0, verticesBuffer);
-        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT, 0, colorBuffer);
+		drawSurface.glVertexPointer(DIMENSIONS, GL10.GL_FLOAT,
+										VERTEX_STRIDE, verticesBuffer);
+        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
+        									VERTEX_STRIDE, colorBuffer);
         
 		//Draw the bar
 		drawSurface.glDrawElements(GL10.GL_TRIANGLES, vertexDrawSequence.length,
-									GL10.GL_UNSIGNED_BYTE, drawDirection);
+											GL10.GL_UNSIGNED_SHORT, drawDirection);
 		//Clear the buffer space
 		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
@@ -247,15 +263,15 @@ public class ChroBar {
 		
 		barColor = colorInt;
 		
-		int len = vertexColors.length;
+		int colorArrayLength = vertexColors.length;
 		
-		for(int i = 0; i < len; i += 4)
+		for(int i = 0; i < colorArrayLength; i += 4)
 			vertexColors[i] = Color.red(barColor);
-		for(int i = 1; i < len; i += 4)
+		for(int i = 1; i < colorArrayLength; i += 4)
 			vertexColors[i] = Color.green(barColor);
-		for(int i = 2; i < len; i += 4)
+		for(int i = 2; i < colorArrayLength; i += 4)
 			vertexColors[i] = Color.blue(barColor);
-		for(int i = 3; i < len; i += 4)
+		for(int i = 3; i < colorArrayLength; i += 4)
 			vertexColors[i] = Color.alpha(barColor);
 		
 		if(colorBuffer != null) {
