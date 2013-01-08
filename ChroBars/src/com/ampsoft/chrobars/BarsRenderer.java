@@ -73,7 +73,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glLoadIdentity();
 		GLU.gluPerspective(gl, 40.0f, ((float) width)/((float) height), 1.0f, 50.0f);
-//		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 	}
@@ -92,7 +91,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	//Whether or not to draw the milliseconds bar
-	private static boolean usingMillis = true;
+	private static boolean usingMillis = false;
 
 	private ChroBar milliseconds, seconds, minutes, hours;
 	private Context activityContext;

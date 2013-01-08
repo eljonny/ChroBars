@@ -40,6 +40,7 @@ public class ChroBar {
 	
 	//Bar pixel margin, shared between all bars
 	private static float barMargin = 5.0f;
+	private static final float baseHeight = -1.8f;
 	
 	//Specifies the color of this bar
 	private int barColor;
@@ -139,8 +140,8 @@ public class ChroBar {
 	private void initVertices() {
 		
 		float[] verts = { -0.5f, 1.0f, 0.0f,    // Upper Left  | 0
-				  		  -0.5f, -0.9f, 0.0f,   // Lower Left  | 1
-						   0.5f, -0.9f, 0.0f,   // Lower Right | 2
+				  		  -0.5f, baseHeight, 0.0f,   // Lower Left  | 1
+						   0.5f, baseHeight, 0.0f,   // Lower Right | 2
 						   0.5f, 1.0f, 0.0f   };// Upper Right | 3
 
 		for(int i = 0; i < VERTEX_COMPONENTS; i++)
@@ -183,36 +184,43 @@ public class ChroBar {
 	 * 
 	 * @param type
 	 */
-	private void adjustBarHeight(int type) {
+	private void adjustBarHeight() {
 		
 		wm.getDefaultDisplay().getMetrics(screen);
-		currentTime = Calendar.getInstance(TimeZone.getTimeZone("GMT-0800"), Locale.US);
 		
 		setBarWidth();
 		
-		switch(type) {
+		currentTime = Calendar.getInstance(TimeZone.getTimeZone("GMT-0800"), Locale.US);
+		float scalingFactor = 3.62f;
+		float barTopHeight = ChroBar.baseHeight + 0.01f;
 		
-		case 0:
-			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)HOURS_IN_DAY)*2.0f)-0.5f);
-			break;
-		case 1:
-			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.MINUTE)/(float)MINUTES_IN_HOUR)*2.0f)-0.5f);
-			break;
-		case 2:
-			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.SECOND)/(float)SECONDS_IN_MINUTE)*2.0f)-0.5f);
-			break;
-		case 3:
-			vertices[1] = vertices[10] = ((((float)currentTime.get(Calendar.MILLISECOND)/(float)MILLIS_IN_SECOND)*2.0f)-0.5f);
-			break;
-		
-		default:
-			System.err.print("Invalid type!");
-		}
+		//Set the bar height
+		float timeRatio = getRatio();
+		vertices[1] = vertices[10] = barTopHeight + (timeRatio*scalingFactor);
 		
 		//Reset the OpenGL vertices buffer with updated coordinates
 		verticesBuffer.clear();
 		verticesBuffer.put(vertices);
 		verticesBuffer.position(0);
+	}
+
+	private float getRatio() {
+
+		switch(barType.getType()) {
+		
+		case 0:
+			return (float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)HOURS_IN_DAY;
+		case 1:
+			return (float)currentTime.get(Calendar.MINUTE)/(float)MINUTES_IN_HOUR;
+		case 2:
+			return (float)currentTime.get(Calendar.SECOND)/(float)SECONDS_IN_MINUTE;
+		case 3:
+			return (float)currentTime.get(Calendar.MILLISECOND)/(float)MILLIS_IN_SECOND;
+			
+		default:
+			System.err.print("Invalid type!");
+			return 0;
+		}
 	}
 
 	/**
@@ -251,7 +259,7 @@ public class ChroBar {
 			surface = drawSurface;
 	    
 		//Recalculate the bar dimensions in preparation for a redraw
-		adjustBarHeight(barType.getType());
+		adjustBarHeight();
 	}
 	
 	/**
