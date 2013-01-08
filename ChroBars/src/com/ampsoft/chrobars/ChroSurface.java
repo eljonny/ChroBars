@@ -30,8 +30,6 @@ public class ChroSurface extends GLSurfaceView {
 		//Might need this later
 		//HACK
 		//surface = null;
-		setRenderer(new BarsRenderer(context));
-		System.out.println("CHROBARS-AMPSOFT<" + ChroUtils.getTimeString() + ">: Renderer set!");
 	}
 	
 	/**

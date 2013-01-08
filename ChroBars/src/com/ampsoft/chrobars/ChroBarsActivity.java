@@ -22,8 +22,10 @@ public class ChroBarsActivity extends Activity {
 		
 		//setContentView(R.layout.activity_chro_bars);
 		chronos = new ChroSurface(this);
+		chronos.setRenderer(new BarsRenderer(this));
+		System.out.println("CHROBARS-AMPSOFT<" +
+				ChroUtils.getTimeString() + ">: Renderer set!");
 		setContentView(chronos);
-		
 		System.out.println("CHROBARS-AMPSOFT<" +
 				ChroUtils.getTimeString() +
 				">: ChroSurface created and set as content view!");

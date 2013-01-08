@@ -38,10 +38,10 @@ public enum ChroType {
 		else {
 
 			chroType = type;
-			float[] verts = { 5.0f, 10.0f, -0.1f,
-							  10.0f, 10.0f, -0.1f,
-							  10.0f, 0.1f, -0.1f,
-							  5.0f, 0.1f, -0.1f  };
+			float[] verts = { 5.0f, 10.0f, 0.0f,
+							  10.0f, 10.0f, 0.0f,
+							  10.0f, 0.1f, 0.0f,
+							  5.0f, 0.1f, 0.0f  };
 			
 			System.arraycopy(verts, 0, vertices, 0, DIMENSIONS_X_VERTICES);
 		}
