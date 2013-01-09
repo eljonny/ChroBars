@@ -1,17 +1,20 @@
 package com.ampsoft.chrobars;
 
 
-import android.app.ActivityManager;
+import java.util.Locale;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.ConfigurationInfo;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 
 /**
  * 
  * @author jhyry
  *
  */
+@SuppressLint("DefaultLocale")
 public class ChroSurface extends GLSurfaceView {
 	
 	private BarsRenderer rend;
@@ -24,7 +27,13 @@ public class ChroSurface extends GLSurfaceView {
 	public ChroSurface(Context context) {
 
 		super(context);
-		getHolder().setFormat(PixelFormat.TRANSLUCENT);
+		
+		//Set the pixel format
+		if((Build.MANUFACTURER.toLowerCase(Locale.US)).contains("samsung") ||
+		   (Build.MANUFACTURER.toLowerCase(Locale.US)).contains("moto"))
+			getHolder().setFormat(PixelFormat.RGB_565);
+		else
+			getHolder().setFormat(PixelFormat.TRANSLUCENT);
 		
 		//Uncomment if you're having trouble
 	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
@@ -32,15 +41,7 @@ public class ChroSurface extends GLSurfaceView {
 		rend = new BarsRenderer();
 		rend.setActivityContext(context);
 		
-		// Check if the system supports OpenGL ES 2.0.
-		final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-		final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
-		
-		if(supportsEs2)
-			setEGLContextClientVersion(2);
-		else
-			setEGLContextClientVersion(0);
+		setEGLContextClientVersion(1);
 		
 		setRenderer(rend);
 		

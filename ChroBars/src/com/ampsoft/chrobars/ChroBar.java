@@ -256,28 +256,44 @@ public class ChroBar {
 			return;
 		
 		//Set up face culling
+		System.out.println("Calling glFrontFace");
 	    drawSurface.glFrontFace(GL10.GL_CCW);
+	    
+	    System.out.println("Calling glEnable");
 	    drawSurface.glEnable(GL10.GL_CULL_FACE);
+	    
+	    System.out.println("Calling glCullFace");
 	    drawSurface.glCullFace(GL10.GL_BACK);
 		
 	    //Enable the OpenGL vertex array buffer space
+	    System.out.println("Calling glEnableClientState");
 		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		
+		System.out.println("Calling glEnableClientState");
 		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		
 		//Tell openGL where the vertex data is and how to use it
+		System.out.println("Calling glVertexPointer");
 		drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
 										_VERTEX_STRIDE, verticesBuffer);
+		
+		System.out.println("Calling glColorPointer");
         drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
         									_VERTEX_STRIDE, colorBuffer);
         
 		//Draw the bar
+        System.out.println("Calling glDrawElements");
 		drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence.length,
 											GL10.GL_UNSIGNED_SHORT, drawDirection);
 		//Clear the buffer space
+		System.out.println("Calling glDisableClientState");
 		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		
+		System.out.println("Calling glDisableClientState");
 		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		
 		//Disable face culling.
+		System.out.println("Calling glDisable");
 		drawSurface.glDisable(GL10.GL_CULL_FACE);
 	    
 		//Cache the surface
