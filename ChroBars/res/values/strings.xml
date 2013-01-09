@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Application name strings -->
     <string name="app_name">ChroBars</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_about">About ChroBars</string>
+    
+    <!-- Settings strings -->
+    <string name="settings_title">ChroBars Settings</string>
+    <string name="settings_bars_dropdown_title">ChroBars</string>
+    <string name="settings_bar_type">ChroBar</string>
+    <string name="settings_bar_visible">Visible?</string>
+    <string name="settings_bar_pick_color">Color</string>
+    <string name="settings_bar_hour">Hour Bar</string>
+    <string name="settings_bar_minute">Minute Bar</string>
+    <string name="settings_bar_second">Second Bar</string>
+    <string name="settings_bar_millisecond">Millisecond Bar</string>
+    <string name="settings_colorPickerButton">Pick Color</string>
+    
+    <!-- About information strings -->
+    <string name="about_title">ChroBars Credits</string>
+    <string name="about_team_title">Ampsoft Team</string>
+    <string name="about_team_member_jhyry">Jonathan Hyry</string>
+    <string name="about_teamMember_jhyry_role">Code/Testing</string>
+    <string name="about_team_member_tdolen">Travis Dolen</string>
+    <string name="about_teamMember_tdolen_role">Code/Testing</string>
+    <string name="about_team_member_zhaberman">Zachary Haberman</string>
+    <string name="about_teamMember_zhaberman_role">Project Management</string>
 
 </resources>

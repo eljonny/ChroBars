@@ -1,14 +1,11 @@
 package com.ampsoft.chrobars;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
+import android.view.Window;
 
 /**
  * 
@@ -18,10 +15,10 @@ import android.widget.FrameLayout;
 public class ChroBarsActivity extends Activity {
 
 	private ChroSurface chronos;
-	private FrameLayout settings, about;
-	private View frontView;
 	
-	private Animation fadeIn, fadeOut;
+	//Intents for starting the other Activities
+	private Intent settingsIntent;
+	private Intent aboutIntent;
 	
 	/**
 	 * 
@@ -31,22 +28,18 @@ public class ChroBarsActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		
-		//Set up transition animations
-		fadeIn = AnimationUtils.loadAnimation(this, R.anim.anim_fade_in);
-		fadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+		//Remove the title bar
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		frontView = chronos = new ChroSurface(this);
-
-		//setContentView(R.layout.activity_chro_bars);
+		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
+		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
+		
+		settingsIntent.addCategory(Intent.CATEGORY_PREFERENCE);
+		aboutIntent.addCategory(Intent.CATEGORY_DEFAULT);
+		
+		chronos = new ChroSurface(this);
+		
 		setContentView(chronos);
-
-		//Get this Context's LayoutInflater and inflate the settings/about layouts
-		LayoutInflater inflater = getLayoutInflater();
-		
-		settings = (FrameLayout) inflater.inflate(R.layout.menu_settings_chro_bars, null);
-		settings.setVisibility(View.INVISIBLE);
-		about = (FrameLayout) inflater.inflate(R.layout.menu_about_chro_bars, null);
-		about.setVisibility(View.INVISIBLE);
 	}
 
 	/**
@@ -78,35 +71,10 @@ public class ChroBarsActivity extends Activity {
 	}
 	
 	private void aboutChroBars() {
-		frontView.startAnimation(fadeOut);
-		about.setVisibility(View.VISIBLE);
-		about.startAnimation(fadeIn);
-		frontView.setVisibility(View.INVISIBLE);
-		frontView = about;
+		startActivity(aboutIntent);
 	}
 
 	private void chroSettings() {
-		frontView.startAnimation(fadeOut);
-		settings.setVisibility(View.VISIBLE);
-		settings.startAnimation(fadeIn);
-		frontView.setVisibility(View.INVISIBLE);
-		frontView = settings;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void onBackPressed() {
-		
-		if(frontView instanceof ChroSurface)
-			finish();
-		else {
-			frontView.startAnimation(fadeOut);
-			chronos.setVisibility(View.VISIBLE);
-			chronos.startAnimation(fadeIn);
-			frontView.setVisibility(View.INVISIBLE);
-			frontView = chronos;
-		}
+		startActivity(settingsIntent);
 	}
 }

@@ -1,5 +1,7 @@
 package com.ampsoft.chrobars;
 
+import java.util.HashMap;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -21,12 +23,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
-		seconds = new ChroBar(ChroType.SECOND, null, activityContext);
-		minutes = new ChroBar(ChroType.MINUTE, null, activityContext);
-		hours = new ChroBar(ChroType.HOUR, null, activityContext);
-		
-		if(usingMillis)
-			milliseconds = new ChroBar(ChroType.MILLIS, null, activityContext);
+		chroBars.put(ChroType.HOUR, new ChroBar(ChroType.HOUR, null, activityContext));
+		chroBars.put(ChroType.MINUTE, new ChroBar(ChroType.MINUTE, null, activityContext));
+		chroBars.put(ChroType.SECOND, new ChroBar(ChroType.SECOND, null, activityContext));
+		chroBars.put(ChroType.MILLIS, new ChroBar(ChroType.MILLIS, null, activityContext));
 		
 		// Set OpenGL Parameters:
 		// - Background of the OpenGL surface to white
@@ -53,12 +53,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 
 		gl.glTranslatef(0, 0, -5);
 
-		hours.draw(gl);
-		minutes.draw(gl);
-		seconds.draw(gl);
-		
-		if(usingMillis)
-			milliseconds.draw(gl);
+		(chroBars.get(ChroType.HOUR)).draw(gl);
+		(chroBars.get(ChroType.MINUTE)).draw(gl);
+		(chroBars.get(ChroType.SECOND)).draw(gl);
+		(chroBars.get(ChroType.MILLIS)).draw(gl);
 		
 		gl.glLoadIdentity();
 	}
@@ -86,13 +84,23 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		activityContext = context;
 	}
 	
-	protected static boolean usingMilliseconds() {
-		return usingMillis;
+	/**
+	 * 
+	 * @return
+	 */
+	protected static int numberOfBarsToDraw() {
+		
+		return  ( ((chroBars.get(ChroType.HOUR)).isDrawn() ? 1 : 0) +
+				  ((chroBars.get(ChroType.MINUTE)).isDrawn() ? 1 : 0) +
+				  ((chroBars.get(ChroType.SECOND)).isDrawn() ? 1 : 0) +
+				  ((chroBars.get(ChroType.MILLIS)).isDrawn() ? 1 : 0) );
 	}
 	
-	//Whether or not to draw the milliseconds bar
-	private static boolean usingMillis = false;
+	protected static ChroBar getChroBar(ChroType type) {
+		return chroBars.get(type);
+	}
 
-	private ChroBar milliseconds, seconds, minutes, hours;
+	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(4);
+	
 	private Context activityContext;
 }
