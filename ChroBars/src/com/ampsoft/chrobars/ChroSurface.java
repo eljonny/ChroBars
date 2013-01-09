@@ -1,7 +1,9 @@
 package com.ampsoft.chrobars;
 
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 
@@ -29,6 +31,17 @@ public class ChroSurface extends GLSurfaceView {
 		
 		rend = new BarsRenderer();
 		rend.setActivityContext(context);
+		
+		// Check if the system supports OpenGL ES 2.0.
+		final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+		final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
+		
+		if(supportsEs2)
+			setEGLContextClientVersion(2);
+		else
+			setEGLContextClientVersion(0);
+		
 		setRenderer(rend);
 		
 		// TODO Need to figure out this type of rendering
