@@ -293,7 +293,7 @@ public class ChroBar {
 	 * 
 	 * @param colorInt
 	 */
-	protected void changeChroBarColor(int colorInt) {
+	public void changeChroBarColor(int colorInt) {
 		
 		barColor = colorInt;
 		

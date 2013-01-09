@@ -1,4 +1,7 @@
-package com.ampsoft.chrobars;
+package com.ampsoft.chrobars.activities;
+
+import com.ampsoft.chrobars.R;
+import com.ampsoft.chrobars.R.layout;
 
 import android.app.Activity;
 import android.os.Bundle;

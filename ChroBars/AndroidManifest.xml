@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.ampsoft.chrobars.ChroBarsActivity"
+            android:name="com.ampsoft.chrobars.activities.ChroBarsActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,11 +26,11 @@
         </activity>
         
         <activity
-            android:name="com.ampsoft.chrobars.ChroBarsSettingsActivity"
+            android:name="com.ampsoft.chrobars.activities.ChroBarsSettingsActivity"
             android:label="@string/settings_title" />
         
         <activity
-            android:name="com.ampsoft.chrobars.ChroBarsAboutActivity"
+            android:name="com.ampsoft.chrobars.activities.ChroBarsAboutActivity"
             android:label="@string/about_title" />
         
     </application>

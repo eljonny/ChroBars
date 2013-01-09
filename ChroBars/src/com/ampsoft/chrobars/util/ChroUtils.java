@@ -1,6 +1,8 @@
-package com.ampsoft.chrobars;
+package com.ampsoft.chrobars.util;
 
 import java.util.Calendar;
+
+import com.ampsoft.chrobars.ChroBar;
 
 /**
  * 

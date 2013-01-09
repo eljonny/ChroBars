@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ampsoft.chrobars;
+package com.ampsoft.chrobars.util;
 
 import android.os.Bundle;
 import android.app.Dialog;
