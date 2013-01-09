@@ -90,11 +90,13 @@
 	            <CheckBox
 	                android:id="@+id/chrobars_settings_slidingDrawer_chkbxHours"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:checked="true" />
+	                android:checked="false"
+	                android:longClickable="false" />
 	            
 	            <Button
 	                android:id="@+id/chrobars_settings_slidingDrawer_btnHoursColorPicker"
 	                android:layout_gravity="center_vertical|center_horizontal"
+	                android:longClickable="false"
 	                android:text="@string/settings_colorPickerButton" />
 	            
             </TableRow>
@@ -112,12 +114,14 @@
 	            <CheckBox
 	                android:id="@+id/chrobars_settings_slidingDrawer_chkbxMinutes"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:checked="true" />
+	                android:checked="false"
+	                android:longClickable="false" />
 	            
 	            <Button
 	                android:id="@+id/chrobars_settings_slidingDrawer_btnMinutesColorPicker"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:text="@string/settings_colorPickerButton"  />
+	                android:longClickable="false"
+	                android:text="@string/settings_colorPickerButton" />
             
             </TableRow>
             <TableRow 
@@ -134,12 +138,14 @@
 	            <CheckBox
 	                android:id="@+id/chrobars_settings_slidingDrawer_chkbxSeconds"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:checked="true" />
+	                android:checked="false"
+	                android:longClickable="false" />
 	            
 	            <Button
 	                android:id="@+id/chrobars_settings_slidingDrawer_btnSecondsColorPicker"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:text="@string/settings_colorPickerButton"  />
+	                android:longClickable="false"
+	                android:text="@string/settings_colorPickerButton" />
 
             </TableRow>
             <TableRow 
@@ -156,12 +162,14 @@
 	            <CheckBox
 	                android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:checked="true" />
+	                android:checked="false"
+	                android:longClickable="false" />
 	            
 	            <Button
 	                android:id="@+id/chrobars_settings_slidingDrawer_btnMillisecondsColorPicker"
 	                android:layout_gravity="center_vertical|center_horizontal"
-	                android:text="@string/settings_colorPickerButton"  />
+	                android:longClickable="false"
+	                android:text="@string/settings_colorPickerButton" />
             
             </TableRow>
             

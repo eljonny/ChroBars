@@ -33,11 +33,14 @@ public class ChroBar {
 	private static final int _BYTES_IN_SHORT = 2;
 	private static final int _VERTICES = 4;
 	private static final int _VERTEX_STRIDE = 0;
+	private static final int _MAX_BARS_TO_DRAW = 4;
 	
 	private static final short[] _vertexDrawSequence = {0, 1, 2, 0, 2, 3};
 	
-	//Bar pixel margin, shared between all bars
+	//Bar pixel margin and visibility array,
+	//Shared between all bars
 	private static float barMargin = 5.0f;
+	private static boolean[] visible = new boolean[_MAX_BARS_TO_DRAW];
 	
 	//Base Y-Coordinate from which to draw a ChroBar
 	private static final float _baseHeight = -1.8f;
@@ -80,6 +83,10 @@ public class ChroBar {
 		
 		barType = t;
 		
+		if(barType.getType() == 0)
+			for(int i = 0; i < visible.length; i++)
+				visible[i] = true;
+		
 		//Set vertex arrays
 		vertexColors = new float[_VERTICES*_RGBA_COMPONENTS];
 		vertices = new float[_VERTEX_COMPONENTS];
@@ -88,6 +95,7 @@ public class ChroBar {
 		if(color != null)
 			barColor = color;
 		else {
+			
 			switch(barType.getType()) {
 			
 			case 0:
@@ -153,8 +161,8 @@ public class ChroBar {
 	 * 
 	 * @param toDraw
 	 */
-	protected void setDrawBar(boolean toDraw) {
-		drawBar = toDraw;
+	public void setDrawBar(boolean toDraw) {
+		visible[barType.getType()] = drawBar = toDraw;
 	}
 	
 	/**
@@ -185,6 +193,21 @@ public class ChroBar {
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth -= barMargin*2.0f;
 		barWidth *= 2;
+		
+		barTypeCode -= (_MAX_BARS_TO_DRAW - numberOfBars);
+		
+		if(barType.getType() < 3)
+			for(int i = barType.getType() + 1; i < _MAX_BARS_TO_DRAW; i++)
+				if(!visible[i])
+					++barTypeCode;
+		else if(barType.getType() < 2)
+			for(int j = barType.getType() - 1; j >= 0; j--)
+				if(!visible[j])
+					--barTypeCode;
+		
+		if(barTypeCode < 0)
+			while(barTypeCode < 0)
+				barTypeCode++;
 		
 		float leftXCoordinate = barMargin +
 				(barWidth * barTypeCode) + (barMargin * barTypeCode) +
@@ -252,56 +275,56 @@ public class ChroBar {
 
 		//If this bar should not be drawn, exit
 		//The method
-		if(!drawBar)
-			return;
+		if(drawBar) {
 		
-		//Set up face culling
-		System.out.println("Calling glFrontFace");
-	    drawSurface.glFrontFace(GL10.GL_CCW);
-	    
-	    System.out.println("Calling glEnable");
-	    drawSurface.glEnable(GL10.GL_CULL_FACE);
-	    
-	    System.out.println("Calling glCullFace");
-	    drawSurface.glCullFace(GL10.GL_BACK);
-		
-	    //Enable the OpenGL vertex array buffer space
-	    System.out.println("Calling glEnableClientState");
-		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		
-		System.out.println("Calling glEnableClientState");
-		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
-		
-		//Tell openGL where the vertex data is and how to use it
-		System.out.println("Calling glVertexPointer");
-		drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
-										_VERTEX_STRIDE, verticesBuffer);
-		
-		System.out.println("Calling glColorPointer");
-        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
-        									_VERTEX_STRIDE, colorBuffer);
-        
-		//Draw the bar
-        System.out.println("Calling glDrawElements");
-		drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence.length,
-											GL10.GL_UNSIGNED_SHORT, drawDirection);
-		//Clear the buffer space
-		System.out.println("Calling glDisableClientState");
-		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		
-		System.out.println("Calling glDisableClientState");
-		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
-		
-		//Disable face culling.
-		System.out.println("Calling glDisable");
-		drawSurface.glDisable(GL10.GL_CULL_FACE);
-	    
-		//Cache the surface
-	    if(surface == null)
-			surface = drawSurface;
-	    
-		//Recalculate the bar dimensions in preparation for a redraw
-		adjustBarHeight();
+			//Set up face culling
+			//System.out.println("Calling glFrontFace");
+		    drawSurface.glFrontFace(GL10.GL_CCW);
+		    
+		    //System.out.println("Calling glEnable");
+		    drawSurface.glEnable(GL10.GL_CULL_FACE);
+		    
+		    //System.out.println("Calling glCullFace");
+		    drawSurface.glCullFace(GL10.GL_BACK);
+			
+		    //Enable the OpenGL vertex array buffer space
+		    //System.out.println("Calling glEnableClientState");
+			drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			
+			//System.out.println("Calling glEnableClientState");
+			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+			
+			//Tell openGL where the vertex data is and how to use it
+			//System.out.println("Calling glVertexPointer");
+			drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
+											_VERTEX_STRIDE, verticesBuffer);
+			
+			//System.out.println("Calling glColorPointer");
+	        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
+	        									_VERTEX_STRIDE, colorBuffer);
+	        
+			//Draw the bar
+	        //System.out.println("Calling glDrawElements");
+			drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence.length,
+												GL10.GL_UNSIGNED_SHORT, drawDirection);
+			//Clear the buffer space
+			//System.out.println("Calling glDisableClientState");
+			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			
+			//System.out.println("Calling glDisableClientState");
+			drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			
+			//Disable face culling.
+			//System.out.println("Calling glDisable");
+			drawSurface.glDisable(GL10.GL_CULL_FACE);
+		    
+			//Cache the surface
+		    if(surface == null)
+				surface = drawSurface;
+		    
+			//Recalculate the bar dimensions in preparation for a redraw
+			adjustBarHeight();
+		}
 	}
 	
 	/**

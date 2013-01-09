@@ -17,7 +17,7 @@ import android.os.Build;
 @SuppressLint("DefaultLocale")
 public class ChroSurface extends GLSurfaceView {
 	
-	private BarsRenderer rend;
+	private static BarsRenderer rend;
 	
 	/**
 	 * 
@@ -54,7 +54,7 @@ public class ChroSurface extends GLSurfaceView {
 	 * 
 	 * @return
 	 */
-	protected BarsRenderer getRenderer() {
+	public static BarsRenderer getRenderer() {
 		return rend;
 	}
 }

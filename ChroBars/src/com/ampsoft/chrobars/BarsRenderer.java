@@ -35,22 +35,22 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		// - Enable the OpenGL depth testing
 		// - Set the OpenGL depth testing function to be used
 		// - Use NICEST perspective correction.
-		System.out.println("Calling glClearColor");
+		//System.out.println("Calling glClearColor");
 		gl.glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
 		
-		System.out.println("Calling glShadeModel");
+		//System.out.println("Calling glShadeModel");
 		gl.glShadeModel(GL10.GL_SMOOTH);
 		
-		System.out.println("Calling glClearDepth");
+		//System.out.println("Calling glClearDepth");
 		gl.glClearDepthf(1.0f);
 		
-		System.out.println("Calling glEnable");
+		//System.out.println("Calling glEnable");
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		
-		System.out.println("Calling glDepthFunc");
+		//System.out.println("Calling glDepthFunc");
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		
-		System.out.println("Calling glHint");
+		//System.out.println("Calling glHint");
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
 	
@@ -59,10 +59,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		System.out.println("Calling glClear");
+		//System.out.println("Calling glClear");
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		
-		System.out.println("Calling glTranslate");
+		//System.out.println("Calling glTranslate");
 		gl.glTranslatef(0, 0, -5);
 
 		(chroBars.get(ChroType.HOUR)).draw(gl);
@@ -70,7 +70,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		(chroBars.get(ChroType.SECOND)).draw(gl);
 		(chroBars.get(ChroType.MILLIS)).draw(gl);
 		
-		System.out.println("Calling glLoadIdentity");
+		//System.out.println("Calling glLoadIdentity");
 		gl.glLoadIdentity();
 	}
 
@@ -80,22 +80,22 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		//Readjusts the surface to match the current conditions
-		System.out.println("Calling glViewport");
+		//System.out.println("Calling glViewport");
 		gl.glViewport(0, 0, width, height);
 		
-		System.out.println("Calling glMatrixMode");
+		//System.out.println("Calling glMatrixMode");
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		
-		System.out.println("Calling glLoadIdentity");
+		//System.out.println("Calling glLoadIdentity");
 		gl.glLoadIdentity();
 		
-		System.out.println("Calling GLU.gluPerspective");
+		//System.out.println("Calling GLU.gluPerspective");
 		GLU.gluPerspective(gl, 40.0f, ((float) width)/((float) height), 1.0f, 50.0f);
 		
-		System.out.println("Calling glMatrixMode");
+		//System.out.println("Calling glMatrixMode");
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		
-		System.out.println("Calling glLoadIdentity");
+		//System.out.println("Calling glLoadIdentity");
 		gl.glLoadIdentity();
 	}
 	
@@ -120,7 +120,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 				  ((chroBars.get(ChroType.MILLIS)).isDrawn() ? 1 : 0) );
 	}
 	
-	protected static ChroBar getChroBar(ChroType type) {
+	public static ChroBar getChroBar(ChroType type) {
 		return chroBars.get(type);
 	}
 
