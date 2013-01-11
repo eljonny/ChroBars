@@ -8,15 +8,18 @@
     
     <!-- Settings strings -->
     <string name="settings_title">ChroBars Settings</string>
-    <string name="settings_bars_dropdown_title">ChroBars</string>
-    <string name="settings_bar_type">ChroBar</string>
-    <string name="settings_bar_visible">Visible?</string>
-    <string name="settings_bar_pick_color">Color</string>
-    <string name="settings_bar_hour">Hour Bar</string>
-    <string name="settings_bar_minute">Minute Bar</string>
-    <string name="settings_bar_second">Second Bar</string>
-    <string name="settings_bar_millisecond">Millisecond Bar</string>
+    <string name="settings_bars_dropdown_title_chrobars">ChroBars</string>
+    <string name="settings_bars_dropdown_title_general">General</string>
+    <string name="settings_general_precision">Motion Precision</string>
+    <string name="settings_bars_type">ChroBar</string>
+    <string name="settings_bars_visible">Visible?</string>
+    <string name="settings_bars_pick_color">Color</string>
+    <string name="settings_bars_hour">Hour Bar</string>
+    <string name="settings_bars_minute">Minute Bar</string>
+    <string name="settings_bars_second">Second Bar</string>
+    <string name="settings_bars_millisecond">Millisecond Bar</string>
     <string name="settings_colorPickerButton">Pick Color</string>
+    <string name="settings_bars_toastMessage_noneChecked">Please check at least one chrobar to display.</string>
     
     <!-- About information strings -->
     <string name="about_title">ChroBars Credits</string>

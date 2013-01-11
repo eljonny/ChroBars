@@ -1,5 +1,6 @@
 package com.ampsoft.chrobars.util;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.ampsoft.chrobars.ChroBar;
@@ -10,7 +11,9 @@ import com.ampsoft.chrobars.ChroBar;
  *
  */
 public class ChroUtils {
-
+	
+	private static ArrayList<Integer> colorPickerHistory = new ArrayList<Integer>();
+	
 	/**
 	 * 
 	 * @return
@@ -53,5 +56,50 @@ public class ChroUtils {
 											int alpha, int red,
 											int green, int blue) {
 		toChange.changeChroBarColor(alpha, red, green, blue);
+	}
+
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static void barColorChosen(int color) {
+		colorPickerHistory.add(color);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Integer getLastColorPickerChoice() {
+		
+		if(colorPickerHistory.isEmpty())
+			return null;
+		else
+			return colorPickerHistory.get(colorPickerHistory.size()-1);
+	}
+	
+	/**
+	 * 
+	 * @param historyIndex
+	 * @return
+	 */
+	public static int getColorPickerHistoryItem(int historyIndex) {
+		return colorPickerHistory.get(historyIndex);
+	}
+	
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static Integer getColorPickerHistoryColor(int color) {
+		
+			int historyItemIndex = colorPickerHistory.indexOf(color);
+			
+			if(historyItemIndex == -1)
+				return null;
+			else
+				return colorPickerHistory.get(historyItemIndex);
 	}
 }

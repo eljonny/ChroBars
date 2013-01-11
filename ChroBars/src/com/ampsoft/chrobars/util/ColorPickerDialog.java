@@ -26,7 +26,7 @@ import android.view.View;
 public class ColorPickerDialog extends Dialog {
 
     public interface OnColorChangedListener {
-        void colorChanged(int color);
+        void colorChanged(int alpha, int color);
     }
 
     private OnColorChangedListener mListener;
@@ -203,9 +203,11 @@ public class ColorPickerDialog extends Dialog {
                 case MotionEvent.ACTION_UP:
                     if (mTrackingCenter) {
                         if (inCenter) {
-                            mListener.colorChanged(mCenterPaint.getColor());
+                            mListener.colorChanged(mCenterPaint.getAlpha(),
+                            					   mCenterPaint.getColor() );
                         }
                         mTrackingCenter = false;    // so we draw w/o halo
+                        
                         invalidate();
                     }
                     break;
@@ -227,8 +229,8 @@ public class ColorPickerDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         OnColorChangedListener l = new OnColorChangedListener() {
-            public void colorChanged(int color) {
-                mListener.colorChanged(color);
+            public void colorChanged(int alpha, int color) {
+                mListener.colorChanged(alpha, color);
                 dismiss();
             }
         };

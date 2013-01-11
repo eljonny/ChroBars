@@ -339,13 +339,13 @@ public class ChroBar {
 		int colorArrayLength = vertexColors.length;
 		
 		for(int i = 0; i < colorArrayLength; i += 4)
-			vertexColors[i] = Color.red(barColor);
+			vertexColors[i] = (float)Color.red(barColor)/255.0f;
 		for(int i = 1; i < colorArrayLength; i += 4)
-			vertexColors[i] = Color.green(barColor);
+			vertexColors[i] = (float)Color.green(barColor)/255.0f;
 		for(int i = 2; i < colorArrayLength; i += 4)
-			vertexColors[i] = Color.blue(barColor);
+			vertexColors[i] = (float)Color.blue(barColor)/255.0f;
 		for(int i = 3; i < colorArrayLength; i += 4)
-			vertexColors[i] = Color.alpha(barColor);
+			vertexColors[i] = (float)Color.alpha(barColor)/255.0f;
 		
 		if(colorBuffer != null) {
 			colorBuffer.position(0);
@@ -399,5 +399,9 @@ public class ChroBar {
 		
 		return "ChroBar Object " + this.hashCode() +
 				"\nType:\n" + barType + "\nColor: " + barColor;
+	}
+
+	public int getBarColor() {
+		return barColor;
 	}
 }
