@@ -3,6 +3,11 @@ package com.ampsoft.chrobars.util;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.app.Activity;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.ampsoft.chrobars.ChroBar;
 
 /**
@@ -101,5 +106,11 @@ public class ChroUtils {
 				return null;
 			else
 				return colorPickerHistory.get(historyItemIndex);
+	}
+	
+	
+	public void setViewBackground(Activity activity, int color) {
+	    View activityView1 = activity.getWindow().getDecorView();
+	    activityView1.setBackgroundColor(color);
 	}
 }

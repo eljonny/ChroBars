@@ -6,6 +6,7 @@ import com.ampsoft.chrobars.R.id;
 import com.ampsoft.chrobars.R.menu;
 
 import android.app.Activity;
+import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,11 +20,14 @@ import android.view.Window;
  */
 public class ChroBarsActivity extends Activity {
 
-	private ChroSurface chronos;
+	private static ChroSurface chronos;
 	
 	//Intents for starting the other Activities
 	private Intent settingsIntent;
 	private Intent aboutIntent;
+	
+	//For managing the child activities
+	private static LocalActivityManager activityManager;
 	
 	/**
 	 * 
@@ -32,6 +36,8 @@ public class ChroBarsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
+		
+		activityManager = new LocalActivityManager(this, true);
 		
 		//Remove the title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);

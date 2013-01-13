@@ -36,6 +36,7 @@ public class ChroBarsSettingsActivity extends Activity
 	
 	private ArrayList<CheckBox> checkBoxes = new ArrayList<CheckBox>();
 	private ArrayList<Button> buttons = new ArrayList<Button>();
+	private ArrayList<SeekBar> sliders = new ArrayList<SeekBar>();
 	
 	private static SlidingDrawer settingsDrawer;
 	private static TableLayout settingsLayoutContainer;
@@ -47,8 +48,6 @@ public class ChroBarsSettingsActivity extends Activity
 						  minute = BarsRenderer.getChroBar(ChroType.MINUTE),
 						  second = BarsRenderer.getChroBar(ChroType.SECOND),
 						  millisecond = BarsRenderer.getChroBar(ChroType.MILLIS);
-
-	private ArrayList<SeekBar> sliders = new ArrayList<SeekBar>();
 	/**
 	 * 
 	 */
@@ -118,9 +117,13 @@ public class ChroBarsSettingsActivity extends Activity
 		switch(button.getId()) {
 		
 		case R.id.chrobars_settings_slidingDrawer_chrobarsGeneralHandleButton:
-			getLayoutInflater().inflate(R.layout.chrobars_general_settings, (ViewGroup) settingsLayoutContainer);
-			processTouchableUIElements();
-			settingsDrawer.animateOpen();
+			if(atLeastOneCheckBoxChecked()) {
+				getLayoutInflater().inflate(R.layout.chrobars_general_settings, (ViewGroup) settingsLayoutContainer);
+				processTouchableUIElements();
+				settingsDrawer.animateOpen();
+			}
+			else
+				notifyNoCheckedBoxes();
 			break;
 		case R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton:
 			getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
@@ -128,8 +131,64 @@ public class ChroBarsSettingsActivity extends Activity
 			settingsDrawer.animateOpen();
 			break;
 		default:
-			//Do nothing for now, unknown button
+			generalSettings(button);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void notifyNoCheckedBoxes() {
+		
+		Toast message = new Toast(this);
+		message.setText(R.string.settings_bars_toastMessage_noneChecked);
+		message.show();
+	}
+
+	/**
+	 * 
+	 * @param button
+	 */
+	private void generalSettings(Button button) {
+
+		switch(button.getId()) {
+		
+		case R.id.chrobars_settings_setBackgroundButton:
+			pickBackgroundColor();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void pickBackgroundColor() {
+		
+		final View mainActivityView = ;
+		
+		/**
+		 * 
+		 */
+		listening =	new OnColorChangedListener() {
+							
+							/**
+							 * 
+							 */
+							private View background = mainActivityView;
+							
+							/**
+							 * 
+							 */
+							@Override
+							public void colorChanged(int alpha, int rgb) {
+								
+								int colorInt = Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
+								
+								background.setBackgroundColor(colorInt);
+							}
+						};
+						
+		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, mainActivityView.getSolidColor());
+		 picker.show();
 	}
 
 	/**
@@ -154,10 +213,10 @@ public class ChroBarsSettingsActivity extends Activity
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
-								ChroUtils.barColorChosen(Color.argb
-										(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb)));
-								ChroUtils.changeChroBarColor(bar,
-										Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb)));
+								int colorInt = Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
+								
+								ChroUtils.barColorChosen(colorInt);
+								ChroUtils.changeChroBarColor(bar, colorInt);
 							}
 						};
 						
@@ -198,11 +257,8 @@ public class ChroBarsSettingsActivity extends Activity
 
 		if(atLeastOneCheckBoxChecked())
 			finish();
-		else {
-			Toast message = new Toast(this);
-			message.setText(R.string.settings_bars_toastMessage_noneChecked);
-			message.show();
-		}
+		else
+			notifyNoCheckedBoxes();
 	}
 	
 	/**
@@ -265,7 +321,12 @@ public class ChroBarsSettingsActivity extends Activity
 	 * @return
 	 */
 	private boolean atLeastOneCheckBoxChecked() {
-
+		
+		//Someone pressed back on the general settings
+		//Screen so this has already been checked
+		if(checkBoxes.isEmpty())
+			return true;
+		
 		byte checkedBoxes = 0;
 		
 		for(CheckBox check : checkBoxes)

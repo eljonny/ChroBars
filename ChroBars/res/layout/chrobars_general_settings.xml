@@ -14,6 +14,8 @@
             android:id="@+id/chrobars_settings_slidingDrawer_lblPrecision"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
             android:text="@string/settings_general_precision"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -21,6 +23,7 @@
             android:id="@+id/seekBar1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
             android:max="3"
             android:progress="1" />
 
@@ -30,6 +33,24 @@
         android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_columnTitles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/settings_general_pickBackgroundColor"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <Button
+            android:id="@+id/chrobars_settings_setBackgroundButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="@string/settings_colorPickerButton" />
+
     </TableRow>
 
     <TableRow
