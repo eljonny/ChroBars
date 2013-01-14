@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * This file has been modified by Jonathan Hyry for use with the ChroBars 
+ * android app project.
  */
 
 package com.ampsoft.chrobars.util;
@@ -30,17 +33,44 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 
+/**
+ * 
+ * @author Google
+ * @author Jonathan Hyry
+ *
+ */
 public class ColorPickerDialog extends Dialog {
 
-    public interface OnColorChangedListener {
-        void colorChanged(int alpha, int color);
-    }
-
-    private OnColorChangedListener mListener;
-    private int mInitialColor;
-
+    /**
+     * 
+     * @author Google
+     * @author jon
+     *
+     */
     private static class ColorPickerView extends View {
+
+        private static final int CENTER_X = 100;
+        private static final int CENTER_Y = 100;
+        private static final int CENTER_RADIUS = 32;
+        
+        private static final float PI = 3.1415926f;
+
+        private boolean saturationChanged;
+        private boolean mTrackingCenter;
+        private boolean mHighlightCenter;
+		private int windowHeight;
+		private int _BOTTOM_DIALOG_MARGIN = 15;
+		private int _SATURATION = 1;
+		private int _LIGHTNESS = 2;
+		private int _SIDE_MARGIN = 20;
+    	private float lightnessRectConstraint, saturationGradientTopMargin, rectStrokeWidth,
+						circleConstraint, lightnessGradientTopMargin, saturationRectConstraint;
+        private double maxLightness_Angle, minLightness_Angle,
+        			   maxSaturation_Angle, minSaturation_Angle;
     	
+        private final int[] mColors, mLightness;
+		private int[] mSaturation;
+		
         private Paint mPaint;
         private Paint mCenterPaint;
         private Paint mLightnessPaint;
@@ -49,18 +79,14 @@ public class ColorPickerDialog extends Dialog {
     	
         private RectF mOuterColorsRectF, mLightnessRectF, mSaturationRectF;
         
-        private final int[] mColors, mLightness;
-		private int[] mSaturation;
-        
         private OnColorChangedListener mListener;
         
-        private float lightnessRectConstraint, saturationGradientTopMargin, rectStrokeWidth,
-        				circleConstraint, lightnessGradientTopMargin, saturationRectConstraint;
-        
-        private double maxLightness_Angle, minLightness_Angle,
-        			   maxSaturation_Angle, minSaturation_Angle;
-		private int _SIDE_MARGIN = 20;
-        
+        /**
+         * 
+         * @param c
+         * @param l
+         * @param color
+         */
         ColorPickerView(Context c, OnColorChangedListener l, int color) {
         	
             super(c);
@@ -134,15 +160,10 @@ public class ColorPickerDialog extends Dialog {
             windowHeight = CENTER_Y+(int)lightnessRectConstraint+
             	(int)(saturationRectConstraint/4.0f)+_BOTTOM_DIALOG_MARGIN;
         }
-        
-        private boolean mTrackingCenter;
-        private boolean mHighlightCenter;
-		private int windowHeight;
-		private int _BOTTOM_DIALOG_MARGIN = 15;
-		private int _SATURATION = 1;
-		private int _LIGHTNESS = 2;
-		private boolean saturationChanged;
 
+        /**
+         * 
+         */
         @Override 
         protected void onDraw(Canvas canvas) {
 
@@ -177,6 +198,10 @@ public class ColorPickerDialog extends Dialog {
             System.out.println("Lightness angles | Min: " + minLightness_Angle + "Max: " + maxLightness_Angle);
         }
         
+        /**
+         * 
+         * @return
+         */
         private Shader getNewSaturationGradient() {
         	
         	float[] initColorHSV = new float[3];
@@ -192,6 +217,9 @@ public class ColorPickerDialog extends Dialog {
 										 mSaturation, null, Shader.TileMode.CLAMP);
 		}
 
+        /**
+         * 
+         */
 		@Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             
@@ -217,15 +245,22 @@ public class ColorPickerDialog extends Dialog {
             maxLightness_Angle = PI+Math.atan2(bottomRightY, bottomRightX);
             minLightness_Angle = PI+Math.atan2(bottomLeftY, bottomLeftX);
         }
-        
-        private static final int CENTER_X = 100;
-        private static final int CENTER_Y = 100;
-        private static final int CENTER_RADIUS = 32;
 
+		/**
+		 * 
+		 * @param x
+		 * @return
+		 */
         private int floatToByte(float x) {
             int n = java.lang.Math.round(x);
             return n;
         }
+        
+        /**
+         * 
+         * @param n
+         * @return
+         */
         private int pinToByte(int n) {
             if (n < 0) {
                 n = 0;
@@ -235,10 +270,23 @@ public class ColorPickerDialog extends Dialog {
             return n;
         }
         
+        /**
+         * 
+         * @param s
+         * @param d
+         * @param p
+         * @return
+         */
         private int ave(int s, int d, float p) {
             return s + java.lang.Math.round(p * (d - s));
         }
         
+        /**
+         * 
+         * @param colors
+         * @param unit
+         * @return
+         */
         private int interpColor(int colors[], float unit) {
             if (unit <= 0) {
                 return colors[0];
@@ -261,8 +309,13 @@ public class ColorPickerDialog extends Dialog {
             
             return Color.argb(a, r, g, b);
         }
-        
-        @SuppressWarnings("unused")
+
+        /**
+         * 
+         * @param color
+         * @param rad
+         * @return
+         */
 		private int rotateColor(int color, float rad) {
             float deg = rad * 180 / 3.1415927f;
             int r = Color.red(color);
@@ -285,11 +338,12 @@ public class ColorPickerDialog extends Dialog {
             int ib = floatToByte(a[10] * r + a[11] * g + a[12] * b);
             
             return Color.argb(Color.alpha(color), pinToByte(ir),
-                              pinToByte(ig), pinToByte(ib));
+                              		pinToByte(ig), pinToByte(ib));
         }
-        
-        private static final float PI = 3.1415926f;
 
+		/**
+		 * 
+		 */
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX() - CENTER_X;
@@ -361,16 +415,42 @@ public class ColorPickerDialog extends Dialog {
             return true;
         }
 
-		private int setColor_SorL(int color, double percent, int value) {
+        /**
+         * 
+         * @param color
+         * @param percent
+         * @param valueToSet
+         * @return
+         */
+		private int setColor_SorL(int color, double percent, int valueToSet) {
 			
 			float[] hsv = new float[3];
 			Color.colorToHSV(color, hsv);
-			hsv[value] = (float)percent;
+			hsv[valueToSet] = (float)percent;
 			
 			return Color.HSVToColor(Color.alpha(color), hsv);
 		}
     }
 
+    private int mInitialColor;
+    private OnColorChangedListener mListener;
+
+	/**
+	 * 
+	 * @author Google
+	 * @author Jonathan hyry
+	 *
+	 */
+    public interface OnColorChangedListener {
+        void colorChanged(int alpha, int color);
+    }
+
+    /**
+     * 
+     * @param context
+     * @param listener
+     * @param initialColor
+     */
     public ColorPickerDialog(Context context,
                              OnColorChangedListener listener,
                              int initialColor) {
@@ -380,6 +460,9 @@ public class ColorPickerDialog extends Dialog {
         mInitialColor = initialColor;
     }
 
+    /**
+     * 
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
