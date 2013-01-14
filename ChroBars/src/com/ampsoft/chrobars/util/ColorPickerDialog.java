@@ -16,10 +16,17 @@
 
 package com.ampsoft.chrobars.util;
 
-import android.os.Bundle;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
+import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -33,46 +40,122 @@ public class ColorPickerDialog extends Dialog {
     private int mInitialColor;
 
     private static class ColorPickerView extends View {
+    	
         private Paint mPaint;
         private Paint mCenterPaint;
-    	private RectF mRectF;
-        private final int[] mColors;
+        private Paint mLightnessPaint;
+        private Paint mSaturationPaint;
+        private Shader saturationGradient;
+    	
+        private RectF mOuterColorsRectF, mLightnessRectF, mSaturationRectF;
+        
+        private final int[] mColors, mLightness;
+		private int[] mSaturation;
+        
         private OnColorChangedListener mListener;
         
-        private float r;
+        private float lightnessRectConstraint, saturationGradientTopMargin, rectStrokeWidth,
+        				circleConstraint, lightnessGradientTopMargin, saturationRectConstraint;
+        
+        private double maxLightness_Angle, minLightness_Angle,
+        			   maxSaturation_Angle, minSaturation_Angle;
+		private int _SIDE_MARGIN = 20;
         
         ColorPickerView(Context c, OnColorChangedListener l, int color) {
+        	
             super(c);
             mListener = l;
+            
             mColors = new int[] {
                 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00,
                 0xFFFFFF00, 0xFFFF0000
             };
-            Shader s = new SweepGradient(0, 0, mColors, null);
+            
+            mLightness = new int[] { 0x00000000, 0xFFFFFFFF };
+            
+            float[] initColorHSV = new float[3];
+            Color.colorToHSV(color, initColorHSV);
+            initColorHSV[1] = 0.0f;
+            int zeroSaturation = Color.HSVToColor(initColorHSV);
+            
+            mSaturation = new int[] { zeroSaturation, color };
+            
+            Shader outerRing = new SweepGradient(0, 0, mColors, null);
             
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mPaint.setShader(s);
+            mPaint.setShader(outerRing);
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setStrokeWidth(32);
             
             mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mCenterPaint.setColor(color);
             mCenterPaint.setStrokeWidth(5);
+
+            rectStrokeWidth = mPaint.getStrokeWidth()*0.5f;
+            lightnessRectConstraint = CENTER_Y + mPaint.getStrokeWidth() + 0.75f*(rectStrokeWidth);
+            lightnessGradientTopMargin = mPaint.getStrokeWidth() + 0.75f*(rectStrokeWidth);
+            saturationRectConstraint = lightnessRectConstraint + _BOTTOM_DIALOG_MARGIN*2 + rectStrokeWidth;
+            saturationGradientTopMargin = _BOTTOM_DIALOG_MARGIN*2;
             
-            r = CENTER_X - mPaint.getStrokeWidth()*0.5f;
-            mRectF = new RectF(-r, -r, r, r);
+            Shader lightnessGradient = new LinearGradient(-CENTER_X, lightnessRectConstraint,
+            											   CENTER_X, lightnessRectConstraint +
+            																rectStrokeWidth,
+            											   mLightness, null, Shader.TileMode.CLAMP);
+            
+            saturationGradient = new LinearGradient(-CENTER_X, saturationRectConstraint,
+													 CENTER_X, saturationRectConstraint +
+																			rectStrokeWidth,
+													 mSaturation, null, Shader.TileMode.CLAMP);
+            
+            mLightnessPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mLightnessPaint.setShader(lightnessGradient);
+            mLightnessPaint.setStyle(Paint.Style.STROKE);
+            mLightnessPaint.setStrokeWidth(rectStrokeWidth);
+            
+            mSaturationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mSaturationPaint.setShader(saturationGradient);
+            mSaturationPaint.setStyle(Paint.Style.STROKE);
+            mSaturationPaint.setStrokeWidth(rectStrokeWidth);
+            
+            circleConstraint = CENTER_X - mPaint.getStrokeWidth()*0.5f;
+            
+            mOuterColorsRectF = new RectF(-circleConstraint,
+            							  -circleConstraint,
+            							  circleConstraint,
+            							  circleConstraint  );
+            
+            mLightnessRectF = new RectF(-CENTER_X+_SIDE_MARGIN, lightnessRectConstraint,
+            							 CENTER_X-_SIDE_MARGIN, lightnessRectConstraint -
+            							 			mLightnessPaint.getStrokeWidth());
+            mSaturationRectF = new RectF(-CENTER_X+_SIDE_MARGIN, saturationRectConstraint,
+										 CENTER_X-_SIDE_MARGIN, saturationRectConstraint -
+										 			mSaturationPaint.getStrokeWidth());
+            
+            windowHeight = CENTER_Y+(int)lightnessRectConstraint+
+            	(int)(saturationRectConstraint/4.0f)+_BOTTOM_DIALOG_MARGIN;
         }
         
         private boolean mTrackingCenter;
         private boolean mHighlightCenter;
+		private int windowHeight;
+		private int _BOTTOM_DIALOG_MARGIN = 15;
+		private int _SATURATION = 1;
+		private int _LIGHTNESS = 2;
+		private boolean saturationChanged;
 
         @Override 
         protected void onDraw(Canvas canvas) {
-            
+
+        	//Only set a new shader if the actual color changed.
+            if(!saturationChanged)
+            	mSaturationPaint.setShader(getNewSaturationGradient());
+        	
             canvas.translate(CENTER_X, CENTER_X);
             
-            canvas.drawOval(mRectF, mPaint);            
+            canvas.drawOval(mOuterColorsRectF, mPaint);
             canvas.drawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
+            canvas.drawRect(mLightnessRectF, mLightnessPaint);
+            canvas.drawRect(mSaturationRectF, mSaturationPaint);
             
             if (mTrackingCenter) {
                 int c = mCenterPaint.getColor();
@@ -90,11 +173,49 @@ public class ColorPickerDialog extends Dialog {
                 mCenterPaint.setStyle(Paint.Style.FILL);
                 mCenterPaint.setColor(c);
             }
+            
+            System.out.println("Lightness angles | Min: " + minLightness_Angle + "Max: " + maxLightness_Angle);
         }
         
-        @Override
+        private Shader getNewSaturationGradient() {
+        	
+        	float[] initColorHSV = new float[3];
+            Color.colorToHSV(mCenterPaint.getColor(), initColorHSV);
+            initColorHSV[1] = 0.0f;
+            int zeroSaturation = Color.HSVToColor(initColorHSV);
+            
+            mSaturation = new int[] { zeroSaturation, mCenterPaint.getColor() };
+			
+			return new LinearGradient(-CENTER_X, saturationRectConstraint,
+										 CENTER_X, saturationRectConstraint +
+										 rectStrokeWidth,
+										 mSaturation, null, Shader.TileMode.CLAMP);
+		}
+
+		@Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            setMeasuredDimension(CENTER_X*2, CENTER_Y*2);
+            
+        	setMeasuredDimension(CENTER_X*2, windowHeight);
+            
+            int height = (int) (getMeasuredHeight()-_BOTTOM_DIALOG_MARGIN-(CENTER_Y/2)-saturationGradientTopMargin);
+            int width = getMeasuredWidth();
+            
+            double bottomLeftX = -((double)width/2), bottomLeftY = -(double)height;
+            double bottomRightX = (double)width/2, bottomRightY = -(double)height;
+            
+            maxSaturation_Angle = PI+Math.atan2(bottomRightY, bottomRightX);
+            minSaturation_Angle = PI+Math.atan2(bottomLeftY, bottomLeftX);
+            
+            height -= rectStrokeWidth;
+            height -= lightnessGradientTopMargin;
+            
+            bottomLeftX = -((double)width/2);
+            bottomLeftY = -(double)height;
+            bottomRightX = (double)width/2;
+            bottomRightY = -(double)height;
+            
+            maxLightness_Angle = PI+Math.atan2(bottomRightY, bottomRightX);
+            minLightness_Angle = PI+Math.atan2(bottomLeftY, bottomLeftX);
         }
         
         private static final int CENTER_X = 100;
@@ -191,12 +312,37 @@ public class ColorPickerDialog extends Dialog {
                         }
                     } else {
                         float angle = (float)java.lang.Math.atan2(y, x);
+                        System.out.println("Angle: " + angle);
                         // need to turn angle [-PI ... PI] into unit [0....1]
                         float unit = angle/(2*PI);
+                        System.out.println("Unit: " + unit);
+                        
                         if (unit < 0) {
                             unit += 1;
                         }
-                        mCenterPaint.setColor(interpColor(mColors, unit));
+                        
+                        float wheelLimit = lightnessRectConstraint + mPaint.getStrokeWidth() + lightnessGradientTopMargin;
+                        float lightnessLimit = wheelLimit + rectStrokeWidth/2.0f + saturationGradientTopMargin;
+                        
+                        if(event.getY() < wheelLimit) {
+                        	mCenterPaint.setColor(interpColor(mColors, unit));
+                        	saturationChanged = false;
+                        }
+                        else if(angle >= minLightness_Angle && angle <= maxLightness_Angle && event.getY() < lightnessLimit) {
+                        
+                        	double percentLightness = (maxLightness_Angle - angle)/
+                        								(maxLightness_Angle - minLightness_Angle);
+                        	mCenterPaint.setColor(setColor_SorL(mCenterPaint.getColor(), percentLightness, _LIGHTNESS));
+                        	saturationChanged = false;
+                        }
+                        else if(angle >= minSaturation_Angle && angle <= maxSaturation_Angle) {
+                        	
+                        	double percentSaturation = (maxSaturation_Angle - angle)/
+    								(maxSaturation_Angle - minSaturation_Angle);
+                    		mCenterPaint.setColor(setColor_SorL(mCenterPaint.getColor(), percentSaturation, _SATURATION));
+                    		saturationChanged = true;
+                        }
+                        
                         invalidate();
                     }
                     break;
@@ -214,6 +360,15 @@ public class ColorPickerDialog extends Dialog {
             }
             return true;
         }
+
+		private int setColor_SorL(int color, double percent, int value) {
+			
+			float[] hsv = new float[3];
+			Color.colorToHSV(color, hsv);
+			hsv[value] = (float)percent;
+			
+			return Color.HSVToColor(Color.alpha(color), hsv);
+		}
     }
 
     public ColorPickerDialog(Context context,

@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars;
+package com.ampsoft.chrobars.opengl;
 
 
 import java.util.Locale;

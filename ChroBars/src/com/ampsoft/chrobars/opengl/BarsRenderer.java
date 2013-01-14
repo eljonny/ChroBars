@@ -1,11 +1,15 @@
-package com.ampsoft.chrobars;
+package com.ampsoft.chrobars.opengl;
 
 import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.ampsoft.chrobars.ChroBar;
+import com.ampsoft.chrobars.ChroType;
+
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
@@ -36,21 +40,14 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		// - Set the OpenGL depth testing function to be used
 		// - Use NICEST perspective correction.
 		//System.out.println("Calling glClearColor");
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 0.5f);
-		
-		//System.out.println("Calling glShadeModel");
+		gl.glClearColor(backgroundColor[0],
+							 backgroundColor[1],
+							 backgroundColor[2],
+							 backgroundColor[3] );
 		gl.glShadeModel(GL10.GL_SMOOTH);
-		
-		//System.out.println("Calling glClearDepth");
 		gl.glClearDepthf(1.0f);
-		
-		//System.out.println("Calling glEnable");
 		gl.glEnable(GL10.GL_DEPTH_TEST);
-		
-		//System.out.println("Calling glDepthFunc");
 		gl.glDepthFunc(GL10.GL_LEQUAL);
-		
-		//System.out.println("Calling glHint");
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
 	
@@ -59,18 +56,21 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		//System.out.println("Calling glClear");
+		
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		
-		//System.out.println("Calling glTranslate");
+		gl.glClearColor(backgroundColor[0],
+						backgroundColor[1],
+						backgroundColor[2],
+						backgroundColor[3] );
+		
 		gl.glTranslatef(0, 0, -5);
 
-		(chroBars.get(ChroType.HOUR)).draw(gl);
-		(chroBars.get(ChroType.MINUTE)).draw(gl);
-		(chroBars.get(ChroType.SECOND)).draw(gl);
-		(chroBars.get(ChroType.MILLIS)).draw(gl);
-		
-		//System.out.println("Calling glLoadIdentity");
+		chroBars.get(ChroType.HOUR).draw(gl);
+		chroBars.get(ChroType.MINUTE).draw(gl);
+		chroBars.get(ChroType.SECOND).draw(gl);
+		chroBars.get(ChroType.MILLIS).draw(gl);
+
 		gl.glLoadIdentity();
 	}
 
@@ -79,23 +79,13 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
+		
 		//Readjusts the surface to match the current conditions
-		//System.out.println("Calling glViewport");
 		gl.glViewport(0, 0, width, height);
-		
-		//System.out.println("Calling glMatrixMode");
 		gl.glMatrixMode(GL10.GL_PROJECTION);
-		
-		//System.out.println("Calling glLoadIdentity");
 		gl.glLoadIdentity();
-		
-		//System.out.println("Calling GLU.gluPerspective");
 		GLU.gluPerspective(gl, 40.0f, ((float) width)/((float) height), 1.0f, 50.0f);
-		
-		//System.out.println("Calling glMatrixMode");
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		
-		//System.out.println("Calling glLoadIdentity");
 		gl.glLoadIdentity();
 	}
 	
@@ -112,19 +102,53 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 * 
 	 * @return
 	 */
-	protected static int numberOfBarsToDraw() {
+	public int numberOfBarsToDraw() {
 		
-		return  ( ((chroBars.get(ChroType.HOUR)).isDrawn() ? 1 : 0) +
-				  ((chroBars.get(ChroType.MINUTE)).isDrawn() ? 1 : 0) +
-				  ((chroBars.get(ChroType.SECOND)).isDrawn() ? 1 : 0) +
-				  ((chroBars.get(ChroType.MILLIS)).isDrawn() ? 1 : 0) );
+		return  ( (chroBars.get(ChroType.HOUR).isDrawn() ? 1 : 0) +
+				  (chroBars.get(ChroType.MINUTE).isDrawn() ? 1 : 0) +
+				  (chroBars.get(ChroType.SECOND).isDrawn() ? 1 : 0) +
+				  (chroBars.get(ChroType.MILLIS).isDrawn() ? 1 : 0)   );
 	}
 	
-	public static ChroBar getChroBar(ChroType type) {
+	/**
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public ChroBar getChroBar(ChroType type) {
 		return chroBars.get(type);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	public int getBackgroundColor() {
+		
+		return Color.argb((int)(backgroundColor[3]*255.0f),
+						  (int)(backgroundColor[0]*255.0f),
+						  (int)(backgroundColor[1]*255.0f),
+						  (int)(backgroundColor[2]*255.0f) );
+	}
+	
+	/**
+	 * 
+	 * @param argb
+	 */
+	public void setBackgroundColor(int argb) {
+		
+		backgroundColor[0] = (float)Color.red(argb)/255.0f;
+		backgroundColor[1] = (float)Color.green(argb)/255.0f;
+		backgroundColor[2] = (float)Color.blue(argb)/255.0f;
+		backgroundColor[3] = (float)Color.alpha(argb)/255.0f;
+	}
+	
+	//For setting the background color
+	private static float[] backgroundColor = {1.0f, 1.0f, 1.0f, 0.5f};
+
+	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(4);
 	
+	//Context in which this Renderer exists
 	private Context activityContext;
 }

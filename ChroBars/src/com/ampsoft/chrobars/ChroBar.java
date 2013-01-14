@@ -15,13 +15,16 @@ import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.ampsoft.chrobars.opengl.BarsRenderer;
+import com.ampsoft.chrobars.opengl.ChroSurface;
+
 /**
  * 
  * @author jhyry
  *
  */
 public class ChroBar {
-	
+
 	private static final int _HOURS_IN_DAY = 24;
 	private static final int _MINUTES_IN_HOUR = 60;
 	private static final int _SECONDS_IN_MINUTE = 60;
@@ -57,6 +60,7 @@ public class ChroBar {
 	
 	//Type of data this represents
 	private ChroType barType;
+	private static BarsRenderer renderer;
 	
 	//OpenGL Surface and drawing buffers
 	private GL10 surface = null;
@@ -80,6 +84,8 @@ public class ChroBar {
 	 * @param color
 	 */
 	public ChroBar(ChroType t, Integer color, Context activityContext) {
+		
+		renderer = ChroSurface.getRenderer();
 		
 		barType = t;
 		
@@ -189,7 +195,7 @@ public class ChroBar {
 		barMargin *= 2.0f;
 		
 		//Perform bar width calculations
-		int numberOfBars = BarsRenderer.numberOfBarsToDraw();
+		int numberOfBars = renderer.numberOfBarsToDraw();
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth -= barMargin*2.0f;
 		barWidth *= 2;
@@ -390,6 +396,14 @@ public class ChroBar {
 		if(surface != null)
 			draw(surface);
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getBarColor() {
+		return barColor;
+	}
 	
 	/**
 	 * 
@@ -399,9 +413,5 @@ public class ChroBar {
 		
 		return "ChroBar Object " + this.hashCode() +
 				"\nType:\n" + barType + "\nColor: " + barColor;
-	}
-
-	public int getBarColor() {
-		return barColor;
 	}
 }

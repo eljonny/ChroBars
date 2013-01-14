@@ -1,17 +1,14 @@
 package com.ampsoft.chrobars.activities;
 
-import com.ampsoft.chrobars.ChroSurface;
-import com.ampsoft.chrobars.R;
-import com.ampsoft.chrobars.R.id;
-import com.ampsoft.chrobars.R.menu;
-
 import android.app.Activity;
-import android.app.LocalActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+
+import com.ampsoft.chrobars.R;
+import com.ampsoft.chrobars.opengl.ChroSurface;
 
 /**
  * 
@@ -26,9 +23,6 @@ public class ChroBarsActivity extends Activity {
 	private Intent settingsIntent;
 	private Intent aboutIntent;
 	
-	//For managing the child activities
-	private static LocalActivityManager activityManager;
-	
 	/**
 	 * 
 	 */
@@ -37,20 +31,16 @@ public class ChroBarsActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		
-		activityManager = new LocalActivityManager(this, true);
 		
-		//Remove the title bar
+		//Remove the title bar, get ViewGroup access
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		//Create the GLSurfaceView and set it as the content view
+		chronos = new ChroSurface(this);
+		setContentView(chronos);
 		
 		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
 		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
-		
-		settingsIntent.addCategory(Intent.CATEGORY_PREFERENCE);
-		aboutIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		
-		chronos = new ChroSurface(this);
-		
-		setContentView(chronos);
 	}
 
 	/**
@@ -58,6 +48,7 @@ public class ChroBarsActivity extends Activity {
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_chro_bars, menu);
 		return true;
@@ -68,24 +59,21 @@ public class ChroBarsActivity extends Activity {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
 	    // Handle item selection
 	    switch (item.getItemId()) {
+	    
 	        case R.id.menu_settings:
-	            chroSettings();
-	            return true;
+	        	startActivity(settingsIntent);
+	            break;
 	        case R.id.menu_about:
-	            aboutChroBars();
-	            return true;
+	        	startActivity(aboutIntent);
+	            break;
+	            
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
-	}
-	
-	private void aboutChroBars() {
-		startActivity(aboutIntent);
-	}
-
-	private void chroSettings() {
-		startActivity(settingsIntent);
+		
+		return true;
 	}
 }

@@ -16,10 +16,11 @@ import android.widget.SlidingDrawer;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
-import com.ampsoft.chrobars.BarsRenderer;
 import com.ampsoft.chrobars.ChroBar;
 import com.ampsoft.chrobars.ChroType;
 import com.ampsoft.chrobars.R;
+import com.ampsoft.chrobars.opengl.BarsRenderer;
+import com.ampsoft.chrobars.opengl.ChroSurface;
 import com.ampsoft.chrobars.util.ChroUtils;
 import com.ampsoft.chrobars.util.ColorPickerDialog;
 import com.ampsoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
@@ -44,10 +45,10 @@ public class ChroBarsSettingsActivity extends Activity
 	/**
 	 * For this instance, get the current ChroBars.
 	 */
-	private final ChroBar hour = BarsRenderer.getChroBar(ChroType.HOUR),
-						  minute = BarsRenderer.getChroBar(ChroType.MINUTE),
-						  second = BarsRenderer.getChroBar(ChroType.SECOND),
-						  millisecond = BarsRenderer.getChroBar(ChroType.MILLIS);
+	private static ChroBar hour,
+						   minute,
+						   second,
+						   millisecond;
 	/**
 	 * 
 	 */
@@ -55,6 +56,8 @@ public class ChroBarsSettingsActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
+		
+		System.out.println("Constructing settings activity...");
 		
 		//Remove the title bar
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -64,9 +67,6 @@ public class ChroBarsSettingsActivity extends Activity
 		settingsDrawer = (SlidingDrawer)findViewById(R.id.chrobars_settings_slidingDrawer);
 		settingsLayoutContainer = (TableLayout) settingsDrawer.getContent();
 		getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
-		settingsDrawer.animateToggle();
-		
-		processTouchableUIElements();
 	}
 
 	/**
@@ -140,9 +140,12 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void notifyNoCheckedBoxes() {
 		
-		Toast message = new Toast(this);
-		message.setText(R.string.settings_bars_toastMessage_noneChecked);
-		message.show();
+		Toast noneChecked =
+			Toast.makeText(this,
+					 	   R.string.settings_bars_toastMessage_noneChecked,
+					 	   Toast.LENGTH_SHORT								 );
+		
+		noneChecked.show();
 	}
 
 	/**
@@ -163,7 +166,7 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void pickBackgroundColor() {
 		
-		final View mainActivityView = ;
+		final BarsRenderer renderer = ChroSurface.getRenderer();
 		
 		/**
 		 * 
@@ -173,7 +176,7 @@ public class ChroBarsSettingsActivity extends Activity
 							/**
 							 * 
 							 */
-							private View background = mainActivityView;
+							private BarsRenderer rend = renderer;
 							
 							/**
 							 * 
@@ -181,13 +184,14 @@ public class ChroBarsSettingsActivity extends Activity
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
-								int colorInt = Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
+								int colorInt =
+									Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
 								
-								background.setBackgroundColor(colorInt);
+								rend.setBackgroundColor(colorInt);
 							}
 						};
 						
-		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, mainActivityView.getSolidColor());
+		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, renderer.getBackgroundColor());
 		 picker.show();
 	}
 
@@ -264,13 +268,41 @@ public class ChroBarsSettingsActivity extends Activity
 	/**
 	 * 
 	 */
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		
+		BarsRenderer renderer = ChroSurface.getRenderer();
+		
+		if(hasFocus) {
+			
+			hour = renderer.getChroBar(ChroType.HOUR);
+			minute = renderer.getChroBar(ChroType.MINUTE);
+			second = renderer.getChroBar(ChroType.SECOND);
+			millisecond = renderer.getChroBar(ChroType.MILLIS);
+			
+			processTouchableUIElements();
+			settingsDrawer.animateOpen();
+		}
+	}
+	
+	/**
+	 * 
+	 */
 	private void processTouchableUIElements() {
 
 		checkBoxes.clear();
 		buttons.clear();
 		sliders.clear();
 		
-		for(View touchable : settingsLayoutContainer.getTouchables()) {
+		ArrayList<View> touchables = settingsLayoutContainer.getTouchables();
+		
+		//Nothing to check
+		if(touchables == null)
+			return;
+		else if(touchables.isEmpty())
+			return;
+		
+		for(View touchable : touchables) {
 			
 			if(touchable instanceof CheckBox)
 				checkBoxes.add((CheckBox)touchable);
@@ -294,25 +326,31 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void checkCheckBoxes() {
 
-		for(CheckBox box : checkBoxes) {
+		if(this.getWindow().isActive()) {
+
+			for(CheckBox box : checkBoxes) {
+				
+				System.out.println("Checking " + box);
+				
+				switch(box.getId()) {
+				
+				case R.id.chrobars_settings_slidingDrawer_chkbxHours:
+					System.out.println("Setting " + hour);
+					box.setChecked(hour.isDrawn());
+					break;
+				case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
+					box.setChecked(minute.isDrawn());
+					break;
+				case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
+					box.setChecked(second.isDrawn());
+					break;
+				case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
+					box.setChecked(millisecond.isDrawn());
+					break;
+				}
 			
-			switch(box.getId()) {
-			
-			case R.id.chrobars_settings_slidingDrawer_chkbxHours:
-				box.setChecked(hour.isDrawn());
-				break;
-			case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
-				box.setChecked(minute.isDrawn());
-				break;
-			case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
-				box.setChecked(second.isDrawn());
-				break;
-			case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
-				box.setChecked(millisecond.isDrawn());
-				break;
+				box.setOnClickListener(this);			
 			}
-			
-			box.setOnClickListener(this);
 		}
 	}
 
@@ -323,7 +361,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private boolean atLeastOneCheckBoxChecked() {
 		
 		//Someone pressed back on the general settings
-		//Screen so this has already been checked
+		//Screen, so this has already been checked
 		if(checkBoxes.isEmpty())
 			return true;
 		
