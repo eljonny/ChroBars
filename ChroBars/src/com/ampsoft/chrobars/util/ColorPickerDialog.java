@@ -316,6 +316,7 @@ public class ColorPickerDialog extends Dialog {
          * @param rad
          * @return
          */
+		@SuppressWarnings("unused")
 		private int rotateColor(int color, float rad) {
             float deg = rad * 180 / 3.1415927f;
             int r = Color.red(color);

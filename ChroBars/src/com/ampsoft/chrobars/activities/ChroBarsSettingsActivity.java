@@ -42,13 +42,15 @@ public class ChroBarsSettingsActivity extends Activity
 	private static SlidingDrawer settingsDrawer;
 	private static TableLayout settingsLayoutContainer;
 	
+	private static Toast noneChecked;
+	
 	/**
 	 * For this instance, get the current ChroBars.
 	 */
 	private static ChroBar hour,
-						   minute,
-						   second,
-						   millisecond;
+						     minute,
+						     second,
+						     millisecond;
 	/**
 	 * 
 	 */
@@ -67,6 +69,11 @@ public class ChroBarsSettingsActivity extends Activity
 		settingsDrawer = (SlidingDrawer)findViewById(R.id.chrobars_settings_slidingDrawer);
 		settingsLayoutContainer = (TableLayout) settingsDrawer.getContent();
 		getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
+		
+		noneChecked = Toast.makeText(this,
+						   			 R.string.settings_bars_toastMessage_noneChecked,
+						   			 Toast.LENGTH_SHORT								 );
+		noneChecked.show(); noneChecked.cancel();
 	}
 
 	/**
@@ -123,7 +130,7 @@ public class ChroBarsSettingsActivity extends Activity
 				settingsDrawer.animateOpen();
 			}
 			else
-				notifyNoCheckedBoxes();
+				noneChecked.show();
 			break;
 		case R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton:
 			getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
@@ -133,19 +140,6 @@ public class ChroBarsSettingsActivity extends Activity
 		default:
 			generalSettings(button);
 		}
-	}
-
-	/**
-	 * 
-	 */
-	private void notifyNoCheckedBoxes() {
-		
-		Toast noneChecked =
-			Toast.makeText(this,
-					 	   R.string.settings_bars_toastMessage_noneChecked,
-					 	   Toast.LENGTH_SHORT								 );
-		
-		noneChecked.show();
 	}
 
 	/**
@@ -262,7 +256,7 @@ public class ChroBarsSettingsActivity extends Activity
 		if(atLeastOneCheckBoxChecked())
 			finish();
 		else
-			notifyNoCheckedBoxes();
+			noneChecked.show();
 	}
 	
 	/**

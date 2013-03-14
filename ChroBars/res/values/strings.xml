@@ -27,12 +27,12 @@
     
     <!-- About information strings -->
     <string name="about_title">ChroBars Credits</string>
-    <string name="about_team_title">Ampsoft Team</string>
-    <string name="about_team_member_jhyry">Jonathan Hyry</string>
-    <string name="about_teamMember_jhyry_role">Code/Testing</string>
-    <string name="about_team_member_tdolen">Travis Dolen</string>
-    <string name="about_teamMember_tdolen_role">Code/Testing</string>
-    <string name="about_team_member_zhaberman">Zachary Haberman</string>
-    <string name="about_teamMember_zhaberman_role">Project Management</string>
-
+    <string name="about_team_member_jhyry">Jonathan Hyry\nLead Developer/Tester</string>
+    <string name="about_team_member_tdolen">Travis Dolen\nCode/Testing</string>
+    <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management</string>
+    
+    <!-- Utility strings -->
+	<string name="empty_str"></string>
+	<string name="newline_str">/n</string>
+	
 </resources>

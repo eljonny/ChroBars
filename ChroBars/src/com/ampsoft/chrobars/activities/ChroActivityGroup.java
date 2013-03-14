@@ -18,7 +18,6 @@ public class ChroActivityGroup extends ActivityGroup {
 	private static LocalActivityManager activityManager;
 	private static ArrayList<Window> activityWindows;
 	private static ArrayList<String> activityIds;
-	private static Window childWindow;
 	private static int _SETTINGS_WINDOW = 0;
 	private static int _ABOUT_WINDOW = 1;
 

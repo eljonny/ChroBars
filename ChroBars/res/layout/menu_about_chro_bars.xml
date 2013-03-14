@@ -1,7 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/creditsRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/creditsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:text="@string/about_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextSwitcher
+        android:id="@+id/creditsTextSwitcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/creditsTitle"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="100dp"
+        android:contentDescription="@string/about_title"
+        android:inAnimation="@anim/anim_fade_in"
+        android:outAnimation="@anim/anim_fade_out" >
+
+        <TextView
+            android:id="@+id/dummy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lines="2"
+            android:text="@string/empty_str" />
+
+        <TextView
+            android:id="@+id/dummy2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lines="2"
+            android:text="@string/empty_str" />
+
+    </TextSwitcher>
+
+</RelativeLayout>
