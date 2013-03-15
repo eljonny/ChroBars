@@ -27,7 +27,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
-		chroBars.put(ChroType.HOUR, new ChroBar(ChroType.HOUR, null, activityContext));
+		chroBars.put(ChroType.HOUR,   new ChroBar(ChroType.HOUR,   null, activityContext));
 		chroBars.put(ChroType.MINUTE, new ChroBar(ChroType.MINUTE, null, activityContext));
 		chroBars.put(ChroType.SECOND, new ChroBar(ChroType.SECOND, null, activityContext));
 		chroBars.put(ChroType.MILLIS, new ChroBar(ChroType.MILLIS, null, activityContext));
@@ -41,9 +41,9 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		// - Use NICEST perspective correction.
 		//System.out.println("Calling glClearColor");
 		gl.glClearColor(backgroundColor[0],
-							 backgroundColor[1],
-							 backgroundColor[2],
-							 backgroundColor[3] );
+						 backgroundColor[1],
+						 backgroundColor[2],
+						 backgroundColor[3] );
 		gl.glShadeModel(GL10.GL_SMOOTH);
 		gl.glClearDepthf(1.0f);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
@@ -66,7 +66,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glTranslatef(0, 0, -5);
 
-		chroBars.get(ChroType.HOUR).draw(gl);
+		chroBars.get(ChroType.HOUR	).draw(gl);
 		chroBars.get(ChroType.MINUTE).draw(gl);
 		chroBars.get(ChroType.SECOND).draw(gl);
 		chroBars.get(ChroType.MILLIS).draw(gl);
@@ -94,7 +94,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 * @param context
 	 */
 	protected void setActivityContext(Context context) {
-		
 		activityContext = context;
 	}
 	
@@ -144,7 +143,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	//For setting the background color
-	private static float[] backgroundColor = {1.0f, 1.0f, 1.0f, 0.5f};
+	private static float[] backgroundColor = {0.87f, 0.87f, 0.87f, 0.5f};
 
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(4);

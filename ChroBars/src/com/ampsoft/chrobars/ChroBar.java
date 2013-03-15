@@ -30,33 +30,60 @@ public class ChroBar {
 	private static final int _SECONDS_IN_MINUTE = 60;
 	private static final int _MILLIS_IN_SECOND = 1000;
 	private static final int _RGBA_COMPONENTS = 4;
-	private static final int _VERTEX_COMPONENTS = 12;
+	private static final int _2D_VERTEX_COMPONENTS = 12;
+	private static final int _3D_VERTEX_COMPONENTS = 24;
 	private static final int _DIMENSIONS = 3;
 	private static final int _BYTES_IN_FLOAT = 4;
 	private static final int _BYTES_IN_SHORT = 2;
-	private static final int _VERTICES = 4;
+	private static final int _2D_VERTICES = 4;
+	private static final int _3D_VERTICES = 8;
 	private static final int _VERTEX_STRIDE = 0;
 	private static final int _MAX_BARS_TO_DRAW = 4;
 	
-	private static final short[] _vertexDrawSequence = {0, 1, 2, 0, 2, 3};
+	//Vertex draw sequences for 3D and 2D
+	private static final short[] _vertexDrawSequence_2D = {	0, 1, 2,
+																0, 2, 3  };
+	
+	private static final short[] _vertexDrawSequence_3D = {	0, 4, 5,
+													           	0, 5, 1,
+													           	1, 5, 6,
+													           	1, 6, 2,
+														        2, 6, 7,
+														        2, 7, 3,
+														        3, 7, 4,
+														        3, 4, 0,
+														        4, 7, 6,
+														        4, 6, 5,
+														        3, 0, 1,
+														        3, 1, 2  };
 	
 	//Bar pixel margin and visibility array,
-	//Shared between all bars
+	//Shared between all bars. First column of
+	// visible array is actual bar visibility,
+	// where the second column is whether or not
+	// to draw the bar in 3D. Using the settings
+	// screen, enabling/disabling 3D affects each one.
 	private static float barMargin = 5.0f;
-	private static boolean[] visible = new boolean[_MAX_BARS_TO_DRAW];
+	private static boolean[][] visible = new boolean[_MAX_BARS_TO_DRAW][2];
+	//Perspective adjustment for rear portion of bar
+	private static float bar_3D_offset = 0.1f;
 	
 	//Base Y-Coordinate from which to draw a ChroBar
 	private static final float _baseHeight = -1.8f;
+	//Base Z-Coordinate from which to extend a ChroBar into 3D
+	private static final float _baseDepth = -0.75f;
 	
 	//The bar color is stored as a color int
 	private int barColor;
+	//How many bars have been created
+	private static int barsCreated = 0;
 	
 	//Whether this bar should be drawn
-	private boolean drawBar = true;
+	private boolean drawBar = true, draw3D = true;
 	
 	//Vertex arrays
-	private float[] vertexColors;
-	private float[] vertices;
+	private float[] vertexColors_2D, vertexColors_3D;
+	private float[] vertices_2D, vertices_3D;
 	
 	//Type of data this represents
 	private ChroType barType;
@@ -65,9 +92,14 @@ public class ChroBar {
 	//OpenGL Surface and drawing buffers
 	private GL10 surface = null;
 	private ByteBuffer rawBuffer;
-	private ShortBuffer drawDirection;
-	private FloatBuffer verticesBuffer;
-	private FloatBuffer colorBuffer;
+	//2D buffers
+	private ShortBuffer drawDirection_2D;
+	private FloatBuffer verticesBuffer_2D;
+	private FloatBuffer colorBuffer_2D;
+	//3D buffers
+	private ShortBuffer drawDirection_3D;
+	private FloatBuffer verticesBuffer_3D;
+	private FloatBuffer colorBuffer_3D;
 	
 	//Screen size for the current device is
 	//found using these objects
@@ -89,13 +121,22 @@ public class ChroBar {
 		
 		barType = t;
 		
-		if(barType.getType() == 0)
-			for(int i = 0; i < visible.length; i++)
-				visible[i] = true;
+		if(barType.getType() == 3)
+			setDrawBar(false);
+		else
+			setDrawBar(true);
 		
-		//Set vertex arrays
-		vertexColors = new float[_VERTICES*_RGBA_COMPONENTS];
-		vertices = new float[_VERTEX_COMPONENTS];
+		setDraw3D(true);
+		
+		//Set 2D vertex arrays
+		vertexColors_2D = new float[_2D_VERTICES*_RGBA_COMPONENTS];
+		vertices_2D = new float[_2D_VERTEX_COMPONENTS];
+		
+		//Set 3D vertex arrays
+		vertexColors_3D = new float[_3D_VERTICES*_RGBA_COMPONENTS];
+		vertices_3D = new float[_3D_VERTEX_COMPONENTS];
+		
+		System.out.println("New 3D vertex array length: " + vertices_3D.length);
 		
 		//Set bar color
 		if(color != null)
@@ -105,16 +146,16 @@ public class ChroBar {
 			switch(barType.getType()) {
 			
 			case 0:
-				changeChroBarColor(Color.BLACK);
+				changeChroBarColor(Color.argb(255, 101, 234, 255));
 				break;
 			case 1:
-				changeChroBarColor(Color.CYAN);
+				changeChroBarColor(Color.argb(255, 255, 193, 70 ));
 				break;
 			case 2:
-				changeChroBarColor(Color.GREEN);
+				changeChroBarColor(Color.argb(255, 126, 255, 136));
 				break;
 			case 3:
-				changeChroBarColor(Color.MAGENTA);
+				changeChroBarColor(Color.argb(255, 255, 133, 233));
 				break;
 				
 			default:
@@ -127,26 +168,53 @@ public class ChroBar {
 		initVertices();
 		wm = (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE);
 		
+		/* Init 2D structures */
+		
 		//Allocate the raw vertex buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertices.length*_BYTES_IN_FLOAT);
+		rawBuffer = ByteBuffer.allocateDirect(vertices_2D.length*_BYTES_IN_FLOAT);
 		rawBuffer.order(ByteOrder.nativeOrder());
-		verticesBuffer = rawBuffer.asFloatBuffer();
-		verticesBuffer.put(vertices);
-		verticesBuffer.position(0);
+		verticesBuffer_2D = rawBuffer.asFloatBuffer();
+		verticesBuffer_2D.put(vertices_2D);
+		verticesBuffer_2D.position(0);
 		
 		//Allocate the raw color buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertexColors.length*_BYTES_IN_FLOAT);
+		rawBuffer = ByteBuffer.allocateDirect(vertexColors_2D.length*_BYTES_IN_FLOAT);
 		rawBuffer.order(ByteOrder.nativeOrder());
-		colorBuffer = rawBuffer.asFloatBuffer();
-		colorBuffer.put(vertexColors);
-		colorBuffer.position(0);
+		colorBuffer_2D = rawBuffer.asFloatBuffer();
+		colorBuffer_2D.put(vertexColors_2D);
+		colorBuffer_2D.position(0);
 		
 		//Allocate the vertex draw sequence buffer
-		rawBuffer = ByteBuffer.allocateDirect(_vertexDrawSequence.length*_BYTES_IN_SHORT);
+		rawBuffer = ByteBuffer.allocateDirect(_vertexDrawSequence_2D.length*_BYTES_IN_SHORT);
 		rawBuffer.order(ByteOrder.nativeOrder());
-		drawDirection = rawBuffer.asShortBuffer();
-		drawDirection.put(_vertexDrawSequence);
-		drawDirection.position(0);
+		drawDirection_2D = rawBuffer.asShortBuffer();
+		drawDirection_2D.put(_vertexDrawSequence_2D);
+		drawDirection_2D.position(0);
+		
+		/* Init 3D structures */
+		
+		//Allocate the raw vertex buffer
+		rawBuffer = ByteBuffer.allocateDirect(vertices_3D.length*_BYTES_IN_FLOAT);
+		rawBuffer.order(ByteOrder.nativeOrder());
+		verticesBuffer_3D = rawBuffer.asFloatBuffer();
+		verticesBuffer_3D.put(vertices_3D);
+		verticesBuffer_3D.position(0);
+		
+		//Allocate the raw color buffer
+		rawBuffer = ByteBuffer.allocateDirect(vertexColors_3D.length*_BYTES_IN_FLOAT);
+		rawBuffer.order(ByteOrder.nativeOrder());
+		colorBuffer_3D = rawBuffer.asFloatBuffer();
+		colorBuffer_3D.put(vertexColors_3D);
+		colorBuffer_3D.position(0);
+		
+		//Allocate the vertex draw sequence buffer
+		rawBuffer = ByteBuffer.allocateDirect(_vertexDrawSequence_3D.length*_BYTES_IN_SHORT);
+		rawBuffer.order(ByteOrder.nativeOrder());
+		drawDirection_3D = rawBuffer.asShortBuffer();
+		drawDirection_3D.put(_vertexDrawSequence_3D);
+		drawDirection_3D.position(0);
+		
+		barsCreated++;
 	}
 
 	/**
@@ -154,13 +222,26 @@ public class ChroBar {
 	 */
 	private void initVertices() {
 		
-		float[] verts = { -0.5f, 1.0f, 0.0f,    // Upper Left  | 0
-				  		  -0.5f, _baseHeight, 0.0f,   // Lower Left  | 1
-						   0.5f, _baseHeight, 0.0f,   // Lower Right | 2
-						   0.5f, 1.0f, 0.0f   };// Upper Right | 3
+		float[] verts_2D = { 	 -0.5f, 1.0f, 		 0.0f,    	// Upper Left  | 0
+						  		 -0.5f, _baseHeight, 0.0f,    	// Lower Left  | 1
+								  0.5f, _baseHeight, 0.0f,    	// Lower Right | 2
+								  0.5f, 1.0f, 		 0.0f  };	// Upper Right | 3
+		
+		float[] verts_3D = {	 -0.3f,  1.0f,		  0.0f,    		  // Upper Left Front  | 0
+					  		  	 -0.3f,  _baseHeight, 0.0f,    		  // Lower Left Front  | 1
+					  		  	  0.3f,  _baseHeight, 0.0f,    		  // Lower Right Front | 2
+								  0.3f,  1.0f,		  0.0f,    	 	  // Upper Right Front | 3
+					  		  	 -0.2f,  1.0f,		  _baseDepth,     // Upper Left Rear   | 4
+					  		  	 -0.2f,  _baseHeight, _baseDepth,     // Lower Left Rear   | 5
+								  0.4f,  _baseHeight, _baseDepth,     // Lower Right Rear  | 6
+								  0.4f,  1.0f,		  _baseDepth  };  // Upper Right Rear  | 7
 
-		for(int i = 0; i < _VERTEX_COMPONENTS; i++)
-			vertices[i] = verts[i];
+		System.out.println("New 3D vertex array length: " + verts_3D.length);
+		
+		for(int i = 0; i < _2D_VERTEX_COMPONENTS; i++)
+			vertices_2D[i] = verts_2D[i];
+		for(int i = 0; i < _3D_VERTEX_COMPONENTS; i++)
+			vertices_3D[i] = verts_3D[i];
 	}
 	
 	/**
@@ -168,7 +249,15 @@ public class ChroBar {
 	 * @param toDraw
 	 */
 	public void setDrawBar(boolean toDraw) {
-		visible[barType.getType()] = drawBar = toDraw;
+		visible[barType.getType()][0] = drawBar = toDraw;
+	}
+	
+	/**
+	 * 
+	 * @param toDraw3D
+	 */
+	public void setDraw3D(boolean toDraw3D) {
+		visible[barType.getType()][1] = draw3D = toDraw3D;
 	}
 	
 	/**
@@ -177,6 +266,14 @@ public class ChroBar {
 	 */
 	public boolean isDrawn() {
 		return drawBar;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isDrawnIn3D() {
+		return draw3D;
 	}
 
 	/**
@@ -204,26 +301,43 @@ public class ChroBar {
 		
 		if(barType.getType() < 3)
 			for(int i = barType.getType() + 1; i < _MAX_BARS_TO_DRAW; i++)
-				if(!visible[i])
+				if(!visible[i][0])
 					++barTypeCode;
 		else if(barType.getType() < 2)
 			for(int j = barType.getType() - 1; j >= 0; j--)
-				if(!visible[j])
+				if(!visible[j][0])
 					--barTypeCode;
 		
 		if(barTypeCode < 0)
 			while(barTypeCode < 0)
 				barTypeCode++;
-		
-		float leftXCoordinate = barMargin +
-				(barWidth * barTypeCode) + (barMargin * barTypeCode) +
-					(((int)barTypeCode) > 0 ? barMargin : 0.0f) - 1.0f;
-		
-		float rightXCoordinate = leftXCoordinate + barWidth;
-		
+
 		//Set the width of this bar
-		vertices[0] = vertices[3] = leftXCoordinate;
-		vertices[6] = vertices[9] = rightXCoordinate;
+		if(!draw3D) {
+			
+			float leftXCoordinate_2D = barMargin +
+					(barWidth * barTypeCode) + (barMargin * barTypeCode) +
+						(((int)barTypeCode) > 0 ? barMargin : 0.0f) - 1.0f;
+			float rightXCoordinate_2D = leftXCoordinate_2D + barWidth;
+			
+			vertices_2D[0] = vertices_2D[3] = leftXCoordinate_2D;
+			vertices_2D[6] = vertices_2D[9] = rightXCoordinate_2D;
+		}
+		else {
+			
+			float leftXCoordinate_3D_front = barMargin +
+					(barWidth * barTypeCode) + (barMargin * barTypeCode) +
+						(((int)barTypeCode) > 0 ? barMargin : 0.0f) - 1.0f;
+			float leftXCoordinate_3D_rear  = leftXCoordinate_3D_front + bar_3D_offset;
+			
+			float rightXCoordinate_3D_front = leftXCoordinate_3D_front + barWidth;
+			float rightXCoordinate_3D_rear  = rightXCoordinate_3D_front + bar_3D_offset;
+			
+			vertices_3D[0] = vertices_3D[3]   = leftXCoordinate_3D_front;
+			vertices_3D[6] = vertices_3D[9]   = rightXCoordinate_3D_front;
+			vertices_3D[12] = vertices_3D[15] = leftXCoordinate_3D_rear;
+			vertices_3D[18] = vertices_3D[21] = rightXCoordinate_3D_rear;
+		}
 	}
 
 	/**
@@ -239,15 +353,28 @@ public class ChroBar {
 		currentTime = Calendar.getInstance(TimeZone.getTimeZone("GMT-0800"), Locale.US);
 		float scalingFactor = 3.65f;
 		float barTopHeight = ChroBar._baseHeight + 0.01f;
-		
-		//Set the bar height
+
 		float timeRatio = getRatio();
-		vertices[1] = vertices[10] = barTopHeight + (timeRatio*scalingFactor);
 		
-		//Reset the OpenGL vertices buffer with updated coordinates
-		verticesBuffer.clear();
-		verticesBuffer.put(vertices);
-		verticesBuffer.position(0);
+		if(!draw3D) {
+			//Set the bar height
+			vertices_2D[1] = vertices_2D[10] = barTopHeight + (timeRatio*scalingFactor);
+			
+			//Reset the OpenGL vertices buffer with updated coordinates
+			verticesBuffer_2D.clear();
+			verticesBuffer_2D.put(vertices_2D);
+			verticesBuffer_2D.position(0);
+		}
+		else {
+			//Set the bar height
+			vertices_3D[1] = vertices_3D[10] = vertices_3D[13] =
+					vertices_3D[22] = barTopHeight + (timeRatio*scalingFactor);
+			
+			//Reset the OpenGL vertices buffer with updated coordinates
+			verticesBuffer_3D.clear();
+			verticesBuffer_3D.put(vertices_3D);
+			verticesBuffer_3D.position(0);
+		}
 	}
 
 	/**
@@ -300,19 +427,36 @@ public class ChroBar {
 			//System.out.println("Calling glEnableClientState");
 			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			
-			//Tell openGL where the vertex data is and how to use it
-			//System.out.println("Calling glVertexPointer");
-			drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
-											_VERTEX_STRIDE, verticesBuffer);
-			
-			//System.out.println("Calling glColorPointer");
-	        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
-	        									_VERTEX_STRIDE, colorBuffer);
-	        
-			//Draw the bar
-	        //System.out.println("Calling glDrawElements");
-			drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence.length,
-												GL10.GL_UNSIGNED_SHORT, drawDirection);
+			if(!draw3D) {
+				//Tell openGL where the vertex data is and how to use it
+				//System.out.println("Calling glVertexPointer");
+				drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
+												_VERTEX_STRIDE, verticesBuffer_2D);
+				
+				//System.out.println("Calling glColorPointer");
+		        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
+		        									_VERTEX_STRIDE, colorBuffer_2D);
+		        
+				//Draw the bar
+		        //System.out.println("Calling glDrawElements");
+				drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence_2D.length,
+													GL10.GL_UNSIGNED_SHORT, drawDirection_2D);
+			}
+			else {
+				//Tell openGL where the vertex data is and how to use it
+				//System.out.println("Calling glVertexPointer");
+				drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
+												_VERTEX_STRIDE, verticesBuffer_3D);
+				
+				//System.out.println("Calling glColorPointer");
+		        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
+		        									_VERTEX_STRIDE, colorBuffer_3D);
+		        
+				//Draw the bar
+		        //System.out.println("Calling glDrawElements");
+				drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence_3D.length,
+													GL10.GL_UNSIGNED_SHORT, drawDirection_3D);
+			}
 			//Clear the buffer space
 			//System.out.println("Calling glDisableClientState");
 			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
@@ -342,21 +486,36 @@ public class ChroBar {
 		
 		barColor = colorInt;
 		
-		int colorArrayLength = vertexColors.length;
+		int color2DArrayLength = vertexColors_2D.length;
+		int color3DArrayLength = vertexColors_3D.length;
 		
-		for(int i = 0; i < colorArrayLength; i += 4)
-			vertexColors[i] = (float)Color.red(barColor)/255.0f;
-		for(int i = 1; i < colorArrayLength; i += 4)
-			vertexColors[i] = (float)Color.green(barColor)/255.0f;
-		for(int i = 2; i < colorArrayLength; i += 4)
-			vertexColors[i] = (float)Color.blue(barColor)/255.0f;
-		for(int i = 3; i < colorArrayLength; i += 4)
-			vertexColors[i] = (float)Color.alpha(barColor)/255.0f;
+		for(int i = 0; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.red(barColor)/255.0f;
+		for(int i = 1; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.green(barColor)/255.0f;
+		for(int i = 2; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.blue(barColor)/255.0f;
+		for(int i = 3; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.alpha(barColor)/255.0f;
 		
-		if(colorBuffer != null) {
-			colorBuffer.position(0);
-			colorBuffer.put(vertexColors);
-			colorBuffer.position(0);
+		for(int i = 0; i < color3DArrayLength; i += 4)
+			vertexColors_3D[i] = (float)Color.red(barColor)/255.0f;
+		for(int i = 1; i < color3DArrayLength; i += 4)
+			vertexColors_3D[i] = (float)Color.green(barColor)/255.0f;
+		for(int i = 2; i < color3DArrayLength; i += 4)
+			vertexColors_3D[i] = (float)Color.blue(barColor)/255.0f;
+		for(int i = 3; i < color3DArrayLength; i += 4)
+			vertexColors_3D[i] = (float)Color.alpha(barColor)/255.0f;
+		
+		if(colorBuffer_2D != null) {
+			colorBuffer_2D.position(0);
+			colorBuffer_2D.put(vertexColors_2D);
+			colorBuffer_2D.position(0);
+		}
+		if(colorBuffer_3D != null) {
+			colorBuffer_3D.position(0);
+			colorBuffer_3D.put(vertexColors_3D);
+			colorBuffer_3D.position(0);
 		}
 	}
 	
@@ -403,6 +562,14 @@ public class ChroBar {
 	 */
 	public int getBarColor() {
 		return barColor;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static int barsCreated() {
+		return barsCreated;
 	}
 	
 	/**

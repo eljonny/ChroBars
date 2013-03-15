@@ -75,7 +75,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:checked="true"
+            android:textOff="@string/disabled"
+            android:textOn="@string/enabled" />
 
     </TableRow>
 
@@ -100,7 +103,8 @@
             android:layout_gravity="fill_vertical"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:checked="true" />
 
     </TableRow>
 

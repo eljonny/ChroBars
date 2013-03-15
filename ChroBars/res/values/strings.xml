@@ -36,5 +36,7 @@
     <!-- Utility strings -->
 	<string name="empty_str"></string>
 	<string name="newline_str">/n</string>
+	<string name="enabled">Enabled</string>
+	<string name="disabled">Disabled</string>
 	
 </resources>
