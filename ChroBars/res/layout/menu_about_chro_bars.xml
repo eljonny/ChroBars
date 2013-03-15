@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/creditsRelativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="#EDEDED" >
 
     <TextView
         android:id="@+id/creditsTitle"
@@ -29,16 +30,42 @@
             android:id="@+id/dummy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="2"
-            android:text="@string/empty_str" />
+            android:gravity="center_vertical|center_horizontal"
+            android:lines="3"
+            android:maxLines="3"
+            android:maxWidth="200dp"
+            android:minWidth="100dp"
+            android:text="@string/empty_str"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:width="200dp" />
 
         <TextView
-            android:id="@+id/dummy2"
+            android:id="@+id/dummy1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lines="2"
-            android:text="@string/empty_str" />
+            android:gravity="center_vertical|center_horizontal"
+            android:lines="3"
+            android:maxLines="3"
+            android:maxWidth="200dp"
+            android:minWidth="100dp"
+            android:text="@string/empty_str"
+            android:textStyle="normal"
+            android:typeface="sans"
+            android:width="200dp" />
 
     </TextSwitcher>
+
+    <TextView
+        android:id="@+id/creditsCopyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:text="@string/about_copyright"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="12sp"
+        android:typeface="sans" />
 
 </RelativeLayout>

@@ -19,7 +19,8 @@ import com.ampsoft.chrobars.util.ChroBarsCredits;
  */
 public class ChroBarsAboutActivity extends Activity {
 
-	private static final long _switcher_period = 4000;
+	private static final long _switcher_period = 3500;
+	
 	private static ChroBarsCredits credits;
 	private static ChroAboutTimerTask textSwitcher;
 
@@ -42,14 +43,16 @@ public class ChroBarsAboutActivity extends Activity {
 		construct();
 		startCreditsRoll();
 	}
-
+	
 	/**
-	 * 
+	 * Make sure the Timer gets cancelled before we finish.
 	 */
-	private void startCreditsRoll() {
+	@Override
+	public void onBackPressed() {
 		
-		System.out.println("Working with " + credits.numberOfEntries() + " credits.");
-		textSwitchTimer.schedule(textSwitcher, new Date(), _switcher_period);
+		textSwitchTimer.cancel();
+		textSwitchTimer.purge();
+		finish();
 	}
 
 	/**
@@ -58,8 +61,24 @@ public class ChroBarsAboutActivity extends Activity {
 	private void construct() {
 		
 		System.out.println("Constructing about activity...");
+		
 		creditsDisplayView = (TextSwitcher)findViewById(R.id.creditsTextSwitcher);
 		credits = new ChroBarsCredits(this);
 		textSwitcher = new ChroAboutTimerTask(creditsDisplayView, credits);
+	}
+
+	/**
+	 * @throws InterruptedException 
+	 * 
+	 */
+	private void startCreditsRoll() {
+		
+		System.out.println("Working with " + credits.numberOfEntries() + " credits.");
+		
+		//Set up temporary date object set to a half second past the current time.
+		Date nearFuture = new Date();
+		nearFuture.setTime(System.currentTimeMillis() + 800);
+		
+		textSwitchTimer.schedule(textSwitcher, nearFuture, _switcher_period);
 	}
 }
