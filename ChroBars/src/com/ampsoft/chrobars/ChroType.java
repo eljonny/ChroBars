@@ -7,15 +7,20 @@ package com.ampsoft.chrobars;
  */
 public enum ChroType {
 
+	MILLIS3D(7),
+	SECOND3D(6),
+	MINUTE3D(5),
+	HOUR3D(4),
 	MILLIS(3),
 	SECOND(2),
 	MINUTE(1),
 	HOUR(0);
 	
-	private final byte MAX_TYPE_VALUE = 3;
+	private final byte MAX_TYPE_VALUE = 7;
 	private final byte MIN_TYPE_VALUE = 0;
 	
 	private int chroType;
+	private boolean barIs3D = false;
 	
 	/**
 	 * 
@@ -30,6 +35,8 @@ public enum ChroType {
 		}
 		else
 			chroType = type;
+		if(type > 3)
+			barIs3D = true;
 	}
 	
 	/**
@@ -38,5 +45,13 @@ public enum ChroType {
 	 */
 	public int getType() {
 		return chroType;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean is3D() {
+		return barIs3D;
 	}
 }
