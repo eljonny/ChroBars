@@ -13,6 +13,11 @@ import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 
+/**
+ * 
+ * @author jhyry
+ *
+ */
 public class BarsRenderer implements GLSurfaceView.Renderer {
 
 	/**
@@ -26,8 +31,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		
-		
 		
 		for(ChroType ct : ChroType.values())
 				chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
@@ -103,7 +106,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	public int numberOfBarsToDraw() {
 		
-		return  ( (chroBars.get(ChroType.HOUR).isDrawn() ? 1 : 0) +
+		return  ((chroBars.get(ChroType.HOUR).isDrawn() ? 1 : 0) +
 				  (chroBars.get(ChroType.MINUTE).isDrawn() ? 1 : 0) +
 				  (chroBars.get(ChroType.SECOND).isDrawn() ? 1 : 0) +
 				  (chroBars.get(ChroType.MILLIS).isDrawn() ? 1 : 0)   );

@@ -1,12 +1,7 @@
 package com.ampsoft.chrobars;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 import java.util.Calendar;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -16,7 +11,6 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.ampsoft.chrobars.data.ChroBarStaticData;
-import com.ampsoft.chrobars.opengl.BarsRenderer;
 import com.ampsoft.chrobars.opengl.ChroSurface;
 
 /**
@@ -59,47 +53,15 @@ public abstract class ChroBar {
 		//If the data object is null, make one. Otherwise do nothing.
 		barsData = barsData == null ? new ChroBarStaticData() : barsData;
 		
-		renderer = ChroSurface.getRenderer();
+		barsData.setObjectReference("renderer", ChroSurface.getRenderer());
+		barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
+		barsData.incIntegerField("barsCreated");
 		
 		barType = t;
-		
-		if(barType.getType() == ChroType.MILLIS.getType())
-			setDrawBar(false);
-		else
-			setDrawBar(true);
-		
-		//Set bar color
-		if(color != null)
-			barColor = color;
-		
-		else {
-			
-			switch(barType.getType()) {
-			
-			case 0:
-				changeChroBarColor(Color.argb(255, 101, 234, 255));
-				break;
-			case 1:
-				changeChroBarColor(Color.argb(255, 255, 193, 70 ));
-				break;
-			case 2:
-				changeChroBarColor(Color.argb(255, 126, 255, 136));
-				break;
-			case 3:
-				changeChroBarColor(Color.argb(255, 255, 133, 233));
-				break;
-				
-			default:
-				System.err.print("Invalid type!");
-			}
-		}
 		
 		//Initialize the vertex array with default values
 		//And get the current window manager
 		initVertices();
-		wm = (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE);
-		
-		barsCreated++;
 	}
 
 	/**
@@ -112,7 +74,7 @@ public abstract class ChroBar {
 	 * @param toDraw
 	 */
 	public void setDrawBar(boolean toDraw) {
-		visible[barType.getType()] = drawBar = toDraw;
+		barsData.getNonFinalBooleanArray("visible")[barType.getType()] = drawBar = toDraw;
 	}
 	
 	/**
@@ -250,7 +212,7 @@ public abstract class ChroBar {
 	 * @return
 	 */
 	public static int barsCreated() {
-		return barsCreated;
+		return barsData.getNonFinalInt("barsCreated");
 	}
 	
 	/**

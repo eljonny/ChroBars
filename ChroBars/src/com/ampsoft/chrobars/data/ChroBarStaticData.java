@@ -161,6 +161,87 @@ public final class ChroBarStaticData {
 	public Object getNonFinalObject(String objFieldName) {
 		return getVarFromString(objFieldName);
 	}
+	
+	/**
+	 * 
+	 */
+	public void incIntegerField(String intName) {
+		
+		for(Field f : nonFinalStatic) {
+			if(f.getClass().isPrimitive()) {
+				if(f.getName().equals(intName)) {
+					
+					try {
+						f.setInt(null, f.getInt(null) + 1);
+					}
+					catch (IllegalArgumentException illegalArgEx) {
+						
+						System.out.println("A IllegalArgumentException occurred:\n" +
+											illegalArgEx.getMessage() + "\n\nCause: " + illegalArgEx.getCause());
+						
+						illegalArgEx.printStackTrace();
+					}
+					catch (IllegalAccessException illegalAccessEx) {
+						
+						System.out.println("A IllegalAccessException occurred:\n" +
+											illegalAccessEx.getMessage() + "\n\nCause: " + illegalAccessEx.getCause());
+						
+						illegalAccessEx.printStackTrace();
+					}
+					catch (Exception unknownEx) {
+						
+						System.out.println("An unknown exception occurred:\n" +
+											unknownEx.getMessage() + "\n\nCause: " +
+											unknownEx.getCause());
+						
+						unknownEx.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param objFieldName
+	 * @param ref
+	 */
+	public <T> void setObjectReference(String objFieldName, T ref) {
+		
+		for(Field f : nonFinalStatic) {
+			if(f.getClass().isPrimitive())
+				continue;
+			if(f.getName().equals(objFieldName) && f.getType().getClass().
+					 getSimpleName().equals(ref.getClass().getSimpleName())) {
+				
+				try {
+					f.set(null, ref);
+				}
+				catch (IllegalArgumentException illegalArgEx) {
+					
+					System.out.println("A IllegalArgumentException occurred:\n" +
+										illegalArgEx.getMessage() + "\n\nCause: " + illegalArgEx.getCause());
+					
+					illegalArgEx.printStackTrace();
+				}
+				catch (IllegalAccessException illegalAccessEx) {
+					
+					System.out.println("A IllegalAccessException occurred:\n" +
+										illegalAccessEx.getMessage() + "\n\nCause: " + illegalAccessEx.getCause());
+					
+					illegalAccessEx.printStackTrace();
+				}
+				catch (Exception unknownEx) {
+
+					System.out.println("An unknown exception occurred:\n" +
+										unknownEx.getMessage() + "\n\nCause: " +
+										unknownEx.getCause());
+					
+					unknownEx.printStackTrace();
+				}
+			}
+		}
+	}
 
 	/**
 	 * 
