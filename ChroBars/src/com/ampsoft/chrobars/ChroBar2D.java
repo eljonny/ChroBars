@@ -8,7 +8,12 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.microedition.khronos.opengles.GL10;
+
+import com.ampsoft.chrobars.data.ChroBarStaticData;
+
 import android.content.Context;
+import android.graphics.Color;
 
 public class ChroBar2D extends ChroBar {
 	
@@ -130,5 +135,70 @@ public class ChroBar2D extends ChroBar {
 		verticesBuffer_2D.clear();
 		verticesBuffer_2D.put(vertices_2D);
 		verticesBuffer_2D.position(0);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	protected float getRatio(int barType) {
+		
+		switch(barType) {
+		
+		case 0:
+			return (float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)ChroBarStaticData._HOURS_IN_DAY;
+		case 1:
+			return (float)currentTime.get(Calendar.MINUTE)/(float)ChroBarStaticData._MINUTES_IN_HOUR;
+		case 2:
+			return (float)currentTime.get(Calendar.SECOND)/(float)ChroBarStaticData._SECONDS_IN_MINUTE;
+		case 3:
+			return (float)currentTime.get(Calendar.MILLISECOND)/(float)ChroBarStaticData._MILLIS_IN_SECOND;
+			
+		default:
+			System.err.print("Invalid type!");
+			return 0;
+		}
+	}
+	
+	protected void drawBar(GL10 drawSurface) {
+
+		//Tell openGL where the vertex data is and how to use it
+		//System.out.println("Calling glVertexPointer");
+		drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
+										_VERTEX_STRIDE, verticesBuffer_2D);
+		
+		//System.out.println("Calling glColorPointer");
+        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
+        									_VERTEX_STRIDE, colorBuffer_2D);
+        
+		//Draw the bar
+        //System.out.println("Calling glDrawElements");
+		drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence_2D.length,
+											GL10.GL_UNSIGNED_SHORT, drawDirection_2D);
+	}
+	
+	/**
+	 * Changes the barColor value and those of the vertices.
+	 * 
+	 * @param colorInt
+	 */
+	public void changeChroBarColor(int colorInt) {
+		
+		barColor = colorInt;
+		
+		int color2DArrayLength = vertexColors_2D.length;
+		
+		for(int i = 0; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.red(barColor)/255.0f;
+		for(int i = 1; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.green(barColor)/255.0f;
+		for(int i = 2; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.blue(barColor)/255.0f;
+		for(int i = 3; i < color2DArrayLength; i += 4)
+			vertexColors_2D[i] = (float)Color.alpha(barColor)/255.0f;
+		
+		colorBuffer_2D.position(0);
+		colorBuffer_2D.put(vertexColors_2D);
+		colorBuffer_2D.position(0);
 	}
 }

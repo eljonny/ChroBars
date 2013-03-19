@@ -140,24 +140,7 @@ public abstract class ChroBar {
 	 * 
 	 * @return
 	 */
-	private float getRatio() {
-
-		switch(barType.getType()) {
-		
-		case 0:
-			return (float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)_HOURS_IN_DAY;
-		case 1:
-			return (float)currentTime.get(Calendar.MINUTE)/(float)_MINUTES_IN_HOUR;
-		case 2:
-			return (float)currentTime.get(Calendar.SECOND)/(float)_SECONDS_IN_MINUTE;
-		case 3:
-			return (float)currentTime.get(Calendar.MILLISECOND)/(float)_MILLIS_IN_SECOND;
-			
-		default:
-			System.err.print("Invalid type!");
-			return 0;
-		}
-	}
+	protected abstract float getRatio(int barType);
 
 	/**
 	 * 
@@ -186,36 +169,8 @@ public abstract class ChroBar {
 			//System.out.println("Calling glEnableClientState");
 			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			
-			if(!draw3D) {
-				//Tell openGL where the vertex data is and how to use it
-				//System.out.println("Calling glVertexPointer");
-				drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
-												_VERTEX_STRIDE, verticesBuffer_2D);
-				
-				//System.out.println("Calling glColorPointer");
-		        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
-		        									_VERTEX_STRIDE, colorBuffer_2D);
-		        
-				//Draw the bar
-		        //System.out.println("Calling glDrawElements");
-				drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence_2D.length,
-													GL10.GL_UNSIGNED_SHORT, drawDirection_2D);
-			}
-			else {
-				//Tell openGL where the vertex data is and how to use it
-				//System.out.println("Calling glVertexPointer");
-				drawSurface.glVertexPointer(_DIMENSIONS, GL10.GL_FLOAT,
-												_VERTEX_STRIDE, verticesBuffer_3D);
-				
-				//System.out.println("Calling glColorPointer");
-		        drawSurface.glColorPointer(_RGBA_COMPONENTS, GL10.GL_FLOAT,
-		        									_VERTEX_STRIDE, colorBuffer_3D);
-		        
-				//Draw the bar
-		        //System.out.println("Calling glDrawElements");
-				drawSurface.glDrawElements(GL10.GL_TRIANGLES, _vertexDrawSequence_3D.length,
-													GL10.GL_UNSIGNED_SHORT, drawDirection_3D);
-			}
+			drawBar(drawSurface);
+			
 			//Clear the buffer space
 			//System.out.println("Calling glDisableClientState");
 			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
@@ -236,47 +191,14 @@ public abstract class ChroBar {
 		}
 	}
 	
+	protected abstract void drawBar(GL10 drawSurface);
+	
 	/**
 	 * Changes the barColor value and those of the vertices.
 	 * 
 	 * @param colorInt
 	 */
-	public void changeChroBarColor(int colorInt) {
-		
-		barColor = colorInt;
-		
-		int color2DArrayLength = vertexColors_2D.length;
-		int color3DArrayLength = vertexColors_3D.length;
-		
-		for(int i = 0; i < color2DArrayLength; i += 4)
-			vertexColors_2D[i] = (float)Color.red(barColor)/255.0f;
-		for(int i = 1; i < color2DArrayLength; i += 4)
-			vertexColors_2D[i] = (float)Color.green(barColor)/255.0f;
-		for(int i = 2; i < color2DArrayLength; i += 4)
-			vertexColors_2D[i] = (float)Color.blue(barColor)/255.0f;
-		for(int i = 3; i < color2DArrayLength; i += 4)
-			vertexColors_2D[i] = (float)Color.alpha(barColor)/255.0f;
-		
-		for(int i = 0; i < color3DArrayLength; i += 4)
-			vertexColors_3D[i] = (float)Color.red(barColor)/255.0f;
-		for(int i = 1; i < color3DArrayLength; i += 4)
-			vertexColors_3D[i] = (float)Color.green(barColor)/255.0f;
-		for(int i = 2; i < color3DArrayLength; i += 4)
-			vertexColors_3D[i] = (float)Color.blue(barColor)/255.0f;
-		for(int i = 3; i < color3DArrayLength; i += 4)
-			vertexColors_3D[i] = (float)Color.alpha(barColor)/255.0f;
-		
-		if(colorBuffer_2D != null) {
-			colorBuffer_2D.position(0);
-			colorBuffer_2D.put(vertexColors_2D);
-			colorBuffer_2D.position(0);
-		}
-		if(colorBuffer_3D != null) {
-			colorBuffer_3D.position(0);
-			colorBuffer_3D.put(vertexColors_3D);
-			colorBuffer_3D.position(0);
-		}
-	}
+	public abstract void changeChroBarColor(int colorInt);
 	
 	/**
 	 * Changes the color of this bar using ARGB parameters.
@@ -339,5 +261,20 @@ public abstract class ChroBar {
 		
 		return "ChroBar Object " + this.hashCode() +
 				"\nType:\n" + barType + "\nColor: " + barColor;
+	}
+
+	/**
+	 * 
+	 * @param ct
+	 * @param object
+	 * @param activityContext
+	 * @return
+	 */
+	public static ChroBar getInstance(ChroType ct, Context activityContext) {
+		
+		if(ct.is3D())
+			return new ChroBar3D(ct, null, activityContext);
+		else
+			return new ChroBar2D(ct, null, activityContext);
 	}
 }

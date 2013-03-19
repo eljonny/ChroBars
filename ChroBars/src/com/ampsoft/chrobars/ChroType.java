@@ -16,8 +16,8 @@ public enum ChroType {
 	MINUTE(1),
 	HOUR(0);
 	
-	private final byte MAX_TYPE_VALUE = 7;
-	private final byte MIN_TYPE_VALUE = 0;
+	private final static byte MAX_TYPE_VALUE = 7;
+	private final static byte MIN_TYPE_VALUE = 0;
 	
 	private int chroType;
 	private boolean barIs3D = false;
@@ -45,6 +45,14 @@ public enum ChroType {
 	 */
 	public int getType() {
 		return chroType;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static int types() {
+		return MAX_TYPE_VALUE + 1;
 	}
 	
 	/**
