@@ -20,7 +20,6 @@ public enum ChroType {
 	private final static byte MIN_TYPE_VALUE = 0;
 	
 	private int chroType;
-	private boolean barIs3D = false;
 	
 	/**
 	 * 
@@ -35,8 +34,6 @@ public enum ChroType {
 		}
 		else
 			chroType = type;
-		if(type > 3)
-			barIs3D = true;
 	}
 	
 	/**
@@ -60,6 +57,16 @@ public enum ChroType {
 	 * @return
 	 */
 	public boolean is3D() {
-		return barIs3D;
+		return chroType > 3;
+	}
+	
+	/**
+	 * @return A string decribing the properties of this ChroType enum 
+	 * 				value of the form "type-{type}_3D-{is3d?}".
+	 */
+	@Override
+	public String toString() {
+		
+		return "type-" + chroType + "_3D-" + (chroType > 3);
 	}
 }

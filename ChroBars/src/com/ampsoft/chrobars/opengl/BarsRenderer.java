@@ -69,10 +69,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glTranslatef(0, 0, -5);
 
-		chroBars.get(ChroType.HOUR	).draw(gl);
-		chroBars.get(ChroType.MINUTE).draw(gl);
-		chroBars.get(ChroType.SECOND).draw(gl);
-		chroBars.get(ChroType.MILLIS).draw(gl);
+		for(ChroBar cb : getVisibleBars())
+			cb.draw(gl);
 
 		gl.glLoadIdentity();
 	}
@@ -106,10 +104,13 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	public int numberOfBarsToDraw() {
 		
-		return  ((chroBars.get(ChroType.HOUR).isDrawn() ? 1 : 0) +
-				  (chroBars.get(ChroType.MINUTE).isDrawn() ? 1 : 0) +
-				  (chroBars.get(ChroType.SECOND).isDrawn() ? 1 : 0) +
-				  (chroBars.get(ChroType.MILLIS).isDrawn() ? 1 : 0)   );
+		int sum = 0;
+		
+		for(ChroBar cb : getVisibleBars())
+			if(cb.isDrawn())
+				sum++;
+		
+		return  sum;
 	}
 	
 	/**
@@ -119,6 +120,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	public ChroBar getChroBar(ChroType type) {
 		return chroBars.get(type);
+	}
+	
+	public ChroBar[] getVisibleBars() {
+		
 	}
 
 	/**
