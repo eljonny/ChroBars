@@ -1,6 +1,8 @@
 package com.ampsoft.chrobars.util;
 
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Set;
 
 import com.ampsoft.chrobars.ChroType;
 
@@ -24,6 +26,11 @@ public final class ChroBarsSettings {
 	private static SharedPreferences.Editor chroPrefsEditor;
 	private static final String prefsFile = "chroprefs";
 	
+	/**
+	 * 
+	 * @param activityContext
+	 * @return
+	 */
 	public static boolean setPrefsInstance(Context activityContext) {
 		
 		chroPrefs = activityContext.getSharedPreferences(prefsFile, activityContext.MODE_PRIVATE);
@@ -35,12 +42,36 @@ public final class ChroBarsSettings {
 			return true;
 	}
 	
+	/**
+	 * 
+	 */
 	public static void loadSavedPrefs() {
-		for(Field pref : ChroBarsSettings.class.getFields())
-			if(pref.getClass().isPrimitive())
-				pref.set(this, value)chro
+		
+		Map<String, ?> prefsMap = chroPrefs.getAll();
+		Set<String> preferenceKeys = prefsMap.keySet();
+		
+		if(prefsMap.isEmpty()) {
+			defaultInit();
+			return;
+		}
+		
+		for(Field pref : ChroBarsSettings.class.getFields()) {
+			if(pref.getClass().isPrimitive()) {
+				if(prefsMap.containsKey(pref.getName()))
+					pref.set(this, chroPrefs.)
+			}
+			else
+				pref.set(null, chroPrefs.))
+		}
 	}
 	
+	/**
+	 * Initializes the application with default values.
+	 */
+	private static void defaultInit() {
+		
+	}
+
 	public static void setPrefValue(String pref, boolean value) {
 		
 	}

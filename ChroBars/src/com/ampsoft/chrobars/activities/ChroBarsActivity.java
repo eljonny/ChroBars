@@ -9,6 +9,7 @@ import android.view.Window;
 
 import com.ampsoft.chrobars.R;
 import com.ampsoft.chrobars.opengl.ChroSurface;
+import com.ampsoft.chrobars.util.ChroBarsSettings;
 
 /**
  * 
@@ -18,6 +19,8 @@ import com.ampsoft.chrobars.opengl.ChroSurface;
 public class ChroBarsActivity extends Activity {
 
 	private static ChroSurface chronos;
+	
+	private static ChroBarsSettings settings;
 	
 	//Intents for starting the other Activities
 	private Intent settingsIntent;
@@ -39,6 +42,7 @@ public class ChroBarsActivity extends Activity {
 		chronos = new ChroSurface(this);
 		setContentView(chronos);
 		
+		settigs = new ChroBarsSettings();
 		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
 		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
 	}

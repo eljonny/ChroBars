@@ -212,7 +212,7 @@ public abstract class ChroBar {
 	 * @return
 	 */
 	public static int barsCreated() {
-		return barsData.getNonFinalInt("barsCreated");
+		return barsData.getInt("barsCreated");
 	}
 	
 	/**

@@ -58,20 +58,16 @@ public final class ChroBarStaticData {
 	 * Chrobars non-final static application data
 	 */
 	
+	/**
+	 * Stores the number of bar objects that have been created for this ChroBarsActivity 
+	 */
+	private static int barsCreated = 0;
+	
 	/** 
 	  * Bar pixel margin and visibility array,
 	  * Shared between all bars
 	  */
 	private static float barMargin = 5.0f;
-	
-	/** 
-	  * First column of
-	  * visible array is actual bar visibility,
-	  * where the second column is whether or not
-	  * to draw the bar in 3D; Using the settings
-	  * screen, enabling/disabling 3D affects both
-	 */
-	private static boolean[] visible = new boolean[_MAX_BARS_TO_DRAW];
 	
 	/**
 	 * Perspective adjustment for rear portion of bar
@@ -87,11 +83,6 @@ public final class ChroBarStaticData {
 	 * Object reference to the current window manager
 	 */
 	private static WindowManager wm;
-	
-	/**
-	 * Stores the number of bar objects that have been created for this ChroBarsActivity 
-	 */
-	private static int barsCreated = 0;
 	
 	/*
 	 * End ChroBars application data
@@ -116,14 +107,15 @@ public final class ChroBarStaticData {
 	/**
 	 * 
 	 */
-	private void updateNonFinalFields() {
-		
-		nonFinalStatic.clear();
+	private synchronized void updateNonFinalFields() {
 		
 		for(Field f : ChroBarStaticData.class.getFields())
 			if(!Modifier.isFinal(f.getModifiers()))
 				if(Modifier.isStatic(f.getModifiers()))
-					nonFinalStatic.add(f);
+					if(!nonFinalStatic.contains(f))
+						synchronized(nonFinalStatic) {
+							nonFinalStatic.add(f);
+						}
 	}
 
 	/**
@@ -131,17 +123,8 @@ public final class ChroBarStaticData {
 	 * @param floatFieldName
 	 * @return
 	 */
-	public float getNonFinalFloat(String floatFieldName) {
+	public float getFloat(String floatFieldName) {
 		return (Float)getVarFromString(floatFieldName);
-	}
-	
-	/**
-	 * 
-	 * @param boolArFieldName
-	 * @return
-	 */
-	public boolean[] getNonFinalBooleanArray(String boolArFieldName) {
-		return (boolean[])getVarFromString(boolArFieldName);
 	}
 	
 	/**
@@ -149,7 +132,7 @@ public final class ChroBarStaticData {
 	 * @param intFieldName
 	 * @return
 	 */
-	public int getNonFinalInt(String intFieldName) {
+	public int getInt(String intFieldName) {
 		return (Integer)getVarFromString(intFieldName);
 	}
 	
@@ -158,44 +141,41 @@ public final class ChroBarStaticData {
 	 * @param objFieldName
 	 * @return
 	 */
-	public Object getNonFinalObject(String objFieldName) {
+	public Object getObject(String objFieldName) {
 		return getVarFromString(objFieldName);
+	}
+
+	/**
+	 * 
+	 * @param floatFieldName
+	 * @return
+	 */
+	private Object getVarFromString(String floatFieldName) {
+		
+		try {
+			if(nonFinalStatic.contains(this.getClass().getField(floatFieldName)))
+				return this.getClass().getField(floatFieldName).get(null);
+		}
+		catch (Exception unknownEx) { printExDetails(unknownEx); }
+		
+		return null;
 	}
 	
 	/**
 	 * 
 	 */
-	public void incIntegerField(String intName) {
+	public synchronized void modifyIntegerField(String intName, int incBy) {
 		
 		for(Field f : nonFinalStatic) {
 			if(f.getClass().isPrimitive()) {
 				if(f.getName().equals(intName)) {
 					
 					try {
-						f.setInt(null, f.getInt(null) + 1);
+						synchronized(f) {
+							f.setInt(null, f.getInt(null) + incBy);
+						}
 					}
-					catch (IllegalArgumentException illegalArgEx) {
-						
-						System.out.println("A IllegalArgumentException occurred:\n" +
-											illegalArgEx.getMessage() + "\n\nCause: " + illegalArgEx.getCause());
-						
-						illegalArgEx.printStackTrace();
-					}
-					catch (IllegalAccessException illegalAccessEx) {
-						
-						System.out.println("A IllegalAccessException occurred:\n" +
-											illegalAccessEx.getMessage() + "\n\nCause: " + illegalAccessEx.getCause());
-						
-						illegalAccessEx.printStackTrace();
-					}
-					catch (Exception unknownEx) {
-						
-						System.out.println("An unknown exception occurred:\n" +
-											unknownEx.getMessage() + "\n\nCause: " +
-											unknownEx.getCause());
-						
-						unknownEx.printStackTrace();
-					}
+					catch (Exception unknownEx) { printExDetails(unknownEx); }
 				}
 			}
 		}
@@ -206,7 +186,7 @@ public final class ChroBarStaticData {
 	 * @param objFieldName
 	 * @param ref
 	 */
-	public <T> void setObjectReference(String objFieldName, T ref) {
+	public synchronized <T> void setObjectReference(String objFieldName, T ref) {
 		
 		for(Field f : nonFinalStatic) {
 			if(f.getClass().isPrimitive())
@@ -215,82 +195,24 @@ public final class ChroBarStaticData {
 					 getSimpleName().equals(ref.getClass().getSimpleName())) {
 				
 				try {
-					f.set(null, ref);
+					synchronized(f) {
+						f.set(null, ref);
+					}
 				}
-				catch (IllegalArgumentException illegalArgEx) {
-					
-					System.out.println("A IllegalArgumentException occurred:\n" +
-										illegalArgEx.getMessage() + "\n\nCause: " + illegalArgEx.getCause());
-					
-					illegalArgEx.printStackTrace();
-				}
-				catch (IllegalAccessException illegalAccessEx) {
-					
-					System.out.println("A IllegalAccessException occurred:\n" +
-										illegalAccessEx.getMessage() + "\n\nCause: " + illegalAccessEx.getCause());
-					
-					illegalAccessEx.printStackTrace();
-				}
-				catch (Exception unknownEx) {
-
-					System.out.println("An unknown exception occurred:\n" +
-										unknownEx.getMessage() + "\n\nCause: " +
-										unknownEx.getCause());
-					
-					unknownEx.printStackTrace();
-				}
+				catch (Exception unknownEx) { printExDetails(unknownEx); }
 			}
 		}
 	}
-
+	
 	/**
 	 * 
-	 * @param floatFieldName
-	 * @return
+	 * @param ex
 	 */
-	private Object getVarFromString(String floatFieldName) throws NullPointerException {
+	private void printExDetails(Exception ex) {
 		
-		try {
-			if(nonFinalStatic.contains(this.getClass().getField(floatFieldName)))
-				return this.getClass().getField(floatFieldName).get(null);
-		}
-		catch (SecurityException secEx) {
+		System.out.println(ex.getClass().getCanonicalName() + " occurred:\n" +
+				ex.getMessage() + "\n\nCause: " + ex.getCause() + "\n\nTrace:\n");
 		
-			System.out.println("A SecurityException occurred:\n" +
-								secEx.getMessage() + "\n\nCause: " + secEx.getCause());
-			
-			secEx.printStackTrace();
-		}
-		catch (NoSuchFieldException nsfEx) {
-			
-			System.out.println("A NoSuchFieldException occurred:\n" +
-								nsfEx.getMessage() + "\n\nCause: " + nsfEx.getCause());
-			
-			nsfEx.printStackTrace();
-		}
-		catch (IllegalArgumentException illegalArgEx) {
-			
-			System.out.println("A IllegalArgumentException occurred:\n" +
-								illegalArgEx.getMessage() + "\n\nCause: " + illegalArgEx.getCause());
-			
-			illegalArgEx.printStackTrace();
-		}
-		catch (IllegalAccessException illegalAccessEx) {
-			
-			System.out.println("A IllegalAccessException occurred:\n" +
-								illegalAccessEx.getMessage() + "\n\nCause: " + illegalAccessEx.getCause());
-			
-			illegalAccessEx.printStackTrace();
-		}
-		catch (Exception unknownEx) {
-			
-			System.out.println("An unknown exception occurred:\n" +
-								unknownEx.getMessage() + "\n\nCause: " +
-								unknownEx.getCause());
-			
-			unknownEx.printStackTrace();
-		}
-		
-		throw new NullPointerException("The specified field does not exist.");
+		ex.printStackTrace();
 	}
 }
