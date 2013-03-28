@@ -13,7 +13,7 @@ import com.ampsoft.chrobars.ChroBar;
  * @author jhyry
  *
  */
-public class ChroUtils {
+public final class ChroUtils {
 	
 	private static ArrayList<Integer> colorPickerHistory = new ArrayList<Integer>();
 	
@@ -107,8 +107,21 @@ public class ChroUtils {
 	}
 	
 	
-	public void setViewBackground(Activity activity, int color) {
-	    View activityView1 = activity.getWindow().getDecorView();
+	public static void setViewBackground(Activity activity, int color) {
+	    
+		View activityView1 = activity.getWindow().getDecorView();
 	    activityView1.setBackgroundColor(color);
+	}
+	
+	/**
+	 * 
+	 * @param ex
+	 */
+	public static void printExDetails(Exception ex) {
+		
+		System.out.println(ex.getClass().getCanonicalName() + " occurred:\n" +
+				ex.getMessage() + "\n\nCause: " + ex.getCause() + "\n\nTrace:\n");
+		
+		ex.printStackTrace();
 	}
 }

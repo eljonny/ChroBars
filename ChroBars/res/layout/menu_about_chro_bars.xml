@@ -6,7 +6,7 @@
     android:background="#DEDEDE" >
 
     <TextView
-        android:id="@+id/creditsTitle"
+        android:id="@+id/chrobars_settings_general_lblChgBGColor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -19,7 +19,7 @@
         android:id="@+id/creditsTextSwitcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/creditsTitle"
+        android:layout_below="@+id/chrobars_settings_general_lblChgBGColor"
         android:layout_centerInParent="true"
         android:layout_marginTop="100dp"
         android:contentDescription="@string/about_title"

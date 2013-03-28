@@ -3,6 +3,8 @@ package com.ampsoft.chrobars.opengl;
 
 import java.util.Locale;
 
+import com.ampsoft.chrobars.util.ChroBarsSettings;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -48,6 +50,14 @@ public class ChroSurface extends GLSurfaceView {
 		// TODO Need to figure out this type of rendering
 		// Listener-based, I think
 		//setRenderMode(RENDERMODE_WHEN_DIRTY);
+	}
+	
+	/**
+	 * Method to pass the settings object reference on to the renderer.
+	 * @param s The settings object instance, of type ChroBarsSettings.
+	 */
+	public void setSettingsInstance(ChroBarsSettings s) {
+		rend.setSettingsObjectReference(s);
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.ampsoft.chrobars.data.ChroBarStaticData;
+import com.ampsoft.chrobars.opengl.BarsRenderer;
 import com.ampsoft.chrobars.opengl.ChroSurface;
 
 /**
@@ -21,12 +22,12 @@ import com.ampsoft.chrobars.opengl.ChroSurface;
 public abstract class ChroBar {
 
 	protected static ChroBarStaticData barsData = null;
-	
+	protected static BarsRenderer renderer;
 	//The bar color is stored as a color int
 	protected int barColor;
 	
 	//Whether this bar should be drawn
-	protected boolean drawBar = true;
+	protected boolean drawBar, drawNumber;
 	
 	//Type of data this represents
 	protected ChroType barType;
@@ -51,13 +52,17 @@ public abstract class ChroBar {
 	public ChroBar(ChroType t, Integer color, Context activityContext) {
 		
 		//If the data object is null, make one. Otherwise do nothing.
-		barsData = barsData == null ? new ChroBarStaticData() : barsData;
+		barsData = barsData == null ? ChroBarStaticData.getDataInstance() : barsData;
 		
-		barsData.setObjectReference("renderer", ChroSurface.getRenderer());
-		barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
-		barsData.incIntegerField("barsCreated");
+		synchronized(barsData) {
+			barsData.setObjectReference("renderer", ChroSurface.getRenderer());
+			barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
+			barsData.modifyIntegerField("barsCreated", 1);
+		}
 		
 		barType = t;
+		
+		renderer = ChroSurface.getRenderer();
 		
 		//Initialize the vertex array with default values
 		//And get the current window manager
@@ -74,7 +79,15 @@ public abstract class ChroBar {
 	 * @param toDraw
 	 */
 	public void setDrawBar(boolean toDraw) {
-		barsData.getNonFinalBooleanArray("visible")[barType.getType()] = drawBar = toDraw;
+		drawBar = toDraw;
+	}
+	
+	/**
+	 * 
+	 * @param drawNum
+	 */
+	public void setDrawNumber(boolean drawNum) {
+		drawNumber = drawNum;
 	}
 	
 	/**
@@ -83,6 +96,10 @@ public abstract class ChroBar {
 	 */
 	public boolean isDrawn() {
 		return drawBar;
+	}
+	
+	public boolean isNumberDrawn() {
+		return drawNumber;
 	}
 
 	/**
@@ -102,7 +119,29 @@ public abstract class ChroBar {
 	 * 
 	 * @return
 	 */
-	protected abstract float getRatio(int barType);
+	protected float getRatio() {
+		
+		int t = barType.getType();
+		
+		if(t > 3)
+			t -= 4;
+		
+		switch(t) {
+		
+		case 0:
+			return (float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)ChroBarStaticData._HOURS_IN_DAY;
+		case 1:
+			return (float)currentTime.get(Calendar.MINUTE)/(float)ChroBarStaticData._MINUTES_IN_HOUR;
+		case 2:
+			return (float)currentTime.get(Calendar.SECOND)/(float)ChroBarStaticData._SECONDS_IN_MINUTE;
+		case 3:
+			return (float)currentTime.get(Calendar.MILLISECOND)/(float)ChroBarStaticData._MILLIS_IN_SECOND;
+			
+		default:
+			System.err.print("Invalid type!");
+			return 0;
+		}
+	}
 
 	/**
 	 * 
@@ -205,6 +244,14 @@ public abstract class ChroBar {
 	 */
 	public int getBarColor() {
 		return barColor;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ChroType getBarType() {
+		return barType;
 	}
 	
 	/**

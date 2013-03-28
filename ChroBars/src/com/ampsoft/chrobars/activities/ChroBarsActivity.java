@@ -26,6 +26,8 @@ public class ChroBarsActivity extends Activity {
 	private Intent settingsIntent;
 	private Intent aboutIntent;
 	
+	private static ChroBarsActivity instance;
+	
 	/**
 	 * 
 	 */
@@ -34,17 +36,20 @@ public class ChroBarsActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		
-		
 		//Remove the title bar, get ViewGroup access
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
+		settings = ChroBarsSettings.getNewSettingsInstance(this);
+
 		//Create the GLSurfaceView and set it as the content view
 		chronos = new ChroSurface(this);
+		chronos.setSettingsInstance(settings);
 		setContentView(chronos);
 		
-		settigs = new ChroBarsSettings();
 		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
 		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
+		
+		instance = this;
 	}
 
 	/**
@@ -79,5 +84,14 @@ public class ChroBarsActivity extends Activity {
 	    }
 		
 		return true;
+	}
+	
+	/**
+	 * 
+	 * @param requester
+	 * @return
+	 */
+	protected static ChroBarsSettings requestSettingsObjectReference(Object requester) {
+		return requester.getClass().getSuperclass().getCanonicalName().equals(instance.getClass().getSuperclass().getCanonicalName()) ? settings : null;
 	}
 }

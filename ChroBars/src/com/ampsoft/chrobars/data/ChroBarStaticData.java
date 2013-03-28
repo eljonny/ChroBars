@@ -3,10 +3,13 @@ package com.ampsoft.chrobars.data;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import android.view.WindowManager;
 
 import com.ampsoft.chrobars.opengl.BarsRenderer;
+import com.ampsoft.chrobars.util.ChroUtils;
 
 /**
  * 
@@ -32,6 +35,16 @@ public final class ChroBarStaticData {
 	public static final int _3D_VERTICES = 8;
 	public static final int _VERTEX_STRIDE = 0;
 	public static final int _MAX_BARS_TO_DRAW = 4;
+	
+	//Application default settings, immutable
+	public static final byte precision = 0;
+	public static final int backgroundColor = 0x6C6C6C;
+	public static final int hourBarColor = 0xB7E7FF;
+	public static final int minuteBarColor = 0xFFAF4E;
+	public static final int secondBarColor = 0x9FFF9F;
+	public static final int millisecondBarColor = 0xFF5757;
+	public static final boolean threeD = true, displayNumbers = true;
+	public static final boolean[] visibleBars = {true, true, true, false};
 	
 	//Base Y-Coordinate from which to draw a ChroBar
 	public static final float _baseHeight = -1.8f;
@@ -95,13 +108,25 @@ public final class ChroBarStaticData {
 	/**
 	 * Where the non-final fields are stored.
 	 */
-	private ArrayList<Field> nonFinalStatic = new ArrayList<Field>();
+	private static ArrayList<Field> nonFinalStatic = new ArrayList<Field>();
+	private static HashMap<String, Integer> colors;
+	
+	private static Boolean instance = false;
+	
+	public static ChroBarStaticData getDataInstance() {
+		
+		if(instance)
+			throw new RuntimeException(new IllegalAccessException("There is already an instance of the settings object. Aborting."));
+		else
+			return new ChroBarStaticData();
+	}
 	
 	/**
 	 * 
 	 */
-	public ChroBarStaticData() {
+	private ChroBarStaticData() {
 		updateNonFinalFields();
+		instance = true;
 	}
 	
 	/**
@@ -112,9 +137,11 @@ public final class ChroBarStaticData {
 		for(Field f : ChroBarStaticData.class.getFields())
 			if(!Modifier.isFinal(f.getModifiers()))
 				if(Modifier.isStatic(f.getModifiers()))
-					if(!nonFinalStatic.contains(f))
-						synchronized(nonFinalStatic) {
-							nonFinalStatic.add(f);
+					if(f.getClass().isPrimitive() ||
+					   !Collections.class.isAssignableFrom(f.getClass()))
+						synchronized(f) {
+							if(!nonFinalStatic.contains(f))
+								nonFinalStatic.add(f);
 						}
 	}
 
@@ -144,6 +171,19 @@ public final class ChroBarStaticData {
 	public Object getObject(String objFieldName) {
 		return getVarFromString(objFieldName);
 	}
+	
+	public static HashMap<String, Integer> getColorDefaults() {
+		
+		colors = new HashMap<String, Integer>();
+		
+		for(Field data : ChroBarStaticData.class.getFields())
+			if(data.getName().endsWith("Color")) {
+				try { colors.put(data.getName(), data.getInt(null)); }
+				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+			}
+		
+		return colors;
+	}
 
 	/**
 	 * 
@@ -156,7 +196,7 @@ public final class ChroBarStaticData {
 			if(nonFinalStatic.contains(this.getClass().getField(floatFieldName)))
 				return this.getClass().getField(floatFieldName).get(null);
 		}
-		catch (Exception unknownEx) { printExDetails(unknownEx); }
+		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		
 		return null;
 	}
@@ -164,7 +204,7 @@ public final class ChroBarStaticData {
 	/**
 	 * 
 	 */
-	public synchronized void modifyIntegerField(String intName, int incBy) {
+	public synchronized void modifyIntegerField(String intName, int modBy) {
 		
 		for(Field f : nonFinalStatic) {
 			if(f.getClass().isPrimitive()) {
@@ -172,10 +212,10 @@ public final class ChroBarStaticData {
 					
 					try {
 						synchronized(f) {
-							f.setInt(null, f.getInt(null) + incBy);
+							f.setInt(null, f.getInt(null) + modBy);
 						}
 					}
-					catch (Exception unknownEx) { printExDetails(unknownEx); }
+					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 				}
 			}
 		}
@@ -199,20 +239,8 @@ public final class ChroBarStaticData {
 						f.set(null, ref);
 					}
 				}
-				catch (Exception unknownEx) { printExDetails(unknownEx); }
+				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 			}
 		}
-	}
-	
-	/**
-	 * 
-	 * @param ex
-	 */
-	private void printExDetails(Exception ex) {
-		
-		System.out.println(ex.getClass().getCanonicalName() + " occurred:\n" +
-				ex.getMessage() + "\n\nCause: " + ex.getCause() + "\n\nTrace:\n");
-		
-		ex.printStackTrace();
 	}
 }

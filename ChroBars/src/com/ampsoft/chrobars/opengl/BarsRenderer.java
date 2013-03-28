@@ -7,6 +7,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 import com.ampsoft.chrobars.ChroBar;
 import com.ampsoft.chrobars.ChroType;
+import com.ampsoft.chrobars.data.ChroBarStaticData;
+import com.ampsoft.chrobars.util.ChroBarsSettings;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -69,7 +71,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glTranslatef(0, 0, -5);
 
-		for(ChroBar cb : getVisibleBars())
+		for(ChroBar cb : refreshVisibleBars())
 			cb.draw(gl);
 
 		gl.glLoadIdentity();
@@ -98,6 +100,11 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		activityContext = context;
 	}
 	
+	protected void setSettingsObjectReference(ChroBarsSettings settings) {
+		BarsRenderer.settings = settings;
+		setBackgroundColor(settings.getBackgroundColor(false));
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -106,7 +113,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		int sum = 0;
 		
-		for(ChroBar cb : getVisibleBars())
+		for(ChroBar cb : refreshVisibleBars())
 			if(cb.isDrawn())
 				sum++;
 		
@@ -122,8 +129,20 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		return chroBars.get(type);
 	}
 	
-	public ChroBar[] getVisibleBars() {
+	/**
+	 * 
+	 * @return
+	 */
+	public ChroBar[] refreshVisibleBars() {
 		
+		for(ChroType t : chroBars.keySet()) {
+			if(settings.isThreeD() && t.is3D() && chroBars.get(t).isDrawn())
+				visibleBars[t.getType()-ChroBarStaticData._MAX_BARS_TO_DRAW] = chroBars.get(t);
+			else if(!settings.isThreeD() && !t.is3D() && chroBars.get(t).isDrawn())
+				visibleBars[t.getType()] = chroBars.get(t);
+		}
+		
+		return visibleBars;
 	}
 
 	/**
@@ -151,11 +170,13 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	//For setting the background color
-	private static float[] backgroundColor = {0.87f, 0.87f, 0.87f, 0.5f};
+	private static float[] backgroundColor = new float[ChroBarStaticData._RGBA_COMPONENTS];
 
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(8);
+	private static ChroBar[] visibleBars = new ChroBar[ChroBarStaticData._MAX_BARS_TO_DRAW];
 	
 	//Context in which this Renderer exists
 	private Context activityContext;
+	private static ChroBarsSettings settings;
 }
