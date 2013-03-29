@@ -10,6 +10,7 @@ import android.view.Window;
 import com.ampsoft.chrobars.R;
 import com.ampsoft.chrobars.opengl.ChroSurface;
 import com.ampsoft.chrobars.util.ChroBarsSettings;
+import com.ampsoft.chrobars.util.ChroUtils;
 
 /**
  * 
@@ -39,8 +40,14 @@ public class ChroBarsActivity extends Activity {
 		//Remove the title bar, get ViewGroup access
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		settings = ChroBarsSettings.getNewSettingsInstance(this);
-
+		try {
+			settings = ChroBarsSettings.getNewSettingsInstance(this);
+		}
+		catch(Exception unknownEx) {
+			ChroUtils.printExDetails(unknownEx);
+			settings = ChroBarsSettings.getInstance(this);
+		}
+		
 		//Create the GLSurfaceView and set it as the content view
 		chronos = new ChroSurface(this);
 		chronos.setSettingsInstance(settings);

@@ -52,6 +52,10 @@ public class ChroBar2D extends ChroBar {
 		drawDirection_2D = rawBuffer.asShortBuffer();
 		drawDirection_2D.put(ChroBarStaticData._vertexDrawSequence_2D);
 		drawDirection_2D.position(0);
+		
+		//Initialize the vertex array with default values
+		//And get the current window manager
+		initVertices();
 	}
 	
 	/**

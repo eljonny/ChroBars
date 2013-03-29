@@ -52,6 +52,10 @@ public class ChroBar3D extends ChroBar {
 		drawDirection_3D = rawBuffer.asShortBuffer();
 		drawDirection_3D.put(ChroBarStaticData._vertexDrawSequence_3D);
 		drawDirection_3D.position(0);
+		
+		//Initialize the vertex array with default values
+		//And get the current window manager
+		initVertices();
 	}
 
 	/**
@@ -77,14 +81,13 @@ public class ChroBar3D extends ChroBar {
 	
 	/**
 	 * 
-	 * @param screenMetrics
-	 * @param verts2 
 	 */
 	protected void setBarWidth() {
 
 		//Gather required information
 		float screenWidth = (float)screen.widthPixels;
-		float barTypeCode = (float)barType.getType();
+		System.out.println("Screen width: " + screenWidth);
+		float barTypeCode = (float)barType.getType() - 4;
 		float barMargin = barsData.getFloat("barMargin");
 		
 		//Update the bar margin to 5px ratio of screen width
@@ -93,32 +96,36 @@ public class ChroBar3D extends ChroBar {
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
+		System.out.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
-		barWidth -= barMargin*2.0f;
 		barWidth *= 2;
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
-		if(barType.getType() - 4 < 3)
-			for(int i = barType.getType() + 1; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++)
+		if(barType.getType() < 7)
+			for(int i = barType.getType() - 3; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++) {
 				if(!renderer.refreshVisibleBars()[i].isDrawn())
 					++barTypeCode;
-		else if(barType.getType() < 2)
-			for(int j = barType.getType() - 1; j >= 0; j--)
+			}
+		else if(barType.getType() < 6)
+			for(int j = barType.getType() - 5; j >= 0; j--) {
 				if(!renderer.refreshVisibleBars()[j].isDrawn())
 					--barTypeCode;
+			}
 		
 		if(barTypeCode < 0)
-			while(barTypeCode < 0)
-				barTypeCode++;
-			
-		float leftXCoordinate_3D_front = barMargin +
-				(barWidth * barTypeCode) + (barMargin * barTypeCode) +
-					(((int)barTypeCode) > 0 ? barMargin : 0.0f) - 1.0f;
+			barTypeCode = 0;
+					
+		float leftXCoordinate_3D_front = (barWidth * barTypeCode) + (barMargin * barTypeCode) +
+					(((int)barTypeCode) > 0 ? barMargin : 0.0f) - (0.99f + barMargin);
 		float leftXCoordinate_3D_rear  = leftXCoordinate_3D_front + barsData.getFloat("bar_3D_offset");
 		
 		float rightXCoordinate_3D_front = leftXCoordinate_3D_front + barWidth;
 		float rightXCoordinate_3D_rear  = rightXCoordinate_3D_front + barsData.getFloat("bar_3D_offset");
+		
+		System.out.println("Current coords: " + leftXCoordinate_3D_front + ", " +
+							leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
+							", " + rightXCoordinate_3D_rear);
 		
 		vertices_3D[0] = vertices_3D[3]   = leftXCoordinate_3D_front;
 		vertices_3D[6] = vertices_3D[9]   = rightXCoordinate_3D_front;

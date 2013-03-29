@@ -38,10 +38,10 @@ public abstract class ChroBar {
 	
 	//Screen size for the current device is
 	//found using these objects
-	protected DisplayMetrics screen = new DisplayMetrics();
+	protected static DisplayMetrics screen;
 	
 	//Used in determining bar height
-	protected Calendar currentTime;
+	protected static Calendar currentTime;
 	
 	/**
 	 * 
@@ -55,18 +55,17 @@ public abstract class ChroBar {
 		barsData = barsData == null ? ChroBarStaticData.getDataInstance() : barsData;
 		
 		synchronized(barsData) {
-			barsData.setObjectReference("renderer", ChroSurface.getRenderer());
-			barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
+			if(screen == null) {
+				barsData.setObjectReference("renderer", ChroSurface.getRenderer());
+				barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
+			}
 			barsData.modifyIntegerField("barsCreated", 1);
 		}
 		
 		barType = t;
 		
 		renderer = ChroSurface.getRenderer();
-		
-		//Initialize the vertex array with default values
-		//And get the current window manager
-		initVertices();
+		screen = new DisplayMetrics();
 	}
 
 	/**

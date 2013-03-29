@@ -3,7 +3,6 @@ package com.ampsoft.chrobars.data;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import android.view.WindowManager;
@@ -74,27 +73,32 @@ public final class ChroBarStaticData {
 	/**
 	 * Stores the number of bar objects that have been created for this ChroBarsActivity 
 	 */
+	@SuppressWarnings("unused")
 	private static int barsCreated = 0;
 	
 	/** 
 	  * Bar pixel margin and visibility array,
 	  * Shared between all bars
 	  */
+	@SuppressWarnings("unused")
 	private static float barMargin = 5.0f;
 	
 	/**
 	 * Perspective adjustment for rear portion of bar
 	 */
+	@SuppressWarnings("unused")
 	private static float bar_3D_offset = 0.1f;
 	
 	/**
 	 * An object reference to the current surface renderer
 	 */
+	@SuppressWarnings("unused")
 	private static BarsRenderer renderer;
 	
 	/**
 	 * Object reference to the current window manager
 	 */
+	@SuppressWarnings("unused")
 	private static WindowManager wm;
 	
 	/*
@@ -108,14 +112,25 @@ public final class ChroBarStaticData {
 	/**
 	 * Where the non-final fields are stored.
 	 */
-	private static ArrayList<Field> nonFinalStatic = new ArrayList<Field>();
-	private static HashMap<String, Integer> colors;
+	private static ArrayList<Field> _nonFinalStatic = new ArrayList<Field>();
 	
-	private static Boolean instance = false;
+	/**
+	 * Default colors are stored here.
+	 */
+	private static HashMap<String, Integer> _colors;
 	
+	/**
+	 * Singleton control
+	 */
+	private static Boolean _instance = false;
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public static ChroBarStaticData getDataInstance() {
 		
-		if(instance)
+		if(_instance)
 			throw new RuntimeException(new IllegalAccessException("There is already an instance of the settings object. Aborting."));
 		else
 			return new ChroBarStaticData();
@@ -126,7 +141,9 @@ public final class ChroBarStaticData {
 	 */
 	private ChroBarStaticData() {
 		updateNonFinalFields();
-		instance = true;
+		_instance = true;
+		
+		System.out.println("Non-Final Static fields consist of: " + _nonFinalStatic);
 	}
 	
 	/**
@@ -134,15 +151,20 @@ public final class ChroBarStaticData {
 	 */
 	private synchronized void updateNonFinalFields() {
 		
-		for(Field f : ChroBarStaticData.class.getFields())
+		for(Field f : ChroBarStaticData.class.getDeclaredFields())
 			if(!Modifier.isFinal(f.getModifiers()))
-				if(Modifier.isStatic(f.getModifiers()))
-					if(f.getClass().isPrimitive() ||
-					   !Collections.class.isAssignableFrom(f.getClass()))
-						synchronized(f) {
-							if(!nonFinalStatic.contains(f))
-								nonFinalStatic.add(f);
-						}
+				if(Modifier.isStatic(f.getModifiers())) {
+					try {
+						if(!f.getName().startsWith("_"))
+							synchronized(f) {
+								synchronized(_nonFinalStatic) {
+									if(!_nonFinalStatic.contains(f))
+										_nonFinalStatic.add(f);
+								}
+							}
+					}
+					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+				}
 	}
 
 	/**
@@ -171,19 +193,6 @@ public final class ChroBarStaticData {
 	public Object getObject(String objFieldName) {
 		return getVarFromString(objFieldName);
 	}
-	
-	public static HashMap<String, Integer> getColorDefaults() {
-		
-		colors = new HashMap<String, Integer>();
-		
-		for(Field data : ChroBarStaticData.class.getFields())
-			if(data.getName().endsWith("Color")) {
-				try { colors.put(data.getName(), data.getInt(null)); }
-				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
-			}
-		
-		return colors;
-	}
 
 	/**
 	 * 
@@ -193,8 +202,9 @@ public final class ChroBarStaticData {
 	private Object getVarFromString(String floatFieldName) {
 		
 		try {
-			if(nonFinalStatic.contains(this.getClass().getField(floatFieldName)))
-				return this.getClass().getField(floatFieldName).get(null);
+			for(Field f : _nonFinalStatic)
+				if(f.getName().equals(floatFieldName))
+					return f.get(null);
 		}
 		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		
@@ -203,10 +213,27 @@ public final class ChroBarStaticData {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public static HashMap<String, Integer> getColorDefaults() {
+		
+		_colors = new HashMap<String, Integer>();
+		
+		for(Field data : ChroBarStaticData.class.getFields())
+			if(data.getName().endsWith("Color")) {
+				try { _colors.put(data.getName(), data.getInt(null)); }
+				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+			}
+		
+		return _colors;
+	}
+	
+	/**
+	 * 
 	 */
 	public synchronized void modifyIntegerField(String intName, int modBy) {
 		
-		for(Field f : nonFinalStatic) {
+		for(Field f : _nonFinalStatic) {
 			if(f.getClass().isPrimitive()) {
 				if(f.getName().equals(intName)) {
 					
@@ -228,14 +255,11 @@ public final class ChroBarStaticData {
 	 */
 	public synchronized <T> void setObjectReference(String objFieldName, T ref) {
 		
-		for(Field f : nonFinalStatic) {
-			if(f.getClass().isPrimitive())
-				continue;
-			if(f.getName().equals(objFieldName) && f.getType().getClass().
-					 getSimpleName().equals(ref.getClass().getSimpleName())) {
-				
+		for(Field f : _nonFinalStatic) {
+			if(f.getName().equals(objFieldName)) {
 				try {
 					synchronized(f) {
+						System.out.println("Setting field " + objFieldName + " to " + ref);
 						f.set(null, ref);
 					}
 				}

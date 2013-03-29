@@ -34,8 +34,11 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
-		for(ChroType ct : ChroType.values())
-				chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
+		for(ChroType ct : ChroType.values()) {
+			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
+			chroBars.get(ct).changeChroBarColor(settings.getBarColor(ct, false));
+		}
+		refreshVisibleBars();
 		
 		// Set OpenGL Parameters:
 		// - Background of the OpenGL surface to white
@@ -135,11 +138,15 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	public ChroBar[] refreshVisibleBars() {
 		
-		for(ChroType t : chroBars.keySet()) {
-			if(settings.isThreeD() && t.is3D() && chroBars.get(t).isDrawn())
-				visibleBars[t.getType()-ChroBarStaticData._MAX_BARS_TO_DRAW] = chroBars.get(t);
-			else if(!settings.isThreeD() && !t.is3D() && chroBars.get(t).isDrawn())
-				visibleBars[t.getType()] = chroBars.get(t);
+		if(settings.isThreeD()) {
+			for(ChroType t : chroBars.keySet())
+				if(t.is3D())
+					visibleBars[t.getType()-ChroBarStaticData._MAX_BARS_TO_DRAW] = chroBars.get(t);
+		}
+		else {
+			for(ChroType t : chroBars.keySet())
+				if(!t.is3D())
+					visibleBars[t.getType()] = chroBars.get(t);
 		}
 		
 		return visibleBars;
