@@ -25,6 +25,7 @@ public class ChroBarsActivity extends Activity {
 	
 	//Intents for starting the other Activities
 	private Intent settingsIntent;
+	private int layoutId = 0;
 	private Intent aboutIntent;
 	
 	private static ChroBarsActivity instance;
@@ -45,7 +46,12 @@ public class ChroBarsActivity extends Activity {
 		}
 		catch(Exception unknownEx) {
 			ChroUtils.printExDetails(unknownEx);
+			System.out.println("Trying to get existing settings instance...");
 			settings = ChroBarsSettings.getInstance(this);
+			if(settings != null)
+				System.out.println("Existing settings instance retrieved.");
+			else
+				throw new NullPointerException("Cannot continue. The settings object is null.");
 		}
 		
 		//Create the GLSurfaceView and set it as the content view
@@ -57,6 +63,15 @@ public class ChroBarsActivity extends Activity {
 		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
 		
 		instance = this;
+	}
+	
+	/**
+	 * Ensures that the settings singleton can be regenerated.
+	 */
+	@Override
+	public void onBackPressed() {
+		ChroBarsSettings.clean();
+		finish();
 	}
 
 	/**
@@ -80,7 +95,7 @@ public class ChroBarsActivity extends Activity {
 	    switch (item.getItemId()) {
 	    
 	        case R.id.menu_settings:
-	        	startActivity(settingsIntent);
+	        	startActivityForResult(settingsIntent, layoutId);
 	            break;
 	        case R.id.menu_about:
 	        	startActivity(aboutIntent);
@@ -91,6 +106,14 @@ public class ChroBarsActivity extends Activity {
 	    }
 		
 		return true;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void onActivityResult(int request, int result, Intent ac) {
+		layoutId = result;
 	}
 	
 	/**

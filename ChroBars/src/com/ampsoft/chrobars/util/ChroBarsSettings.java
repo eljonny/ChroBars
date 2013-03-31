@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 
 import com.ampsoft.chrobars.ChroType;
+import com.ampsoft.chrobars.R;
 import com.ampsoft.chrobars.data.ChroBarStaticData;
 
 /**
@@ -26,6 +27,7 @@ public final class ChroBarsSettings {
 	
 	//General bars application options
 	private int precision;
+	private int settingsActivityLayout;
 	private boolean threeD, displayNumbers;
 	private ArrayList<Boolean> barsVisibility;
 	
@@ -120,6 +122,10 @@ public final class ChroBarsSettings {
 		chroPrefs = activityContext.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
 		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
 	}
+	
+	public static void clean() {
+		instance = false;
+	}
 
 	/**
 	 * 
@@ -149,6 +155,7 @@ public final class ChroBarsSettings {
 			
 			if(pref.getName().startsWith(userDef))
 				continue;
+			
 			if(pref.getName().startsWith(visList)) {
 				while(keyz.hasNext()) {
 					
@@ -226,6 +233,7 @@ public final class ChroBarsSettings {
 	private void setGeneralDefaultSettings() {
 		
 		System.out.println("Setting general defaults...");
+		settingsActivityLayout = R.layout.chrobars_settings;
 		precision = ChroBarStaticData.precision;
 		threeD = ChroBarStaticData.threeD;
 		displayNumbers = ChroBarStaticData.displayNumbers;
@@ -270,6 +278,7 @@ public final class ChroBarsSettings {
 		System.out.println("Putting all default settings...");
 		
 		putPreference("precision", true);
+		putPreference("settingsActivityLayout", true);
 		putPreference("threeD", false);
 		putPreference("displayNumbers", false);
 		
@@ -415,6 +424,13 @@ public final class ChroBarsSettings {
 	 */
 	private final int getMillisecondBarColor(boolean userDefault) {
 		return userDefault ? userDefault_millisecondBarColor : millisecondBarColor;
+	}
+
+	/**
+	 * @return the settingsActivityLayout
+	 */
+	public int getSettingsActivityLayout() {
+		return settingsActivityLayout;
 	}
 
 	/**

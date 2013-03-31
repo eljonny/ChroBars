@@ -86,7 +86,7 @@ public class ChroBar3D extends ChroBar {
 
 		//Gather required information
 		float screenWidth = (float)screen.widthPixels;
-		System.out.println("Screen width: " + screenWidth);
+		//System.out.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType() - 4;
 		float barMargin = barsData.getFloat("barMargin");
 		
@@ -96,7 +96,7 @@ public class ChroBar3D extends ChroBar {
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
-		System.out.println("We are drawing " + numberOfBars + " bars.");
+		//System.out.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth *= 2;
 		
@@ -123,9 +123,9 @@ public class ChroBar3D extends ChroBar {
 		float rightXCoordinate_3D_front = leftXCoordinate_3D_front + barWidth;
 		float rightXCoordinate_3D_rear  = rightXCoordinate_3D_front + barsData.getFloat("bar_3D_offset");
 		
-		System.out.println("Current coords: " + leftXCoordinate_3D_front + ", " +
-							leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
-							", " + rightXCoordinate_3D_rear);
+		//System.out.println("Current coords: " + leftXCoordinate_3D_front + ", " +
+		//					leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
+		//					", " + rightXCoordinate_3D_rear);
 		
 		vertices_3D[0]  = vertices_3D[3]  = leftXCoordinate_3D_front;
 		vertices_3D[6]  = vertices_3D[9]  = rightXCoordinate_3D_front;
@@ -159,6 +159,9 @@ public class ChroBar3D extends ChroBar {
 		verticesBuffer_3D.position(0);
 	}
 	
+	/**
+	 * 
+	 */
 	protected void drawBar(GL10 drawSurface) {
 
 		//Tell openGL where the vertex data is and how to use it
