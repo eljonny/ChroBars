@@ -60,6 +60,21 @@ public enum ChroType {
 		return chroType > 3;
 	}
 	
+	public String getTypeString() {
+		switch(is3D() ? chroType - 4 : chroType) {
+		case 0:
+			return "hour";
+		case 1:
+			return "minute";
+		case 2:
+			return "second";
+		case 3:
+			return "millisecond";
+		default:
+			return "unknown";
+		}
+	}
+	
 	/**
 	 * @return A string decribing the properties of this ChroType enum 
 	 * 				value of the form "type-{type}_3D-{is3d?}".

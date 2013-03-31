@@ -62,6 +62,9 @@ public final class ChroUtils {
 	}
 
 	/**
+	 * Adds the color chosen for a ChroBar to the color picker history buffer.
+	 * This feature is not fully implemented, but should be in the future to
+	 *  make it easier to choose a color someone previously chose before.
 	 * 
 	 * @param color
 	 * @return
@@ -123,5 +126,17 @@ public final class ChroUtils {
 				ex.getMessage() + "\n\nCause: " + ex.getCause() + "\n\nTrace:\n");
 		
 		ex.printStackTrace();
+	}
+
+	/**
+	 * Builds a semantically-correct variable name from a ChroBar type.
+	 * 
+	 * @param bar A ChroBar of which to build a color variable string.
+	 * @return The string representing the bar's color storage field.
+	 */
+	public static String getChroBarColorVarString(ChroBar bar) {
+		
+		final String postFix = "BarColor";
+		return bar.getBarType().getTypeString() + postFix;
 	}
 }

@@ -127,8 +127,8 @@ public class ChroBar3D extends ChroBar {
 							leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
 							", " + rightXCoordinate_3D_rear);
 		
-		vertices_3D[0] = vertices_3D[3]   = leftXCoordinate_3D_front;
-		vertices_3D[6] = vertices_3D[9]   = rightXCoordinate_3D_front;
+		vertices_3D[0]  = vertices_3D[3]  = leftXCoordinate_3D_front;
+		vertices_3D[6]  = vertices_3D[9]  = rightXCoordinate_3D_front;
 		vertices_3D[12] = vertices_3D[15] = leftXCoordinate_3D_rear;
 		vertices_3D[18] = vertices_3D[21] = rightXCoordinate_3D_rear;
 	}

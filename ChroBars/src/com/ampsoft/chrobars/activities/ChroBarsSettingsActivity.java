@@ -95,17 +95,19 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		if(v instanceof CheckBox)
 			setChroBarVisibility((CheckBox)v);
-		else if(v instanceof Button)
-			pickColor((Button)v);
 		else if(v instanceof ToggleButton)
 			toggle3D((ToggleButton)v);
+		else if(v instanceof Button)
+			pickColor((Button)v);
 	}
 	
 	/**
 	 * 
 	 */
 	private void toggle3D(ToggleButton tButton) {
+		
 		settings.setPrefValue("threeD", tButton.isChecked());
+		renderer.refreshVisibleBars();
 	}
 
 	/**
@@ -168,8 +170,6 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void pickBackgroundColor() {
 		
-		final BarsRenderer renderer = ChroSurface.getRenderer();
-		
 		/**
 		 * 
 		 */
@@ -183,6 +183,11 @@ public class ChroBarsSettingsActivity extends Activity
 							/**
 							 * 
 							 */
+							private ChroBarsSettings settingsRef = settings;
+							
+							/**
+							 * 
+							 */
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
@@ -190,6 +195,7 @@ public class ChroBarsSettingsActivity extends Activity
 									Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
 								
 								rend.setBackgroundColor(colorInt);
+								settingsRef.setPrefValue("backgroundColor", colorInt);
 							}
 						};
 						
@@ -216,6 +222,11 @@ public class ChroBarsSettingsActivity extends Activity
 							/**
 							 * 
 							 */
+							private ChroBarsSettings settingsRef = settings;
+							
+							/**
+							 * 
+							 */
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
@@ -223,6 +234,8 @@ public class ChroBarsSettingsActivity extends Activity
 								
 								ChroUtils.barColorChosen(colorInt);
 								ChroUtils.changeChroBarColor(bar, colorInt);
+								
+								settingsRef.setPrefValue(ChroUtils.getChroBarColorVarString(bar), colorInt);
 							}
 						};
 						
@@ -240,19 +253,19 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		case R.id.chrobars_settings_slidingDrawer_chkbxHours:
 			currentBars[0].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[0].getBarType(), box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[0].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
 			currentBars[1].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[1].getBarType(), box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[1].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
 			currentBars[2].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[2].getBarType(), box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[2].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
 			currentBars[3].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[3].getBarType(), box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[3].getBarType(), false, box.isChecked());
 			return;
 		default:
 			displayNumbers(box);
@@ -270,6 +283,8 @@ public class ChroBarsSettingsActivity extends Activity
 			for(ChroType t : ChroType.values())
 				renderer.getChroBar(t).setDrawNumber(box.isChecked());
 		}
+		else
+			throw new RuntimeException("The checkbox detected is unknown: " + box.isChecked() + "@" + box.toString() + ":" + box.getId() + "\n");
 	}
 
 	/**
@@ -322,15 +337,15 @@ public class ChroBarsSettingsActivity extends Activity
 			if(touchable instanceof CheckBox)
 				if(!checkBoxes.contains(touchable))
 					checkBoxes.add((CheckBox)touchable);
-			else if(touchable instanceof Button)
-				if(!buttons.contains(touchable))
-				buttons.add((Button)touchable);
 			else if(touchable instanceof SeekBar)
 				if(!sliders.contains(touchable))
 					sliders.add((SeekBar)touchable);
 			else if(touchable instanceof ToggleButton)
 				if(!toggles.contains(touchable))
 					toggles.add((ToggleButton)touchable);
+			else if(touchable instanceof Button)
+				if(!buttons.contains(touchable))
+					buttons.add((Button)touchable);
 			
 			touchable.setOnClickListener(this);
 		}

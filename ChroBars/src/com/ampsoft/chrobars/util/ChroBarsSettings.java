@@ -64,6 +64,12 @@ public final class ChroBarsSettings {
 			return new ChroBarsSettings(activityContext);
 	}
 	
+	/**
+	 * A valid context may use this method to obtain the current settings object instance.
+	 * 
+	 * @param aC
+	 * @return
+	 */
 	public static final ChroBarsSettings getInstance(Context aC) {
 		if(aC.equals(instanceActivityContext))
 			return instanceObject;
@@ -145,7 +151,7 @@ public final class ChroBarsSettings {
 					if(tempKey.startsWith(visList)) {
 						System.out.println("Parsing saved item " + tempKey);
 						String[] parsed = tempKey.split("_");
-						barsVisibility.set(Integer.parseInt(parsed[1]), (Boolean) prefsMap.get(tempKey));
+						barsVisibility.set(Integer.parseInt(parsed[parsed.length - 1]), (Boolean) prefsMap.get(tempKey));
 					}
 				}
 			}
@@ -232,31 +238,62 @@ public final class ChroBarsSettings {
 	 */
 	private void putDefaults() {
 		
-		putPreference("precision", precision);
-		putPreference("threeD", threeD);
-		putPreference("displayNumbers", displayNumbers);
+		putPreference("precision", true);
+		putPreference("threeD", false);
+		putPreference("displayNumbers", false);
 		
 		for(int barVis = 0; barVis < barsVisibility.size(); barVis++)
-			putPreference("barsVisibility_" + barVis, barsVisibility.get(barVis));
+			putVisibilityPreference("barsVisibility_" + barVis, barsVisibility.get(barVis));
 		
 		HashMap<String, Integer> defaultColors = ChroBarStaticData.getColorDefaults();
 		
 		for(String key : defaultColors.keySet()) {
-			putPreference(key, defaultColors.get(key));
-			putPreference("userDefault_" + key, defaultColors.get(key));
+			putPreference(key, true);
+			putPreference("userDefault_" + key, true);
 		}
 	}
 
-	private void putPreference(String prefName, boolean val) {
+	/**
+	 * 
+	 * @param prefName
+	 * @param isInt
+	 */
+	private void putPreference(String prefName, boolean isInt) {
 		
-		chroPrefsEditor.putBoolean(prefName, val);
-		chroPrefsEditor.commit();
+		Object setting = null;
+		
+		try { setting = findField(prefName).get(this); }
+		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		
+		if(!isInt)
+			chroPrefsEditor.putBoolean(prefName, (Boolean) setting);
+		else
+			chroPrefsEditor.putInt(prefName, (Integer) setting);
+		
+		commitPreferenceChange(prefName, setting);
+	}
+	
+	/**
+	 * 
+	 * @param visType
+	 * @param visValue
+	 */
+	private void putVisibilityPreference(String visType, boolean visValue) {
+		chroPrefsEditor.putBoolean(visType, visValue);
+		commitPreferenceChange(visType, visValue);
 	}
 
-	private void putPreference(String prefName, int val) {
-		
-		chroPrefsEditor.putInt(prefName, val);
-		chroPrefsEditor.commit();
+	/**
+	 * 
+	 * @param prefName
+	 * @param value
+	 */
+	private void commitPreferenceChange(String prefName, Object value) {
+
+		if(chroPrefsEditor.commit())
+			System.out.println("Successfully saved " + prefName + " as " + value);
+		else
+			throw new RuntimeException("The values were not successfully committed to the preferences object " + chroPrefs);
 	}
 
 	/**
@@ -353,24 +390,12 @@ public final class ChroBarsSettings {
 		if(pref.startsWith("instance"))
 			throw new RuntimeException(new IllegalArgumentException("Illegal modification request."));
 		else {
+			System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 			try { findField(pref).setBoolean(this, value); }
 			catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		}
 		
-		putPreference(pref, value);
-	}
-
-	/**
-	 * 
-	 * @param pref
-	 * @param value
-	 */
-	public final void setPrefValue(String pref, byte value) {
-
-		try { findField(pref).setByte(this, value); }
-		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
-		
-		putPreference(pref, value);
+		putPreference(pref, false);
 	}
 	
 	/**
@@ -380,10 +405,11 @@ public final class ChroBarsSettings {
 	 */
 	public final void setPrefValue(String pref, int value) {
 
+		System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 		try { findField(pref).setInt(this, value); }
 		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		
-		putPreference(pref, value);
+		putPreference(pref, true );
 	}
 	
 	/**
@@ -391,13 +417,13 @@ public final class ChroBarsSettings {
 	 * @param t
 	 * @param visibility
 	 */
-	public final void setVisibilityPrefValue(ChroType t, boolean visibility) {
+	public final void setVisibilityPrefValue(ChroType t, boolean textDraw, boolean visibility) {
 
 		System.out.println("Setting Visibility for bar type " + t + " to " + visibility + ".");
 		System.out.println("Visibility list def: " + barsVisibility);
 		barsVisibility.set(t.getType(), visibility);
 		
-		putPreference("barsVisibility_" + t.getType(), visibility);
+		putVisibilityPreference("barsVisibility_" + (textDraw ? "number_" : "") + t.getType(), visibility);
 	}
 	
 	/**
@@ -406,9 +432,16 @@ public final class ChroBarsSettings {
 	 */
 	private Field findField(String pref) throws NullPointerException {
 
-		for(Field setting : memberFields)
-			if(setting.getName().equals(pref))
+		System.out.println("Trying to find " + pref + "...");
+		for(Field setting : memberFields) {
+			if(setting.getName().equals(pref)) {
+				System.out.println("Setting field for " + pref + " retrieved!");
 				return setting;
+			}
+			else if(setting.getName().startsWith(visList) &&
+										pref.startsWith(visList))
+				return setting;
+		}
 		
 		throw new NullPointerException("The specified preference does not exist.");
 	}
