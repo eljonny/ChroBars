@@ -1,5 +1,6 @@
 package com.ampsoft.chrobars.opengl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -9,6 +10,7 @@ import com.ampsoft.chrobars.ChroBar;
 import com.ampsoft.chrobars.ChroType;
 import com.ampsoft.chrobars.data.ChroBarStaticData;
 import com.ampsoft.chrobars.util.ChroBarsSettings;
+import com.ampsoft.chrobars.util.ChroUtils;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -34,10 +36,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
-		for(ChroType ct : ChroType.values()) {
-			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
-			chroBars.get(ct).changeChroBarColor(settings.getBarColor(ct, false));
-		}
 		refreshVisibleBars();
 		
 		// Set OpenGL Parameters:
@@ -103,11 +101,46 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		activityContext = context;
 	}
 	
+	/**
+	 * 
+	 * @param settings
+	 */
 	protected void setSettingsObjectReference(ChroBarsSettings settings) {
+		
+		//Set settings object reference
 		BarsRenderer.settings = settings;
-		setBackgroundColor(settings.getBackgroundColor(false));
+		
+		//Then populate the HashMap so we can load settings
+		for(ChroType ct : ChroType.values())
+			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
+		
+		//Then load all the relevant settings into the renderer.
+		loadSettings();
 	}
 	
+	/**
+	 * Loads the stored settings into the OpenGL renderer.
+	 */
+	private void loadSettings() {
+		
+		ArrayList<Boolean> visibility = settings.getBarsVisibility();
+		
+		setBackgroundColor(settings.getBackgroundColor(false));
+		
+		//Loads the appropriate settings for each bar.
+		for(ChroType t : ChroType.values()) {
+			
+			ChroBar current = chroBars.get(t);
+			
+			current.setDrawBar(visibility.get(t.getType()));
+			//TODO in the future this should be per-bar.
+			current.setDrawNumber(settings.isDisplayNumbers());
+			ChroUtils.changeChroBarColor(current, settings.getBarColor(t, false));
+		}
+		
+		refreshVisibleBars();
+	}
+
 	/**
 	 * 
 	 * @return
@@ -141,7 +174,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		if(settings.isThreeD()) {
 			for(ChroType t : chroBars.keySet())
 				if(t.is3D())
-					visibleBars[t.getType()-ChroBarStaticData._MAX_BARS_TO_DRAW] = chroBars.get(t);
+					visibleBars[t.getType() - 4] = chroBars.get(t);
 		}
 		else {
 			for(ChroType t : chroBars.keySet())

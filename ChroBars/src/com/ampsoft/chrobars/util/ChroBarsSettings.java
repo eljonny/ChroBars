@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ import com.ampsoft.chrobars.data.ChroBarStaticData;
  * @author jhyry
  *
  */
+@SuppressLint("CommitPrefEdits")
 public final class ChroBarsSettings {
 	
 	//General bars application options
@@ -40,14 +42,18 @@ public final class ChroBarsSettings {
 				  userDefault_millisecondBarColor;
 	
 	//Preferences objects
+	private static final int visSize = ChroBarStaticData._MAX_BARS_TO_DRAW*2;
+	
 	private static SharedPreferences chroPrefs;
-	private static SharedPreferences.Editor chroPrefsEditor;
+	private static ArrayList<Field> memberFields = new ArrayList<Field>();
+	
 	private static final String prefsFile = "chroprefs";
 	private static final String userDef = "user";
 	private static final String visList = "barsVisibility";
-	private static final int visSize = ChroBarStaticData._MAX_BARS_TO_DRAW*2;
+	private static final String colorFieldSuffix = "Color";
+	private static final String userDefColorFieldPrefix = "userDefault_";
+	
 	private static Boolean instance = false;
-	private static ArrayList<Field> memberFields = new ArrayList<Field>();
 	private static Context instanceActivityContext;
 	private static ChroBarsSettings instanceObject;
 	
@@ -112,7 +118,7 @@ public final class ChroBarsSettings {
 
 		instanceActivityContext = activityContext;
 		chroPrefs = activityContext.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
-		chroPrefsEditor = chroPrefs.edit();
+		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
 	}
 
 	/**
@@ -129,6 +135,8 @@ public final class ChroBarsSettings {
 		String tempKey;
 		
 		if(prefsMap.isEmpty()) {
+			
+			System.out.println("Running first-run setup...");
 			defaultInit();
 			return;
 		}
@@ -194,6 +202,7 @@ public final class ChroBarsSettings {
 	 */
 	private void defaultInit() {
 		
+		System.out.println("Will now set default settings.");
 		setGeneralDefaultSettings();
 		setBarVisibilityDefaults();
 		setColorDefaults();
@@ -205,7 +214,7 @@ public final class ChroBarsSettings {
 	 */
 	private void setBarVisibilityDefaults() {
 		
-		System.out.println("Setting visibilities back to defaults...");
+		System.out.println("Setting visibilities to default values...");
 		
 		for(int visIndex = 0; visIndex < visSize; visIndex++)
 			barsVisibility.set(visIndex, ChroBarStaticData.visibleBars[visIndex < 4 ? visIndex : visIndex - 4]);
@@ -216,6 +225,7 @@ public final class ChroBarsSettings {
 	 */
 	private void setGeneralDefaultSettings() {
 		
+		System.out.println("Setting general defaults...");
 		precision = ChroBarStaticData.precision;
 		threeD = ChroBarStaticData.threeD;
 		displayNumbers = ChroBarStaticData.displayNumbers;
@@ -226,17 +236,38 @@ public final class ChroBarsSettings {
 	 */
 	private void setColorDefaults() {
 		
-		backgroundColor 	= userDefault_backgroundColor 		= ChroBarStaticData.backgroundColor;
-		hourBarColor 		= userDefault_hourBarColor 			= ChroBarStaticData.hourBarColor;
-		minuteBarColor 		= userDefault_minuteBarColor 		= ChroBarStaticData.minuteBarColor;
-		secondBarColor 		= userDefault_secondBarColor		= ChroBarStaticData.secondBarColor;
-		millisecondBarColor = userDefault_millisecondBarColor	= ChroBarStaticData.millisecondBarColor;
+		System.out.println("Setting color defaults...");
+		
+		HashMap<String, Integer> defaultColors = ChroBarStaticData.getColorDefaults();
+		
+		for(Field member : memberFields)
+			if(member.getName().endsWith(colorFieldSuffix) &&
+					!member.getName().startsWith(userDefColorFieldPrefix))
+				for(String defColorKey : defaultColors.keySet())
+					if(member.getName().equals(defColorKey)) {
+						
+						try {
+							
+							member.set(this, defaultColors.get(defColorKey));
+							
+							for(Field otherMember : memberFields)
+								if(otherMember.getName().equals(userDefColorFieldPrefix + member.getName())) {
+									otherMember.set(this, defaultColors.get(defColorKey));
+									break;
+								}
+						}
+						catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+						
+						break;
+					}
 	}
 
 	/**
 	 * 
 	 */
 	private void putDefaults() {
+		
+		System.out.println("Putting all default settings...");
 		
 		putPreference("precision", true);
 		putPreference("threeD", false);
@@ -265,12 +296,14 @@ public final class ChroBarsSettings {
 		try { setting = findField(prefName).get(this); }
 		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		
+		SharedPreferences.Editor chroPrefsEditor = chroPrefs.edit();
+		
 		if(!isInt)
 			chroPrefsEditor.putBoolean(prefName, (Boolean) setting);
 		else
 			chroPrefsEditor.putInt(prefName, (Integer) setting);
 		
-		commitPreferenceChange(prefName, setting);
+		commitPreferenceChange(prefName, setting, chroPrefsEditor);
 	}
 	
 	/**
@@ -279,8 +312,11 @@ public final class ChroBarsSettings {
 	 * @param visValue
 	 */
 	private void putVisibilityPreference(String visType, boolean visValue) {
+		
+		SharedPreferences.Editor chroPrefsEditor = chroPrefs.edit();
+		
 		chroPrefsEditor.putBoolean(visType, visValue);
-		commitPreferenceChange(visType, visValue);
+		commitPreferenceChange(visType, visValue, chroPrefsEditor);
 	}
 
 	/**
@@ -288,12 +324,13 @@ public final class ChroBarsSettings {
 	 * @param prefName
 	 * @param value
 	 */
-	private void commitPreferenceChange(String prefName, Object value) {
+	private void commitPreferenceChange(String prefName, Object value,
+										  SharedPreferences.Editor chroPrefsEditor) {
 
 		if(chroPrefsEditor.commit())
 			System.out.println("Successfully saved " + prefName + " as " + value);
 		else
-			throw new RuntimeException("The values were not successfully committed to the preferences object " + chroPrefs);
+			throw new RuntimeException("The values were not successfully committed to the preferences object " + chroPrefs + ".");
 	}
 
 	/**

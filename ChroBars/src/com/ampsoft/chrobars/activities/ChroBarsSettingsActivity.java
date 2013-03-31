@@ -45,6 +45,7 @@ public class ChroBarsSettingsActivity extends Activity
 	
 	private static SlidingDrawer settingsDrawer;
 	private static TableLayout settingsLayoutContainer;
+	private static int lastLayout;
 	
 	private static Toast noneChecked;
 	
@@ -79,7 +80,8 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		settingsDrawer = (SlidingDrawer)findViewById(R.id.chrobars_settings_slidingDrawer);
 		settingsLayoutContainer = (TableLayout) settingsDrawer.getContent();
-		getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
+		lastLayout = R.layout.chrobars_settings;
+		getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
 		
 		noneChecked = Toast.makeText(this,
 						   			 R.string.settings_bars_toastMessage_noneChecked,
@@ -148,7 +150,8 @@ public class ChroBarsSettingsActivity extends Activity
 			if(atLeastOneCheckBoxChecked()) {
 				settingsDrawer.close();
 				settingsLayoutContainer.removeAllViews();
-				getLayoutInflater().inflate(R.layout.chrobars_general_settings, (ViewGroup) settingsLayoutContainer);
+				lastLayout = R.layout.chrobars_general_settings;
+				getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
 				processTouchableUIElements();
 				settingsDrawer.animateOpen();
 			}
@@ -158,7 +161,8 @@ public class ChroBarsSettingsActivity extends Activity
 		case R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton:
 			settingsDrawer.close();
 			settingsLayoutContainer.removeAllViews();
-			getLayoutInflater().inflate(R.layout.chrobars_settings, (ViewGroup) settingsLayoutContainer);
+			lastLayout = R.layout.chrobars_settings;
+			getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
 			processTouchableUIElements();
 			settingsDrawer.animateOpen();
 			break;
@@ -249,23 +253,29 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void setChroBarVisibility(CheckBox box) {
 		
+		int barIndex;
+		
 		switch(box.getId()) {
 		
 		case R.id.chrobars_settings_slidingDrawer_chkbxHours:
-			currentBars[0].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[0].getBarType(), false, box.isChecked());
+			barIndex = settings.isThreeD() ? ChroType.HOUR.getType() : ChroType.HOUR3D.getType();
+			currentBars[barIndex].setDrawBar(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[barIndex].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
-			currentBars[1].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[1].getBarType(), false, box.isChecked());
+			barIndex = settings.isThreeD() ? ChroType.HOUR.getType() : ChroType.HOUR3D.getType();
+			currentBars[barIndex].setDrawBar(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[barIndex].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
-			currentBars[2].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[2].getBarType(), false, box.isChecked());
+			barIndex = settings.isThreeD() ? ChroType.HOUR.getType() : ChroType.HOUR3D.getType();
+			currentBars[barIndex].setDrawBar(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[barIndex].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
-			currentBars[3].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[3].getBarType(), false, box.isChecked());
+			barIndex = settings.isThreeD() ? ChroType.HOUR.getType() : ChroType.HOUR3D.getType();
+			currentBars[barIndex].setDrawBar(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[barIndex].getBarType(), false, box.isChecked());
 			return;
 		default:
 			displayNumbers(box);
@@ -280,6 +290,7 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		if(box.getId() == R.id.chrobars_settings_general_chkbxDispNumbers) {
 			settings.setPrefValue("displayNumbers", box.isChecked());
+			//TODO make this per bar
 			for(ChroType t : ChroType.values())
 				renderer.getChroBar(t).setDrawNumber(box.isChecked());
 		}
@@ -309,11 +320,8 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		if(hasFocus) {
 			
-			ChroBar[] bars = renderer.refreshVisibleBars();
-			
-			for(int i = 0; i < bars.length; i++)
-				currentBars[i] = bars[i];
-			
+			currentBars = renderer.refreshVisibleBars();
+			getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
 			processTouchableUIElements();
 			settingsDrawer.animateOpen();
 		}
@@ -357,6 +365,20 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		for(Button button : buttons)
 			button.setOnClickListener(this);
+		
+		for(ToggleButton onOff : toggles) {
+			switch(onOff.getId()) {
+			case R.id.chrobars_settings_general_tglToggle3D:
+				settings.isThreeD();
+			}
+		}
+		
+		for(SeekBar slider : sliders) {
+			switch(slider.getId()) {
+			case R.id.chrobars_settings_general_slider_motionPrecision:
+				slider.setProgress(settings.getPrecision());
+			}
+		}
 	}
 	
 	/**
@@ -373,16 +395,19 @@ public class ChroBarsSettingsActivity extends Activity
 				switch(box.getId()) {
 				
 				case R.id.chrobars_settings_slidingDrawer_chkbxHours:
-					box.setChecked(currentBars[0].isDrawn());
+					box.setChecked(currentBars[settings.isThreeD() ? ChroType.HOUR.getType() : ChroType.HOUR3D.getType()].isDrawn());
 					break;
 				case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
-					box.setChecked(currentBars[1].isDrawn());
+					box.setChecked(currentBars[settings.isThreeD() ? ChroType.MINUTE.getType() : ChroType.MINUTE3D.getType()].isDrawn());
 					break;
 				case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
-					box.setChecked(currentBars[2].isDrawn());
+					box.setChecked(currentBars[settings.isThreeD() ? ChroType.SECOND.getType() : ChroType.SECOND3D.getType()].isDrawn());
 					break;
 				case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
-					box.setChecked(currentBars[3].isDrawn());
+					box.setChecked(currentBars[settings.isThreeD() ? ChroType.MILLIS.getType() : ChroType.MILLIS3D.getType()].isDrawn());
+					break;
+				case R.id.chrobars_settings_general_chkbxDispNumbers:
+					box.setChecked(settings.isDisplayNumbers());
 				}	
 			}
 		}
