@@ -25,7 +25,6 @@ public class ChroBarsActivity extends Activity {
 	
 	//Intents for starting the other Activities
 	private Intent settingsIntent;
-	private int layoutId = 0;
 	private Intent aboutIntent;
 	
 	private static ChroBarsActivity instance;
@@ -70,8 +69,15 @@ public class ChroBarsActivity extends Activity {
 	 */
 	@Override
 	public void onBackPressed() {
+		super.onBackPressed();
 		ChroBarsSettings.clean();
 		finish();
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		ChroBarsSettings.clean();
 	}
 
 	/**
@@ -95,7 +101,7 @@ public class ChroBarsActivity extends Activity {
 	    switch (item.getItemId()) {
 	    
 	        case R.id.menu_settings:
-	        	startActivityForResult(settingsIntent, layoutId);
+	        	startActivity(settingsIntent);
 	            break;
 	        case R.id.menu_about:
 	        	startActivity(aboutIntent);
@@ -109,14 +115,7 @@ public class ChroBarsActivity extends Activity {
 	}
 	
 	/**
-	 * 
-	 */
-	@Override
-	public void onActivityResult(int request, int result, Intent ac) {
-		layoutId = result;
-	}
-	
-	/**
+	 * This allows other activities in the ChroBars activity package to obtain the settings instance object reference.
 	 * 
 	 * @param requester
 	 * @return
