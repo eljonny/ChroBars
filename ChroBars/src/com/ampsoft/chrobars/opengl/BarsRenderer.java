@@ -184,6 +184,14 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		return visibleBars;
 	}
+	
+	/**
+	 * Returns the current level of bar drawing precision.
+	 * @return The level of precision as an integer.
+	 */
+	public float getPrecision() {
+		return (float)settings.getPrecision();
+	}
 
 	/**
 	 * 

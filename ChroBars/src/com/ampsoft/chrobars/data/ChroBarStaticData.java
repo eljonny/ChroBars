@@ -49,6 +49,13 @@ public final class ChroBarStaticData {
 	public static final float _baseHeight = -1.8f;
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
 	public static final float _baseDepth = -0.75f;
+	public static final float _max_precision = 3.0f;
+	
+	public static final float _msInDay = (float) ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
+														ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
+								 _msInHour = (float) ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
+										 				_SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
+								 _msInMinute = (float) ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
 	
 	//Vertex draw sequences for 3D and 2D
 	public static final short[] _vertexDrawSequence_2D = {	0, 1, 2,

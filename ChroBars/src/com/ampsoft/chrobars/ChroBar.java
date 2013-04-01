@@ -23,7 +23,8 @@ public abstract class ChroBar {
 
 	protected static ChroBarStaticData barsData = null;
 	protected static BarsRenderer renderer;
-	//The bar color is stored as a color int
+	
+	//The bar color is stored as a packed color int
 	protected int barColor;
 	
 	//Whether this bar should be drawn
@@ -115,26 +116,41 @@ public abstract class ChroBar {
 	protected abstract void adjustBarHeight();
 
 	/**
+	 * Returns the current time ratios for hours, minutes, seconds, and milliseconds.
 	 * 
+	 * This takes into account the selected motion precision.
 	 * @return
 	 */
 	protected float getRatio() {
 		
 		int t = barType.getType();
 		
-		if(t > 3)
-			t -= 4;
+		float currentHour = (float)currentTime.get(Calendar.HOUR_OF_DAY),
+				currentMinute = (float)currentTime.get(Calendar.MINUTE),
+				currentSecond = (float)currentTime.get(Calendar.SECOND),
+				currentMillisecond = (float)currentTime.get(Calendar.MILLISECOND);
 		
-		switch(t) {
+		float currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
+								(currentMinute*ChroBarStaticData._msInMinute) +
+								(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		
+		float currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
+								 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		
+		float currentMSInMinute = (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		
+		float precisionRatio = renderer.getPrecision()/ChroBarStaticData._max_precision;
+		
+		switch(t > 3 ? t - 4 : t) {
 		
 		case 0:
-			return (float)currentTime.get(Calendar.HOUR_OF_DAY)/(float)ChroBarStaticData._HOURS_IN_DAY;
+			return ( currentHour + (precisionRatio * currentMSInDay) ) / ( (float)ChroBarStaticData._HOURS_IN_DAY + (precisionRatio * ChroBarStaticData._msInDay)	);
 		case 1:
-			return (float)currentTime.get(Calendar.MINUTE)/(float)ChroBarStaticData._MINUTES_IN_HOUR;
+			return ( currentMinute + (precisionRatio * currentMSInHour) ) / ( (float)ChroBarStaticData._MINUTES_IN_HOUR + (precisionRatio * ChroBarStaticData._msInHour) );
 		case 2:
-			return (float)currentTime.get(Calendar.SECOND)/(float)ChroBarStaticData._SECONDS_IN_MINUTE;
+			return ( currentSecond + (precisionRatio * currentMSInMinute) ) / ( (float)ChroBarStaticData._SECONDS_IN_MINUTE + (precisionRatio * ChroBarStaticData._msInMinute));
 		case 3:
-			return (float)currentTime.get(Calendar.MILLISECOND)/(float)ChroBarStaticData._MILLIS_IN_SECOND;
+			return currentMillisecond / (float)ChroBarStaticData._MILLIS_IN_SECOND;
 			
 		default:
 			System.err.print("Invalid type!");
@@ -143,6 +159,7 @@ public abstract class ChroBar {
 	}
 
 	/**
+	 * General drawing preparation that needs to happen no matter what is being drawn.
 	 * 
 	 * @param drawSurface
 	 */
@@ -191,6 +208,11 @@ public abstract class ChroBar {
 		}
 	}
 	
+	/**
+	 * Provides a subclass with custom drawing implementation capabilities.
+	 * 
+	 * @param drawSurface
+	 */
 	protected abstract void drawBar(GL10 drawSurface);
 	
 	/**
