@@ -98,6 +98,7 @@ public class ChroBar3D extends ChroBar {
 		int numberOfBars = renderer.numberOfBarsToDraw();
 		//System.out.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
+		barWidth -= barMargin;
 		barWidth *= 2f;
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);

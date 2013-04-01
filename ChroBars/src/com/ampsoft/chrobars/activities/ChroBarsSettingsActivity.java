@@ -85,11 +85,33 @@ public class ChroBarsSettingsActivity extends Activity
 		settingsLayoutContainer = (TableLayout) settingsDrawer.getContent();
 		
 		lastLayout = settings.getSettingsActivityLayout();
+		getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
+
+		currentBars = renderer.refreshVisibleBars();
+		processTouchableUIElements();
 		
 		noneChecked = Toast.makeText(this,
 						   			 R.string.settings_bars_toastMessage_noneChecked,
 						   			 Toast.LENGTH_SHORT								 );
 		noneChecked.show(); noneChecked.cancel();
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void onPause() {
+		super.onPause();
+		settingsDrawer.animateClose();
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		settingsDrawer.animateOpen();
 	}
 
 	/**
@@ -112,7 +134,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private void toggle3D(ToggleButton tButton) {
 		
 		settings.setPrefValue("threeD", tButton.isChecked());
-		renderer.refreshVisibleBars();
+		currentBars = renderer.refreshVisibleBars();
 	}
 
 	/**
@@ -150,6 +172,8 @@ public class ChroBarsSettingsActivity extends Activity
 		switch(button.getId()) {
 		
 		case R.id.chrobars_settings_slidingDrawer_chrobarsGeneralHandleButton:
+			if(lastLayout == R.layout.chrobars_general_settings)
+				break;
 			if(atLeastOneCheckBoxChecked()) {
 				settingsDrawer.close();
 				settingsLayoutContainer.removeAllViews();
@@ -162,6 +186,8 @@ public class ChroBarsSettingsActivity extends Activity
 				noneChecked.show();
 			break;
 		case R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton:
+			if(lastLayout == R.layout.chrobars_settings)
+				break;
 			settingsDrawer.close();
 			settingsLayoutContainer.removeAllViews();
 			lastLayout = R.layout.chrobars_settings;
@@ -268,7 +294,7 @@ public class ChroBarsSettingsActivity extends Activity
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
 			currentBars[2].setDrawBar(box.isChecked());
-			settings.setVisibilityPrefValue(currentBars[3].getBarType(), false, box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[2].getBarType(), false, box.isChecked());
 			return;
 		case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
 			currentBars[3].setDrawBar(box.isChecked());
@@ -314,26 +340,11 @@ public class ChroBarsSettingsActivity extends Activity
 	/**
 	 * 
 	 */
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		
-		BarsRenderer renderer = ChroSurface.getRenderer();
-		
-		if(hasFocus) {
-			
-			currentBars = renderer.refreshVisibleBars();
-			getLayoutInflater().inflate(lastLayout, (ViewGroup) settingsLayoutContainer);
-			processTouchableUIElements();
-			settingsDrawer.animateOpen();
-		}
-	}
-	
-	/**
-	 * 
-	 */
 	private void processTouchableUIElements() {
 		
 		ArrayList<View> touchables = settingsLayoutContainer.getTouchables();
+		
+//		System.out.println("Processing UI elements...");
 		
 		//Nothing to check
 		if(touchables == null)
@@ -345,19 +356,28 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		for(View touchable : touchables) {
 			
-			//System.out.println("Examining " + touchable + "...");
-			if(touchable instanceof CheckBox)
+//			System.out.println("Examining " + touchable + "...");
+			
+			if(touchable instanceof CheckBox) {
+//				System.out.println("Processing " + touchable + " as CheckBox.");
 				checkBoxes.add((CheckBox)touchable);
-			else if(touchable instanceof ToggleButton)
+			}
+			else if(touchable instanceof ToggleButton) {
+//				System.out.println("Processing " + touchable + " as ToggleButton.");
 				toggles.add((ToggleButton)touchable);
-			else if(touchable instanceof Button)
+			}
+			else if(touchable instanceof Button) {
+//				System.out.println("Processing " + touchable + " as Button.");
 				buttons.add((Button)touchable);
+			}
 			
 			touchable.setOnClickListener(this);
 		}
 		
 		//Only do this if we are in general settings.
 		if(lastLayout == R.layout.chrobars_general_settings) {
+			
+			sliders.clear();
 			
 			SeekBar precision = (SeekBar) findViewById(R.id.chrobars_settings_general_slider_motionPrecision);
 			precision.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener (){
@@ -415,31 +435,28 @@ public class ChroBarsSettingsActivity extends Activity
 	 * 
 	 */
 	private void checkCheckBoxes() {
-
-		if(this.getWindow().isActive()) {
-
-			for(CheckBox box : checkBoxes) {
-				
-				System.out.println("Checking " + box);
-				
-				switch(box.getId()) {
-				
-				case R.id.chrobars_settings_slidingDrawer_chkbxHours:
-					box.setChecked(currentBars[0].isDrawn());
-					break;
-				case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
-					box.setChecked(currentBars[1].isDrawn());
-					break;
-				case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
-					box.setChecked(currentBars[2].isDrawn());
-					break;
-				case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
-					box.setChecked(currentBars[3].isDrawn());
-					break;
-				case R.id.chrobars_settings_general_chkbxDispNumbers:
-					box.setChecked(settings.isDisplayNumbers());
-				}	
-			}
+		
+		for(CheckBox box : checkBoxes) {
+			
+			System.out.println("Checking " + box);
+			
+			switch(box.getId()) {
+			
+			case R.id.chrobars_settings_slidingDrawer_chkbxHours:
+				box.setChecked(currentBars[0].isDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxMinutes:
+				box.setChecked(currentBars[1].isDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxSeconds:
+				box.setChecked(currentBars[2].isDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
+				box.setChecked(currentBars[3].isDrawn());
+				break;
+			case R.id.chrobars_settings_general_chkbxDispNumbers:
+				box.setChecked(settings.isDisplayNumbers());
+			}	
 		}
 	}
 	
