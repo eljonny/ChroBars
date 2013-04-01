@@ -98,7 +98,7 @@ public class ChroBar3D extends ChroBar {
 		int numberOfBars = renderer.numberOfBarsToDraw();
 		//System.out.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
-		barWidth *= 2;
+		barWidth *= 2f;
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
@@ -116,8 +116,7 @@ public class ChroBar3D extends ChroBar {
 		if(barTypeCode < 0)
 			barTypeCode = 0;
 					
-		float leftXCoordinate_3D_front = (barWidth * barTypeCode) + (barMargin * barTypeCode) +
-					(((int)barTypeCode) > 0 ? barMargin : 0.0f) - (0.99f + barMargin);
+		float leftXCoordinate_3D_front = (barWidth * barTypeCode) + (barMargin * barTypeCode) - (0.95f + barMargin);
 		float leftXCoordinate_3D_rear  = leftXCoordinate_3D_front + barsData.getFloat("bar_3D_offset");
 		
 		float rightXCoordinate_3D_front = leftXCoordinate_3D_front + barWidth;

@@ -93,27 +93,24 @@ public class ChroBar2D extends ChroBar {
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
-		barWidth -= barMargin*2.0f;
-		barWidth *= 2;
+		barWidth -= barMargin;
+		barWidth *= 2f;
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
 		if(barType.getType() < 3)
 			for(int i = barType.getType() + 1; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++)
-				if(!renderer.getChroBar(barType).isDrawn())
+				if(!renderer.refreshVisibleBars()[i].isDrawn())
 					++barTypeCode;
 		else if(barType.getType() < 2)
 			for(int j = barType.getType() - 1; j >= 0; j--)
-				if(!renderer.getChroBar(barType).isDrawn())
+				if(!renderer.refreshVisibleBars()[j].isDrawn())
 					--barTypeCode;
 		
 		if(barTypeCode < 0)
-			while(barTypeCode < 0)
-				barTypeCode++;
+			barTypeCode = 0;
 
-		float leftXCoordinate_2D = barMargin +
-				(barWidth * barTypeCode) + (barMargin * barTypeCode) +
-					(((int)barTypeCode) > 0 ? barMargin : 0.0f) - 1.0f;
+		float leftXCoordinate_2D =  (barWidth * barTypeCode) + (barMargin * barTypeCode) - (.95f + barMargin);
 		float rightXCoordinate_2D = leftXCoordinate_2D + barWidth;
 		
 		vertices_2D[0] = vertices_2D[3] = leftXCoordinate_2D;
