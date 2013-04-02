@@ -72,7 +72,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glTranslatef(0, 0, -5);
 
-		for(ChroBar cb : refreshVisibleBars())
+		for(ChroBar cb : visibleBars)
 			cb.draw(gl);
 
 		gl.glLoadIdentity();

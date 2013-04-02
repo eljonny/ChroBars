@@ -327,7 +327,8 @@ public class ChroBarsSettingsActivity extends Activity
 	@Override
 	public void onBackPressed() {
 
-		if(atLeastOneCheckBoxChecked()) {
+		if(atLeastOneCheckBoxChecked() ||
+			lastLayout == R.layout.chrobars_general_settings) {
 			//save the layout to the settings file so we
 			// know what settings screen the user last saw
 			settings.setPrefValue("settingsActivityLayout", lastLayout);
