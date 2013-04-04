@@ -21,12 +21,11 @@ import com.ampsoft.chrobars.data.ChroBarStaticData;
  */
 public class ChroBar2D extends ChroBar {
 	
-	private float[] vertexColors_2D, vertices_2D, normals_2D;
+	private float[] vertexColors_2D, vertices_2D;
 	
 	private ShortBuffer drawDirection_2D;
 	private FloatBuffer verticesBuffer_2D;
 	private FloatBuffer colorBuffer_2D;
-	private FloatBuffer normalsBuffer_2D;
 	
 	/**
 	 * 
@@ -41,18 +40,12 @@ public class ChroBar2D extends ChroBar {
 		//Set 2D vertex arrays
 		vertexColors_2D = new float[ChroBarStaticData._2D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
 		vertices_2D = new float[ChroBarStaticData._2D_VERTEX_COMPONENTS];
-		normals_2D = new float[ChroBarStaticData._2D_VERTEX_COMPONENTS];
 		
 		//Allocate the raw vertex buffer
 		rawBuffer = ByteBuffer.allocateDirect(vertices_2D.length*ChroBarStaticData._BYTES_IN_FLOAT);
 		rawBuffer.order(ByteOrder.nativeOrder());
 		verticesBuffer_2D = rawBuffer.asFloatBuffer();
 		verticesBuffer_2D.put(vertices_2D).position(0);
-		
-		rawBuffer = ByteBuffer.allocateDirect(normals_2D.length*ChroBarStaticData._BYTES_IN_FLOAT);
-		rawBuffer.order(ByteOrder.nativeOrder());
-		normalsBuffer_2D = rawBuffer.asFloatBuffer();
-		normalsBuffer_2D.put(normals_2D).position(0);
 		
 		//Allocate the raw color buffer
 		rawBuffer = ByteBuffer.allocateDirect(vertexColors_2D.length*ChroBarStaticData._BYTES_IN_FLOAT);
@@ -68,8 +61,6 @@ public class ChroBar2D extends ChroBar {
 		
 		//Initialize the vertex array with default values
 		initVertices();
-		//Initialize 2D normals
-		initNormals();
 	}
 	
 	/**
@@ -87,21 +78,6 @@ public class ChroBar2D extends ChroBar {
 		
 		for(int i = 0; i < ChroBarStaticData._2D_VERTEX_COMPONENTS; i++)
 			vertices_2D[i] = verts_2D[i];
-	}
-	
-	/**
-	 * 
-	 */
-	@Override
-	protected void initNormals() {
-		
-		float[] norms_2D = {	0f,0f,1f,
-								0f,0f,1f,
-								0f,0f,1f,
-								0f,0f,1f	};
-		
-		for(int i = 0; i < norms_2D.length; i++)
-			normals_2D[i] = norms_2D[i];
 	}
 	
 	/**
@@ -230,6 +206,11 @@ public class ChroBar2D extends ChroBar {
 	 */
 	@Override
 	protected FloatBuffer getNormals() {
-		return normalsBuffer_2D;
+		return null;
+	}
+
+	@Override
+	protected void initNormals() throws Exception {
+		throw new Exception("Method not implemented in 2D");
 	}
 }

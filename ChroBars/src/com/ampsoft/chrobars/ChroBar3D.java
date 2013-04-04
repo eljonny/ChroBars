@@ -26,7 +26,7 @@ import com.ampsoft.chrobars.opengl.Vec3D;
 public class ChroBar3D extends ChroBar {
 	
 	private float[] vertexColors_3D, vertices_3D;
-	private static float[] normals = null;
+	private static float[] normals_3D;
 	
 	private ShortBuffer drawDirection_3D;
 	private FloatBuffer verticesBuffer_3D;
@@ -48,7 +48,7 @@ public class ChroBar3D extends ChroBar {
 		//Set 3D vertex arrays
 		vertexColors_3D = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
 		vertices_3D = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
-		normals = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
+		normals_3D = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
 		
 		//Allocate the raw vertex buffer
 		rawBuffer = ByteBuffer.allocateDirect(vertices_3D.length*ChroBarStaticData._BYTES_IN_FLOAT);
@@ -71,18 +71,19 @@ public class ChroBar3D extends ChroBar {
 		System.out.println("Intializing vertices...");
 		//Initialize the vertex array with default values
 		initVertices();
+		
 		//Initialize the vertex normals for lighting.
-//		if(normalsBuffer == null) {
-//			
-//			System.out.println("Initializing static vertex normals...");
-//			initNormals();
-//		
-//			//Set up the buffer of normal vectors
-//			rawBuffer = ByteBuffer.allocateDirect(normals.length*ChroBarStaticData._BYTES_IN_FLOAT);
-//			rawBuffer.order(order_native);
-//			normalsBuffer = rawBuffer.asFloatBuffer();
-//			normalsBuffer.put(normals).position(0);
-//		}
+		if(normalsBuffer == null) {
+			
+			System.out.println("Initializing static 3D vertex normals...");
+			initNormals();
+		
+			//Set up the buffer of normal vectors
+			rawBuffer = ByteBuffer.allocateDirect(normals_3D.length*ChroBarStaticData._BYTES_IN_FLOAT);
+			rawBuffer.order(order_native);
+			normalsBuffer = rawBuffer.asFloatBuffer();
+			normalsBuffer.put(normals_3D).position(0);
+		}
 	}
 
 	/**
@@ -245,7 +246,7 @@ public class ChroBar3D extends ChroBar {
 		for(Vec3D vertexNormal : vertexNormals) {
 			float[] normal = vertexNormal.asArray();
 			for(j = 0; j < normal.length; j++) {
-				normals[i*3 + j] = normal[j];
+				normals_3D[i*3 + j] = normal[j];
 			}
 			i++;
 		}
@@ -298,9 +299,10 @@ public class ChroBar3D extends ChroBar {
 		float rightXCoordinate_3D_front = leftXCoordinate_3D_front + barWidth;
 		float rightXCoordinate_3D_rear  = rightXCoordinate_3D_front + barsData.getFloat("bar_3D_offset");
 		
-		//System.out.println("Current coords: " + leftXCoordinate_3D_front + ", " +
-		//					leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
-		//					", " + rightXCoordinate_3D_rear);
+//		DEBUG
+//		System.out.println("Current coords: " + leftXCoordinate_3D_front + ", " +
+//							leftXCoordinate_3D_rear + ", " + rightXCoordinate_3D_front +
+//							", " + rightXCoordinate_3D_rear);
 		
 		vertices_3D[0]  = vertices_3D[3]  = leftXCoordinate_3D_front;
 		vertices_3D[6]  = vertices_3D[9]  = rightXCoordinate_3D_front;
@@ -330,6 +332,9 @@ public class ChroBar3D extends ChroBar {
 		
 		//Reset the OpenGL vertices buffer with updated coordinates
 		((FloatBuffer) verticesBuffer_3D.clear()).put(vertices_3D).position(0);
+		
+//		initNormals();
+//		((FloatBuffer) normalsBuffer.clear()).put(normals_3D).position(0);
 	}
 	
 	/**

@@ -75,13 +75,21 @@ public final class ChroBarStaticData {
 														        3, 0, 1,
 														        3, 1, 2  };
 	//GL Light buffer defaults
-	public static final float[] _light_ambient = {0f, 0f, 0f, 1.0f},
-								   _light_diffuse = {1f, 1f, 1f, 1f},
-								   _light_specular = {1f, 1f, 1f, 1f},
-								   _light_emission = {0f, 0f, 0f, 1.0f},
-								   _light_position = {1.0f, 1.0f, 2.0f, 0.0f},
+	public static final float[] //Parameters for light 0
+								   _light_0_ambient = {0.05f, 0.05f, 0.05f, 1.0f},
+								   _light_0_diffuse = {.1f, .1f, .1f, 1f},
+								   _light_0_specular = {1f, 1f, 1f, 1f},
+								   _light_0_emission = {0f, 0f, 0f, 1.0f},
+								   _light_0_position = {3f, 5.0f, -10.0f, 0.0f},
+								   //Parameters for light 1
+								   _light_1_ambient = {0.05f, 0.05f, 0.05f, 1.0f},
+								   _light_1_diffuse = {.55f, .55f, .55f, 1f},
+								   _light_1_specular = {1f, 1f, 1f, 1f},
+								   _light_1_emission = {0f, 0f, 0f, 1.0f},
+								   _light_1_position = {-2f, -2.0f, 10.0f, 0.0f},
+								   //Global light parameters
 								   _light_global_ambient = {0.2f, 0.2f, 0.2f, 1.0f},
-								   _specular_shininess = {50.0f};
+								   _specular_shininess = {80.0f};
 	/*
 	 * Chrobars non-final static application data
 	 */
