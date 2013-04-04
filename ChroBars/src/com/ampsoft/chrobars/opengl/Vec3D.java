@@ -54,7 +54,8 @@ public class Vec3D
 		y = 0;
 		z = 0;
 		
-		System.out.println("Default vector values of 0 assigned");
+//		DEBUG
+//		System.out.println("Default vector values of 0 assigned");
 	}
 
 	/**
@@ -69,7 +70,8 @@ public class Vec3D
             y = r.nextInt()*r.nextFloat();
             z = r.nextInt()*r.nextFloat();
 
-    		System.out.println("Random vector values assigned: x=" + x + " y=" + y + " z=" + z);
+//          DEBUG
+//    		System.out.println("Random vector values assigned: x=" + x + " y=" + y + " z=" + z);
         }
         else
         {
@@ -77,7 +79,8 @@ public class Vec3D
             y = 0;
             z = 0;
             
-    		System.out.println("Default vector values of 0 assigned");
+//          DEBUG
+//    		System.out.println("Default vector values of 0 assigned");
         }
     }
 	
@@ -98,7 +101,8 @@ public class Vec3D
 		y = b;
 		z = c;
 		
-		System.out.println("Vector values assigned: x=" + a + " y=" + b + " z=" + c);
+//		DEBUG
+//		System.out.println("Vector values assigned: x=" + a + " y=" + b + " z=" + c);
 	}
 	
 	/**
@@ -113,7 +117,8 @@ public class Vec3D
 		y = vectItr.next();
 		z = vectItr.next();
 		
-		System.out.println("Vector values assigned: x=" + x + " y=" + y + " z=" + z);
+//		DEBUG
+//		System.out.println("Vector values assigned: x=" + x + " y=" + y + " z=" + z);
 	}
 
 	/**

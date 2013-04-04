@@ -38,7 +38,7 @@ public class ChroSurface extends GLSurfaceView {
 			getHolder().setFormat(PixelFormat.TRANSLUCENT);
 		
 		//Uncomment if you're having trouble
-	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
+	    setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
 		
 		rend = new BarsRenderer();
 		rend.setActivityContext(context);

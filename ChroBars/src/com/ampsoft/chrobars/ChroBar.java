@@ -202,15 +202,15 @@ public abstract class ChroBar {
 			//System.out.println("Calling glEnableClientState for color array");
 			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			//System.out.println("Calling glEnableClientState for normals array");
-			drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-			
-			//Set general lighting buffers
-			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
-			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
-			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
-			
-			//load the buffer of normals into the OpenGL draw object.
-			drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, getNormals());
+//			drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+//			
+//			//Set general lighting buffers
+//			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
+//			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
+//			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
+//			
+//			//load the buffer of normals into the OpenGL draw object.
+//			drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, getNormals());
 			
 			//Tell openGL where the vertex data is and how to use it
 			//System.out.println("Calling glVertexPointer");
@@ -222,8 +222,8 @@ public abstract class ChroBar {
 	        							ChroBarStaticData._VERTEX_STRIDE, getColorBuffer());
 			
 			//Set the color material to the appropriate colors.
-			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, getColorBuffer());
-			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, getColorBuffer());
+//			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, getColorBuffer());
+//			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, getColorBuffer());
 	        
 			//Draw the bar
 	        //System.out.println("Calling glDrawElements");
@@ -236,7 +236,7 @@ public abstract class ChroBar {
 			//System.out.println("Calling glDisableClientState for color array");
 			drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 			//System.out.println("Calling glDisableClientState for normals array");
-			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+//			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 			
 			//Disable face culling.
 			//System.out.println("Calling glDisable");
@@ -250,7 +250,7 @@ public abstract class ChroBar {
 			adjustBarHeight();
 		}
 	}
-	
+
 	/**
 	 * Accessor for the float array of normal vectors for the 3D bars.
 	 * @return

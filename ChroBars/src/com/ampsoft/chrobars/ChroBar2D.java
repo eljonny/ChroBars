@@ -14,6 +14,11 @@ import android.view.WindowManager;
 
 import com.ampsoft.chrobars.data.ChroBarStaticData;
 
+/**
+ * 
+ * @author jhyry
+ *
+ */
 public class ChroBar2D extends ChroBar {
 	
 	private float[] vertexColors_2D, vertices_2D, normals_2D;
@@ -23,7 +28,12 @@ public class ChroBar2D extends ChroBar {
 	private FloatBuffer colorBuffer_2D;
 	private FloatBuffer normalsBuffer_2D;
 	
-
+	/**
+	 * 
+	 * @param t
+	 * @param color
+	 * @param activityContext
+	 */
 	public ChroBar2D(ChroType t, Integer color, Context activityContext) {
 		
 		super(t, color, activityContext);
@@ -183,26 +193,41 @@ public class ChroBar2D extends ChroBar {
 		((FloatBuffer) colorBuffer_2D.clear()).put(vertexColors_2D).position(0);
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	protected int getDrawSequenceBufferLength() {
 		return ChroBarStaticData._vertexDrawSequence_2D.length;
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	protected ShortBuffer getDrawDirectionBuffer() {
 		return drawDirection_2D;
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	protected FloatBuffer getColorBuffer() {
 		return colorBuffer_2D;
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	protected FloatBuffer getVerticesBuffer() {
 		return verticesBuffer_2D;
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	protected FloatBuffer getNormals() {
 		return normalsBuffer_2D;
