@@ -74,6 +74,9 @@ public class ChroBarsActivity extends Activity {
 		finish();
 	}
 	
+	/**
+	 * Makes sure that when the activity is destroyed, the settings instance is cleansed.
+	 */
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

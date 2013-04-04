@@ -1,5 +1,8 @@
 package com.ampsoft.chrobars.opengl;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,7 +39,62 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		
-		refreshVisibleBars();
+//		refreshVisibleBars();
+		
+		ByteOrder order_native = ByteOrder.nativeOrder();
+		int bytesInFloat = ChroBarStaticData._BYTES_IN_FLOAT;
+		
+		//Set up local ambient light parameters
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_ambient.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		ambientLightBuffer = lightBufferTemp.asFloatBuffer();
+		ambientLightBuffer.put(ChroBarStaticData._light_ambient).position(0);
+		
+		//Set up global ambient light parameters
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_global_ambient.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		globalAmbientLightBuffer = lightBufferTemp.asFloatBuffer();
+		globalAmbientLightBuffer.put(ChroBarStaticData._light_global_ambient).position(0);
+		
+		
+		//Set up diffuse light parameters
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_diffuse.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		diffuseLightBuffer = lightBufferTemp.asFloatBuffer();
+		diffuseLightBuffer.put(ChroBarStaticData._light_diffuse).position(0);
+		
+		//Set up the emission buffer
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_emission.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		emissionLightBuffer = lightBufferTemp.asFloatBuffer();
+		emissionLightBuffer.put(ChroBarStaticData._light_emission).position(0);
+		
+		//Set up specular light parameters
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_specular.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		specularLightBuffer = lightBufferTemp.asFloatBuffer();
+		specularLightBuffer.put(ChroBarStaticData._light_specular).position(0);
+		
+		//Set up material shininess buffer
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._specular_shininess.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		specularShininessBuffer = lightBufferTemp.asFloatBuffer();
+		specularShininessBuffer.put(ChroBarStaticData._specular_shininess).position(0);
+		
+		//Set up the position of the light in the scene.
+		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_position.length*bytesInFloat);
+		lightBufferTemp.order(order_native);
+		lightPositionBuffer = lightBufferTemp.asFloatBuffer();
+		lightPositionBuffer.put(ChroBarStaticData._light_position).position(0);
+		
+		//Apply the buffered light parameters to the GL object
+		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambientLightBuffer);
+		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_DIFFUSE, diffuseLightBuffer);
+		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_SPECULAR, specularLightBuffer);
+		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_POSITION, lightPositionBuffer);
+		
+		//Set the default global ambient light
+		gl.glLightModelfv(GL10.GL_LIGHT_MODEL_AMBIENT, globalAmbientLightBuffer);
 		
 		// Set OpenGL Parameters:
 		// - Background of the OpenGL surface to white
@@ -70,10 +128,21 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 						backgroundColor[2],
 						backgroundColor[3] );
 		
-		gl.glTranslatef(0, 0, -5);
+		//Enable OpenGL light facilities
+		gl.glEnable(GL10.GL_LIGHTING);
+		gl.glEnable(GL10.GL_LIGHT0);
+		gl.glEnable(GL10.GL_COLOR_MATERIAL);
 
-		for(ChroBar cb : visibleBars)
+		for(ChroBar cb : visibleBars) {
+			System.out.println("Drawing " + cb);
 			cb.draw(gl);
+		}
+		
+		gl.glTranslatef(0f, 0f, -5f);
+		
+		gl.glDisable(GL10.GL_LIGHTING);
+		gl.glDisable(GL10.GL_LIGHT0);
+		gl.glDisable(GL10.GL_COLOR_MATERIAL);
 
 		gl.glLoadIdentity();
 	}
@@ -110,10 +179,12 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		//Set settings object reference
 		BarsRenderer.settings = settings;
 		
+		System.out.println("Constructing bars...");
 		//Then populate the HashMap so we can load settings
 		for(ChroType ct : ChroType.values())
 			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
 		
+		System.out.println("Loading settings...");
 		//Then load all the relevant settings into the renderer.
 		loadSettings();
 	}
@@ -206,6 +277,30 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	/**
+	 * Bars need to use this buffer to set the specular of the material.
+	 * @return A java.nio.FloatBuffer containing the specular light color.
+	 */
+	public FloatBuffer getSpecularBuffer() {
+		return specularLightBuffer;
+	}
+	
+	/**
+	 * Bars need to use this buffer to set the emission of the material.
+	 * @return A java.nio.FloatBuffer containing the emission light color of the object being drawn.
+	 */
+	public FloatBuffer getEmissionLightBuffer() {
+		return emissionLightBuffer;
+	}
+	
+	/**
+	 * Bars will need this buffer to set the material shininess.
+	 * @return A java.nio.FloatBuffer containing the shininess parameter.
+	 */
+	public FloatBuffer getShininessBuffer() {
+		return specularShininessBuffer;
+	}
+	
+	/**
 	 * 
 	 * @param argb
 	 */
@@ -223,6 +318,11 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(8);
 	private static ChroBar[] visibleBars = new ChroBar[ChroBarStaticData._MAX_BARS_TO_DRAW];
+	
+	//For OpenGL Lighting
+	private static ByteBuffer lightBufferTemp;
+	private static FloatBuffer ambientLightBuffer, globalAmbientLightBuffer, emissionLightBuffer,
+									diffuseLightBuffer, specularLightBuffer, lightPositionBuffer, specularShininessBuffer;
 	
 	//Context in which this Renderer exists
 	private Context activityContext;

@@ -123,6 +123,9 @@ public final class ChroBarsSettings {
 		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
 	}
 	
+	/**
+	 * Setting instance to false ensures that we can recreate the settings object.
+	 */
 	public static void clean() {
 		instance = false;
 	}

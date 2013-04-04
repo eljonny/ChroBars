@@ -32,6 +32,7 @@ public final class ChroBarStaticData {
 	public static final int _BYTES_IN_SHORT = 2;
 	public static final int _2D_VERTICES = 4;
 	public static final int _3D_VERTICES = 8;
+	public static final int _3D_FACES = 6;
 	public static final int _VERTEX_STRIDE = 0;
 	public static final int _MAX_BARS_TO_DRAW = 4;
 	
@@ -73,6 +74,14 @@ public final class ChroBarStaticData {
 														        4, 6, 5,
 														        3, 0, 1,
 														        3, 1, 2  };
+	//GL Light buffer defaults
+	public static final float[] _light_ambient = {0f, 0f, 0f, 1.0f},
+								   _light_diffuse = {1f, 1f, 1f, 1f},
+								   _light_specular = {1f, 1f, 1f, 1f},
+								   _light_emission = {0f, 0f, 0f, 1.0f},
+								   _light_position = {1.0f, 1.0f, 2.0f, 0.0f},
+								   _light_global_ambient = {0.2f, 0.2f, 0.2f, 1.0f},
+								   _specular_shininess = {50.0f};
 	/*
 	 * Chrobars non-final static application data
 	 */

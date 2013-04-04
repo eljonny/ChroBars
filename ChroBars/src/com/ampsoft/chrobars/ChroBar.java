@@ -1,6 +1,8 @@
 package com.ampsoft.chrobars;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.Calendar;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -76,6 +78,11 @@ public abstract class ChroBar {
 	
 	/**
 	 * 
+	 */
+	protected abstract void initNormals();
+	
+	/**
+	 * 
 	 * @param toDraw
 	 */
 	public void setDrawBar(boolean toDraw) {
@@ -130,16 +137,28 @@ public abstract class ChroBar {
 				currentSecond = (float)currentTime.get(Calendar.SECOND),
 				currentMillisecond = (float)currentTime.get(Calendar.MILLISECOND);
 		
-		float currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
-								(currentMinute*ChroBarStaticData._msInMinute) +
-								(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		float currentMSInDay = 0, currentMSInHour = 0, currentMSInMinute = 0;
 		
-		float currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
-								 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		int precision = (int) renderer.getPrecision();
 		
-		float currentMSInMinute = (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+		if(precision > 0) {
+			currentMSInMinute = (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+			if(precision > 1) {
+				currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
+						 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+				if(precision > 2) {
+					currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
+							(currentMinute*ChroBarStaticData._msInMinute) +
+							(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+				}
+			}
+		}
+		
+//		System.out.println("Current time:\n" + currentHour + "/" + currentMSInDay + "\n" + currentMinute + "/" + currentMSInHour + "\n" + currentSecond + "/" + currentMSInMinute + "\n" + currentMillisecond);
 		
 		float precisionRatio = renderer.getPrecision()/ChroBarStaticData._max_precision;
+		
+//		System.out.println("Precision ratio: " + precisionRatio);
 		
 		switch(t > 3 ? t - 4 : t) {
 		
@@ -172,28 +191,52 @@ public abstract class ChroBar {
 			//Set up face culling
 			//System.out.println("Calling glFrontFace");
 		    drawSurface.glFrontFace(GL10.GL_CCW);
-		    
 		    //System.out.println("Calling glEnable");
 		    drawSurface.glEnable(GL10.GL_CULL_FACE);
-		    
 		    //System.out.println("Calling glCullFace");
 		    drawSurface.glCullFace(GL10.GL_BACK);
 			
 		    //Enable the OpenGL vertex array buffer space
-		    //System.out.println("Calling glEnableClientState");
+		    //System.out.println("Calling glEnableClientState for vertex array");
 			drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-			
-			//System.out.println("Calling glEnableClientState");
+			//System.out.println("Calling glEnableClientState for color array");
 			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+			//System.out.println("Calling glEnableClientState for normals array");
+			drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 			
-			drawBar(drawSurface);
+			//Set general lighting buffers
+			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
+			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
+			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
+			
+			//load the buffer of normals into the OpenGL draw object.
+			drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, getNormals());
+			
+			//Tell openGL where the vertex data is and how to use it
+			//System.out.println("Calling glVertexPointer");
+			drawSurface.glVertexPointer(ChroBarStaticData._DIMENSIONS, GL10.GL_FLOAT,
+										ChroBarStaticData._VERTEX_STRIDE, getVerticesBuffer());
+			
+			//System.out.println("Calling glColorPointer");
+	        drawSurface.glColorPointer(ChroBarStaticData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+	        							ChroBarStaticData._VERTEX_STRIDE, getColorBuffer());
+			
+			//Set the color material to the appropriate colors.
+			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, getColorBuffer());
+			drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, getColorBuffer());
+	        
+			//Draw the bar
+	        //System.out.println("Calling glDrawElements");
+			drawSurface.glDrawElements(GL10.GL_TRIANGLES, getDrawSequenceBufferLength(),
+										GL10.GL_UNSIGNED_SHORT, getDrawDirectionBuffer());
 			
 			//Clear the buffer space
-			//System.out.println("Calling glDisableClientState");
+			//System.out.println("Calling glDisableClientState for vertex array");
 			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			
-			//System.out.println("Calling glDisableClientState");
+			//System.out.println("Calling glDisableClientState for color array");
 			drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
+			//System.out.println("Calling glDisableClientState for normals array");
+			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 			
 			//Disable face culling.
 			//System.out.println("Calling glDisable");
@@ -209,11 +252,38 @@ public abstract class ChroBar {
 	}
 	
 	/**
-	 * Provides a subclass with custom drawing implementation capabilities.
-	 * 
-	 * @param drawSurface
+	 * Accessor for the float array of normal vectors for the 3D bars.
+	 * @return
 	 */
-	protected abstract void drawBar(GL10 drawSurface);
+	protected abstract FloatBuffer getNormals();
+	
+	/**
+	 * Accessor for the length of the
+	 *  bar-specific draw vertices sequence buffer to be used.
+	 * @return An integer representation of the length of the draw sequence buffer.
+	 */
+	protected abstract int getDrawSequenceBufferLength();
+
+	/**
+	 * Accessor for the draw direction buffer
+	 *  for the current bar.
+	 * @return A FloatBuffer containing the draw sequence buffer.
+	 */
+	protected abstract ShortBuffer getDrawDirectionBuffer();
+
+	/**
+	 * Accessor for the vertices color buffer 
+	 * for the current bar.
+	 * @return A FloatBuffer that represents the colors of vertices.
+	 */
+	protected abstract FloatBuffer getColorBuffer();
+
+	/**
+	 * Accessor for the buffer defining the actual vertices
+	 *  that make up the current bar.
+	 * @return A FloatBuffer containing the vertex definitions.
+	 */
+	protected abstract FloatBuffer getVerticesBuffer();
 	
 	/**
 	 * Changes the barColor value and those of the vertices.
@@ -290,7 +360,7 @@ public abstract class ChroBar {
 	public String toString() {
 		
 		return "ChroBar Object " + this.hashCode() +
-				"\nType:\n" + barType + "\nColor: " + barColor;
+				"\nType: " + barType + "\nColor: " + barColor;
 	}
 
 	/**
