@@ -26,12 +26,12 @@ import com.ampsoft.chrobars.opengl.Vec3D;
 public class ChroBar3D extends ChroBar {
 	
 	private float[] vertexColors_3D, vertices_3D;
-	private static float[] normals_3D;
+	private float[] normals_3D;
 	
 	private ShortBuffer drawDirection_3D;
 	private FloatBuffer verticesBuffer_3D;
 	private FloatBuffer colorBuffer_3D;
-	private static FloatBuffer normalsBuffer;
+	private FloatBuffer normalsBuffer;
 
 	/**
 	 * 
@@ -72,18 +72,15 @@ public class ChroBar3D extends ChroBar {
 		//Initialize the vertex array with default values
 		initVertices();
 		
-		//Initialize the vertex normals for lighting.
-		if(normalsBuffer == null) {
-			
-			System.out.println("Initializing static 3D vertex normals...");
-			initNormals();
-		
-			//Set up the buffer of normal vectors
-			rawBuffer = ByteBuffer.allocateDirect(normals_3D.length*ChroBarStaticData._BYTES_IN_FLOAT);
-			rawBuffer.order(order_native);
-			normalsBuffer = rawBuffer.asFloatBuffer();
-			normalsBuffer.put(normals_3D).position(0);
-		}
+		System.out.println("Initializing vertex normals...");
+		//Initialize the vertex normals.
+		initNormals();
+	
+		//Set up the buffer of normal vectors
+		rawBuffer = ByteBuffer.allocateDirect(normals_3D.length*ChroBarStaticData._BYTES_IN_FLOAT);
+		rawBuffer.order(order_native);
+		normalsBuffer = rawBuffer.asFloatBuffer();
+		normalsBuffer.put(normals_3D).position(0);
 	}
 
 	/**
