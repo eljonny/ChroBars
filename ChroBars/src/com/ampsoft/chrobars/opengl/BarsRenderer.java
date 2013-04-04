@@ -262,8 +262,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 			current.setDrawNumber(settings.isDisplayNumbers());
 			ChroUtils.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
-		
-		refreshVisibleBars();
 	}
 
 	/**
@@ -297,14 +295,18 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	public ChroBar[] refreshVisibleBars() {
 		
 		if(settings.isThreeD()) {
-			for(ChroType t : chroBars.keySet())
-				if(t.is3D())
+			for(ChroType t : chroBars.keySet()) {
+				if(t.is3D()) {
 					visibleBars[t.getType() - 4] = chroBars.get(t);
+				}
+			}
 		}
 		else {
-			for(ChroType t : chroBars.keySet())
-				if(!t.is3D())
+			for(ChroType t : chroBars.keySet()) {
+				if(!t.is3D()) {
 					visibleBars[t.getType()] = chroBars.get(t);
+				}
+			}
 		}
 		
 		return visibleBars;
