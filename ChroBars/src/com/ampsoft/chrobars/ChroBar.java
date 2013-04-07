@@ -55,7 +55,7 @@ public abstract class ChroBar {
 	public ChroBar(ChroType t, Integer color, Context activityContext) {
 		
 		//If the data object is null, make one. Otherwise do nothing.
-		barsData = barsData == null ? ChroBarStaticData.getDataInstance() : barsData;
+		barsData = barsData == null ? ChroBarStaticData.getNewDataInstance() : barsData;
 		
 		synchronized(barsData) {
 			if(screen == null) {
@@ -143,16 +143,13 @@ public abstract class ChroBar {
 		int precision = (int) renderer.getPrecision();
 		
 		if(precision > 0) {
+			
 			currentMSInMinute = (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
-			if(precision > 1) {
-				currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
-						 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
-				if(precision > 2) {
-					currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
-							(currentMinute*ChroBarStaticData._msInMinute) +
-							(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
-				}
-			}
+			currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
+					 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+			currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
+					(currentMinute*ChroBarStaticData._msInMinute) +
+					(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
 		}
 		
 //		DEBUG

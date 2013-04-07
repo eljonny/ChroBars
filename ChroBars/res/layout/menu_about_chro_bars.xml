@@ -16,7 +16,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextSwitcher
-        android:id="@+id/creditsTextSwitcher"
+        android:id="@+id/txtswitchCredits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chrobars_settings_general_lblChgBGColor"
@@ -27,7 +27,7 @@
         android:outAnimation="@anim/anim_fade_out" >
 
         <TextView
-            android:id="@+id/dummy"
+            android:id="@+id/txtdummy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical|center_horizontal"
@@ -41,7 +41,7 @@
             android:width="200dp" />
 
         <TextView
-            android:id="@+id/dummy1"
+            android:id="@+id/txtdummy1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical|center_horizontal"
@@ -57,13 +57,24 @@
     </TextSwitcher>
 
     <TextView
-        android:id="@+id/creditsCopyright"
+        android:id="@+id/lblCreditsCopyright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
         android:text="@string/about_copyright"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="12sp"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/lblAboutVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lblCreditsCopyright"
+        android:layout_centerHorizontal="true"
+        android:text="@string/about_version"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="12sp"
         android:typeface="sans" />

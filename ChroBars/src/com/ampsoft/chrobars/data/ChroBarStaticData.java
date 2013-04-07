@@ -44,13 +44,16 @@ public final class ChroBarStaticData {
 	public static final int secondBarColor = 0x9FFF9F;
 	public static final int millisecondBarColor = 0xFF5757;
 	public static final boolean threeD = true, displayNumbers = true;
+	public static final boolean dynamicLighting = false;
 	public static final boolean[] visibleBars = {true, true, true, false};
+	public static final boolean[] visibleNumbers = {true, true, true, false};
 	
 	//Base Y-Coordinate from which to draw a ChroBar
 	public static final float _baseHeight = -1.8f;
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
-	public static final float _baseDepth = -0.75f;
+	public static final float _baseDepth = -0.5f;
 	public static final float _max_precision = 3.0f;
+	public static final float _left_screen_edge = -1f;
 	
 	public static final float _msInDay = (float) ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
 														ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
@@ -105,7 +108,13 @@ public final class ChroBarStaticData {
 	  * Shared between all bars
 	  */
 	@SuppressWarnings("unused")
-	private static float barMargin = 5.0f;
+	private static float barMargin = 20.0f;
+	
+	/**
+	 * Margin, in pixels, from the edge of the screen to the left-most or right-most bar.
+	 */
+	@SuppressWarnings("unused")
+	private static float edgeMargin = 20.0f;
 	
 	/**
 	 * Perspective adjustment for rear portion of bar
@@ -124,6 +133,8 @@ public final class ChroBarStaticData {
 	 */
 	@SuppressWarnings("unused")
 	private static WindowManager wm;
+	
+	private static ChroBarStaticData _inst;
 	
 	/*
 	 * End ChroBars application data
@@ -152,12 +163,24 @@ public final class ChroBarStaticData {
 	 * 
 	 * @return
 	 */
-	public static ChroBarStaticData getDataInstance() {
+	public static ChroBarStaticData getNewDataInstance() {
 		
-		if(_instance)
-			throw new RuntimeException(new IllegalAccessException("There is already an instance of the settings object. Aborting."));
-		else
-			return new ChroBarStaticData();
+		if(_instance) {
+			System.err.println("Data class instance already exists. Returning current instance.");
+			return _inst;
+		}
+		else {
+			_inst = new ChroBarStaticData();
+			return _inst;
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static ChroBarStaticData getDataInstance() {
+		return _instance ? _inst : getNewDataInstance();
 	}
 	
 	/**

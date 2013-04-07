@@ -18,7 +18,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.ampsoft.chrobars.ChroBar;
-import com.ampsoft.chrobars.ChroType;
 import com.ampsoft.chrobars.R;
 import com.ampsoft.chrobars.data.ChroBarStaticData;
 import com.ampsoft.chrobars.opengl.BarsRenderer;
@@ -123,7 +122,7 @@ public class ChroBarsSettingsActivity extends Activity
 		if(v instanceof CheckBox)
 			setChroBarVisibility((CheckBox)v);
 		else if(v instanceof ToggleButton)
-			toggle3D((ToggleButton)v);
+			toggleSetting((ToggleButton)v);
 		else if(v instanceof Button)
 			pickColor((Button)v);
 	}
@@ -131,10 +130,17 @@ public class ChroBarsSettingsActivity extends Activity
 	/**
 	 * 
 	 */
-	private void toggle3D(ToggleButton tButton) {
+	private void toggleSetting(ToggleButton tButton) {
 		
-		settings.setPrefValue("threeD", tButton.isChecked());
-		currentBars = renderer.refreshVisibleBars();
+		switch(tButton.getId()) {
+		case R.id.chrobars_settings_general_tglToggle3D:
+			settings.setPrefValue("threeD", tButton.isChecked());
+			currentBars = renderer.refreshVisibleBars();
+			checkCheckBoxes();
+			break;
+		case R.id.chrobars_settings_general_tglToggleDynLighting:
+			settings.setPrefValue("dynamicLighting", tButton.isChecked());
+		}
 	}
 
 	/**
@@ -311,14 +317,27 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void displayNumbers(CheckBox box) {
 		
-		if(box.getId() == R.id.chrobars_settings_general_chkbxDispNumbers) {
-			settings.setPrefValue("displayNumbers", box.isChecked());
-			//TODO make this per bar
-			for(ChroType t : ChroType.values())
-				renderer.getChroBar(t).setDrawNumber(box.isChecked());
+		switch(box.getId()) {
+		case R.id.chrobars_settings_slidingDrawer_chkbxHours_numbers:
+			currentBars[0].setDrawNumber(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[0].getBarType(), true, box.isChecked());
+			return;
+		case R.id.chrobars_settings_slidingDrawer_chkbxMinutes_numbers:
+			currentBars[1].setDrawNumber(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[1].getBarType(), true, box.isChecked());
+			return;
+		case R.id.chrobars_settings_slidingDrawer_chkbxSeconds_numbers:
+			currentBars[2].setDrawNumber(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[2].getBarType(), true, box.isChecked());
+			return;
+		case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds_numbers:
+			currentBars[3].setDrawNumber(box.isChecked());
+			settings.setVisibilityPrefValue(currentBars[3].getBarType(), true, box.isChecked());
+			return;
+			
 		}
-		else
-			throw new RuntimeException("The checkbox detected is unknown: " + box.isChecked() + "@" + box.toString() + ":" + box.getId() + "\n");
+		
+		throw new RuntimeException("The checkbox detected is unknown: " + box.isChecked() + "@" + box.toString() + ":" + box.getId() + "\n");
 	}
 
 	/**
@@ -375,8 +394,8 @@ public class ChroBarsSettingsActivity extends Activity
 			touchable.setOnClickListener(this);
 		}
 		
-		//Only do this if we are in general settings.
-		if(lastLayout == R.layout.chrobars_general_settings) {
+		//Only do this if we are in chrobars settings.
+		if(lastLayout == R.layout.chrobars_settings) {
 			
 			sliders.clear();
 			
@@ -428,6 +447,9 @@ public class ChroBarsSettingsActivity extends Activity
 			
 			case R.id.chrobars_settings_general_tglToggle3D:
 				tB.setChecked(settings.isThreeD());
+				break;
+			case R.id.chrobars_settings_general_tglToggleDynLighting:
+				tB.setChecked(settings.usesDynamicLighting());
 			}
 		}
 	}
@@ -455,8 +477,18 @@ public class ChroBarsSettingsActivity extends Activity
 			case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds:
 				box.setChecked(currentBars[3].isDrawn());
 				break;
-			case R.id.chrobars_settings_general_chkbxDispNumbers:
-				box.setChecked(settings.isDisplayNumbers());
+				
+			case R.id.chrobars_settings_slidingDrawer_chkbxHours_numbers:
+				box.setChecked(currentBars[0].isNumberDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxMinutes_numbers:
+				box.setChecked(currentBars[1].isNumberDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxSeconds_numbers:
+				box.setChecked(currentBars[2].isNumberDrawn());
+				break;
+			case R.id.chrobars_settings_slidingDrawer_chkbxMilliseconds_numbers:
+				box.setChecked(currentBars[3].isNumberDrawn());
 			}	
 		}
 	}

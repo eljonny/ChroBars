@@ -12,18 +12,20 @@
     <string name="settings_bars_dropdown_title_general">General</string>
     <string name="settings_general_precision">Motion Precision</string>
     <string name="settings_bars_type">ChroBar</string>
-    <string name="settings_bars_visible">Visible?</string>
+    <string name="settings_bar_visible">Visible?</string>
+    <string name="settings_number_visible">Number?</string>
     <string name="settings_bars_pick_color">Color</string>
-    <string name="settings_bars_hour">Hour Bar</string>
-    <string name="settings_bars_minute">Minute Bar</string>
-    <string name="settings_bars_second">Second Bar</string>
-    <string name="settings_bars_millisecond">Millisecond Bar</string>
+    <string name="settings_bars_hour">Hour</string>
+    <string name="settings_bars_minute">Minute</string>
+    <string name="settings_bars_second">Second</string>
+    <string name="settings_bars_millisecond">Milli</string>
     <string name="settings_colorPickerButton">Pick Color</string>
     <string name="settings_bars_toastMessage_noneChecked">Please check at least one chrobar to display.</string>
     <string name="settings_general_pickBackgroundColor">Change background color</string>
     <string name="settings_general_dimensions">3D Bars</string>
     <string name="settings_general_displayNumbers">Display numbers</string>
     <string name="settings_general_numberSettings">Format numbers</string>
+    <string name="settings_general_EnableDisableDynLighting">Dynamic Lighting</string>
     
     <!-- About information strings -->
     <string name="about_title">ChroBars Credits</string>
@@ -32,6 +34,7 @@
     <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management</string>
     <string name="about_team_member_dpolage">Daniel Polage\nExecutive Producer</string>
     <string name="about_copyright">Copyright Daniel Polage, 2013</string>
+    <string name="about_version">0.7.83</string>
     
     <!-- Utility strings -->
 	<string name="empty_str"></string>

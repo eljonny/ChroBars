@@ -91,32 +91,32 @@ public class ChroBar2D extends ChroBar {
 		float screenWidth = (float)screen.widthPixels;
 		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMargin");
+		float edgeMargin = barsData.getFloat("edgeMargin");
 		
 		//Update the bar margin to 5px ratio of screen width
 		barMargin /= screenWidth;
 		barMargin *= 2.0f;
+		//Update the edge margin to current screen pixels
+		edgeMargin /= screenWidth; //Get the edge margin as a ratio to the entire screen width
+		edgeMargin *= 2f; //Normalize the edge margin to cartesian coordinates.
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
-		barWidth -= barMargin;
 		barWidth *= 2f;
+		barWidth -= ((edgeMargin*2f)/(float)numberOfBars);
+		barWidth -= ((barMargin*((float)numberOfBars-1f))/(float)numberOfBars);
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
-		if(barType.getType() < 3)
-			for(int i = barType.getType() + 1; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++)
-				if(!renderer.refreshVisibleBars()[i].isDrawn())
-					++barTypeCode;
-		else if(barType.getType() < 2)
-			for(int j = barType.getType() - 1; j >= 0; j--)
-				if(!renderer.refreshVisibleBars()[j].isDrawn())
-					--barTypeCode;
+		for(int i = barType.getType() + 1; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++)
+			if(!renderer.refreshVisibleBars()[i].isDrawn())
+				++barTypeCode;
 		
 		if(barTypeCode < 0)
 			barTypeCode = 0;
 
-		float leftXCoordinate_2D =  (barWidth * barTypeCode) + (barMargin * barTypeCode) - (.95f + barMargin);
+		float leftXCoordinate_2D =  ChroBarStaticData._left_screen_edge + edgeMargin + (barWidth * barTypeCode) + (barMargin * barTypeCode);
 		float rightXCoordinate_2D = leftXCoordinate_2D + barWidth;
 		
 		vertices_2D[0] = vertices_2D[3] = leftXCoordinate_2D;

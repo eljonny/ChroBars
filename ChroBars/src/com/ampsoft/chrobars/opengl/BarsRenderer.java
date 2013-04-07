@@ -248,7 +248,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	private void loadSettings() {
 		
-		ArrayList<Boolean> visibility = settings.getBarsVisibility();
+		ArrayList<Boolean> barVis = settings.getBarsVisibility();
+		ArrayList<Boolean> numVis = settings.getNumbersVisibility();
 		
 		setBackgroundColor(settings.getBackgroundColor(false));
 		
@@ -257,9 +258,9 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 			
 			ChroBar current = chroBars.get(t);
 			
-			current.setDrawBar(visibility.get(t.getType()));
-			//TODO in the future this should be per-bar.
-			current.setDrawNumber(settings.isDisplayNumbers());
+			current.setDrawBar(barVis.get(t.getType()));
+			current.setDrawNumber(numVis.get(t.getType()));
+			
 			ChroUtils.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
 	}
@@ -314,10 +315,20 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	
 	/**
 	 * Returns the current level of bar drawing precision.
+	 * 
 	 * @return The level of precision as an integer.
 	 */
 	public float getPrecision() {
 		return (float)settings.getPrecision();
+	}
+	
+	/**
+	 * Accessor for the current dynamic lighting setting.
+	 * 
+	 * @return Whether to or to not use dynamic lighting.
+	 */
+	public boolean usesDynamicLighting() {
+		return (boolean)settings.usesDynamicLighting();
 	}
 
 	/**

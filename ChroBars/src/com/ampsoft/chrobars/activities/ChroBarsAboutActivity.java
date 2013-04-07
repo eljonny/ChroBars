@@ -62,7 +62,7 @@ public class ChroBarsAboutActivity extends Activity {
 		
 		System.out.println("Constructing about activity...");
 		
-		creditsDisplayView = (TextSwitcher)findViewById(R.id.creditsTextSwitcher);
+		creditsDisplayView = (TextSwitcher)findViewById(R.id.txtswitchCredits);
 		credits = new ChroBarsCredits(this);
 		textSwitcher = new ChroAboutTimerTask(creditsDisplayView, credits);
 	}
