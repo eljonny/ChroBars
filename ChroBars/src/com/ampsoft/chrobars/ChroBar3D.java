@@ -262,15 +262,17 @@ public class ChroBar3D extends ChroBar {
 		float screenWidth = screen.widthPixels;
 		//System.out.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType() - 4;
-		float barMargin = barsData.getFloat("barMargin");
-		float edgeMargin = barsData.getFloat("edgeMargin");
+		float barMargin = barsData.getFloat("barMarginBase");
+		float edgeMargin = barsData.getFloat("edgeMarginBase");
 		
 		//Update the bar margin to current pixel width ratio of screen.
 		barMargin /= screenWidth;
 		barMargin *= 2f;
+		barMargin *= renderer.getBarMarginScalar();
 		//Update the edge margin to current screen pixels
 		edgeMargin /= screenWidth; //Get the edge margin as a ratio to the entire screen width
 		edgeMargin *= 2f; //Normalize the edge margin to cartesian coordinates.
+		edgeMargin *= renderer.getEdgeMarginScalar(); //Scale the margin to the correct size.
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();

@@ -323,6 +323,22 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public float getBarMarginScalar() {
+		return (float)settings.getBarMarginMultiplier();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public float getEdgeMarginScalar() {
+		return (float)settings.getEdgeMarginMultiplier();
+	}
+	
+	/**
 	 * Accessor for the current dynamic lighting setting.
 	 * 
 	 * @return Whether to or to not use dynamic lighting.
@@ -384,6 +400,9 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(8);
+	
+	//This array holds an up-to-date list of the currently visible bars,
+	// either 2D or 3D
 	private static ChroBar[] visibleBars = new ChroBar[ChroBarStaticData._MAX_BARS_TO_DRAW];
 	
 	//For OpenGL Lighting

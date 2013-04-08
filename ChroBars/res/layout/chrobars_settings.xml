@@ -1,236 +1,324 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/chrobars_settings_slidingDrawer_chrobars_contentTableLayout"
-    android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="wrap_content"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:stretchColumns="0,1,2,3" >
-
-    <TableRow
-        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_columnTitles">
-                        
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblBarTypeLabelColumnTitle"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_horizontal|center_vertical"
-         android:text="@string/settings_bars_type"
-         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblBarVisibleColumnTitle"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:text="@string/settings_bar_visible"
-         android:textAppearance="?android:attr/textAppearanceMedium" />
-     
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblNumberVisibleColumnTitle"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:text="@string/settings_number_visible"
-         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblColorPickColumnTitle"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:text="@string/settings_bars_pick_color"
-         android:textAppearance="?android:attr/textAppearanceMedium" />
-
- 	</TableRow>
-    <TableRow
-        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_hoursBar_settings">
-     
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblHours"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:layout_marginLeft="0dp"
-         android:gravity="center_horizontal"
-         android:text="@string/settings_bars_hour"
-         android:textAppearance="?android:attr/textAppearanceSmall" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxHours"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxHours_numbers"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <Button
-         android:id="@+id/chrobars_settings_slidingDrawer_btnHoursColorPicker"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:longClickable="false"
-         android:text="@string/settings_colorPickerButton" />
-     
-    </TableRow>
-    <TableRow 
-        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_minutesBar_settings">
+    android:layout_weight="0.58" >
     
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblMinutes"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:gravity="center_horizontal"
-         android:text="@string/settings_bars_minute"
-         android:textAppearance="?android:attr/textAppearanceSmall" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxMinutes"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxMinutes_numbers"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <Button
-         android:id="@+id/chrobars_settings_slidingDrawer_btnMinutesColorPicker"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:longClickable="false"
-         android:text="@string/settings_colorPickerButton" />
-    
-    </TableRow>
-    <TableRow 
-        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_secondsBar_settings">
-        
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblSeconds"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:gravity="center_horizontal"
-         android:text="@string/settings_bars_second"
-         android:textAppearance="?android:attr/textAppearanceSmall" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxSeconds"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxSeconds_numbers"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <Button
-         android:id="@+id/chrobars_settings_slidingDrawer_btnSecondsColorPicker"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:longClickable="false"
-         android:text="@string/settings_colorPickerButton" />
-
-    </TableRow>
-    <TableRow 
-        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_millisecondsBar_settings">
-        
-     <TextView
-         android:id="@+id/chrobars_settings_slidingDrawer_lblMilliseconds"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_gravity="center_vertical"
-         android:gravity="center_horizontal"
-         android:text="@string/settings_bars_millisecond"
-         android:textAppearance="?android:attr/textAppearanceSmall" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <CheckBox
-         android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds_numbers"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:checked="false"
-         android:longClickable="false" />
-     
-     <Button
-         android:id="@+id/chrobars_settings_slidingDrawer_btnMillisecondsColorPicker"
-         android:layout_gravity="center_vertical|center_horizontal"
-         android:longClickable="false"
-         android:text="@string/settings_colorPickerButton" />
-    
-    </TableRow>
-
 	<TableLayout
+	    android:id="@+id/chrobars_settings_slidingDrawer_chrobars_contentTableLayout"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical"
-	    android:stretchColumns="0,1" >
+	    android:stretchColumns="0,1,2,3" >
 	
-	    <TableRow
-	        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_precision"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content" >
+	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_columnTitles" >
 	
 	        <TextView
-	            android:id="@+id/chrobars_settings_slidingDrawer_lblPrecision"
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblBarTypeLabelColumnTitle"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginLeft="10dp"
-	            android:layout_marginRight="0dp"
-	            android:layout_marginTop="15dp"
-	            android:gravity="left"
-	            android:text="@string/settings_general_precision"
-	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	            android:layout_gravity="center_horizontal|center_vertical"
+	            android:text="@string/settings_bars_type"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
 	
-	        <SeekBar
-	            android:id="@+id/chrobars_settings_general_slider_motionPrecision"
-	            android:layout_width="match_parent"
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblBarVisibleColumnTitle"
+	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginRight="7dp"
-	            android:layout_marginTop="10dp"
-	            android:max="3"
-	            android:progress="1" />
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:text="@string/settings_bar_visible"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
 	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblNumberVisibleColumnTitle"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:text="@string/settings_number_visible"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblColorPickColumnTitle"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:text="@string/settings_bars_pick_color"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
 	    </TableRow>
 	
 	    <TableRow
-	        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_twoD_threeD"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content" >
+	        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_hoursBar_settings"
+	        android:layout_marginTop="10dp" >
 	
 	        <TextView
-	            android:id="@+id/chrobars_settings_general_lbl3DBars"
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblHours"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginLeft="30dp"
-	            android:layout_marginRight="95dp"
-	            android:layout_marginTop="25dp"
+	            android:layout_gravity="center_vertical"
+	            android:layout_marginLeft="0dp"
 	            android:gravity="center_horizontal"
-	            android:text="@string/settings_general_dimensions"
+	            android:text="@string/settings_bars_hour"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
 	
-	        <ToggleButton
-	            android:id="@+id/chrobars_settings_general_tglToggle3D"
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxHours"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxHours_numbers"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnHoursColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
+	    </TableRow>
+	
+	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_minutesBar_settings" >
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblMinutes"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="5dp"
-	            android:layout_marginLeft="63dp"
-	            android:layout_marginRight="15dp"
-	            android:layout_marginTop="15dp"
-	            android:checked="true"
-	            android:textOff="@string/disabled"
-	            android:textOn="@string/enabled" />
+	            android:layout_gravity="center_vertical"
+	            android:gravity="center_horizontal"
+	            android:text="@string/settings_bars_minute"
+	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxMinutes"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxMinutes_numbers"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnMinutesColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
+	    </TableRow>
+	
+	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_secondsBar_settings" >
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblSeconds"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical"
+	            android:gravity="center_horizontal"
+	            android:text="@string/settings_bars_second"
+	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxSeconds"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxSeconds_numbers"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnSecondsColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
+	    </TableRow>
+	
+	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_millisecondsBar_settings" >
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblMilliseconds"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical"
+	            android:gravity="center_horizontal"
+	            android:text="@string/settings_bars_millisecond"
+	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <CheckBox
+	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds_numbers"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:checked="false"
+	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnMillisecondsColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:layout_marginBottom="0dp"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
 	
 	    </TableRow>
-	    
+	
+	    <TableLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:stretchColumns="0,1" >
+	
+	        <TableRow
+	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_precision"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="0dp" >
+	
+	            <TextView
+	                android:id="@+id/chrobars_settings_slidingDrawer_lblPrecision"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="10dp"
+	                android:layout_marginRight="30dp"
+	                android:layout_marginTop="15dp"
+	                android:gravity="left"
+	                android:text="@string/settings_general_precision"
+	                android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	            <SeekBar
+	                android:id="@+id/chrobars_settings_general_slider_motionPrecision"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_marginBottom="5dp"
+	                android:layout_marginLeft="2dp"
+	                android:layout_marginRight="8dp"
+	                android:layout_marginTop="10dp"
+	                android:max="3"
+	                android:progress="0" />
+	        </TableRow>
+	
+	        <TableRow
+	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_barMargin"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="5dp" >
+	
+	            <TextView
+	                android:id="@+id/chrobars_settings_slidingDrawer_lblBarMargin"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="10dp"
+	                android:layout_marginRight="30dp"
+	                android:layout_marginTop="5dp"
+	                android:gravity="left"
+	                android:text="@string/settings_general_margin_bar"
+	                android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	            <SeekBar
+	                android:id="@+id/chrobars_settings_general_slider_barMargin"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_marginBottom="5dp"
+	                android:layout_marginLeft="2dp"
+	                android:layout_marginRight="8dp"
+	                android:layout_marginTop="0dp"
+	                android:max="8"
+	                android:progress="0" />
+	        </TableRow>
+	
+	        <TableRow
+	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_edgeMargin"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="5dp" >
+	
+	            <TextView
+	                android:id="@+id/chrobars_settings_slidingDrawer_lblEdgeMargin"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="10dp"
+	                android:layout_marginRight="30dp"
+	                android:layout_marginTop="5dp"
+	                android:gravity="left"
+	                android:text="@string/settings_general_margin_edge"
+	                android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	            <SeekBar
+	                android:id="@+id/chrobars_settings_general_slider_edgeMargin"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_marginBottom="10dp"
+	                android:layout_marginLeft="2dp"
+	                android:layout_marginRight="8dp"
+	                android:layout_marginTop="0dp"
+	                android:max="8"
+	                android:progress="0" />
+	        </TableRow>
+	
+	        <TableRow
+	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_edges"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" >
+	
+	            <TextView
+	                android:id="@+id/chrobars_settings_general_lblBarEdges"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center_vertical"
+	                android:layout_marginBottom="8dp"
+	                android:layout_marginLeft="10dp"
+	                android:layout_marginTop="5dp"
+	                android:gravity="center_vertical"
+	                android:text="@string/settings_general_edges"
+	                android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	            <Spinner
+	                android:id="@+id/chrobars_settings_general_cmbEdges"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="center_vertical"
+	                android:layout_marginLeft="0dp"
+	                android:layout_marginRight="5dp"
+	                android:layout_marginTop="0dp" />
+
+	        </TableRow>
+	
+	        <TableRow
+	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_twoD_threeD"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content" >
+	
+	            <TextView
+	                android:id="@+id/chrobars_settings_general_lbl3DBars"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="10dp"
+	                android:layout_marginRight="95dp"
+	                android:layout_marginTop="20dp"
+	                android:text="@string/settings_general_dimensions"
+	                android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	            <ToggleButton
+	                android:id="@+id/chrobars_settings_general_tglToggle3D"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="62dp"
+	                android:layout_marginRight="7dp"
+	                android:layout_marginTop="10dp"
+	                android:checked="true"
+	                android:textOff="@string/disabled"
+	                android:textOn="@string/enabled" />
+	        </TableRow>
+	    </TableLayout>
 	</TableLayout>
-    
-</TableLayout>
+</ScrollView>

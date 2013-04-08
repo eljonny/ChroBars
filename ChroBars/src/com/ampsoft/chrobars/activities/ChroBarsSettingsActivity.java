@@ -9,10 +9,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.SlidingDrawer;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -33,23 +39,25 @@ import com.ampsoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
  *
  */
 public class ChroBarsSettingsActivity extends Activity
-									  implements OnClickListener {
+									  implements OnClickListener,
+									  OnItemSelectedListener, OnSeekBarChangeListener {
 	
 	private static OnColorChangedListener listening;
 	
 	/*
 	 * These ArrayLists store the UI elements that the user interacts with.
 	 */
-	private ArrayList<CheckBox> checkBoxes = new ArrayList<CheckBox>();
-	private ArrayList<Button> buttons = new ArrayList<Button>();
-	private ArrayList<SeekBar> sliders = new ArrayList<SeekBar>();
-	private ArrayList<ToggleButton> toggles = new ArrayList<ToggleButton>();
+	private ArrayList<CheckBox> 		checkBoxes 	= new ArrayList<CheckBox>();
+	private ArrayList<Button> 			buttons 	= new ArrayList<Button>();
+	private ArrayList<SeekBar>			sliders 	= new ArrayList<SeekBar>();
+	private ArrayList<ToggleButton> 	toggles 	= new ArrayList<ToggleButton>();
+	private ArrayList<Spinner>			spinners 	= new ArrayList<Spinner>();
 	
 	private static SlidingDrawer settingsDrawer;
 	private static TableLayout settingsLayoutContainer;
 	private static int lastLayout;
 	
-	private static Toast noneChecked;
+	private static Toast noneChecked, colorPickerInfo;
 	
 	private static ChroBarsSettings settings;
 	private static BarsRenderer renderer;
@@ -89,10 +97,8 @@ public class ChroBarsSettingsActivity extends Activity
 		currentBars = renderer.refreshVisibleBars();
 		processTouchableUIElements();
 		
-		noneChecked = Toast.makeText(this,
-						   			 R.string.settings_bars_toastMessage_noneChecked,
-						   			 Toast.LENGTH_SHORT								 );
-		noneChecked.show(); noneChecked.cancel();
+		noneChecked = Toast.makeText(this, R.string.settings_bars_toastMessage_noneChecked, Toast.LENGTH_SHORT);
+		colorPickerInfo = Toast.makeText(this, R.string.settings_bars_toastMessage_colorPickerInfo, Toast.LENGTH_LONG);
 	}
 	
 	/**
@@ -119,12 +125,18 @@ public class ChroBarsSettingsActivity extends Activity
 	@Override
 	public void onClick(View v) {
 		
-		if(v instanceof CheckBox)
+		if(v instanceof CheckBox) {
+			System.out.println("CheckBox " + v + " pressed.");
 			setChroBarVisibility((CheckBox)v);
-		else if(v instanceof ToggleButton)
+		}
+		else if(v instanceof ToggleButton) {
+			System.out.println("Toggle Button " + v + " pressed.");
 			toggleSetting((ToggleButton)v);
-		else if(v instanceof Button)
+		}
+		else if(v instanceof Button) {
+			System.out.println("Button " + v + " pressed.");
 			pickColor((Button)v);
+		}
 	}
 	
 	/**
@@ -209,6 +221,8 @@ public class ChroBarsSettingsActivity extends Activity
 	 */
 	private void pickBackgroundColor() {
 		
+		colorPickerInfo.show();
+		
 		/**
 		 * 
 		 */
@@ -247,6 +261,8 @@ public class ChroBarsSettingsActivity extends Activity
 	 * @param barToChange
 	 */
 	private void changeBarColorWithPicker(final ChroBar barToChange) {
+		
+		colorPickerInfo.show();
 
 		/**
 		 * 
@@ -372,84 +388,145 @@ public class ChroBarsSettingsActivity extends Activity
 		else if(touchables.isEmpty())
 			return;
 		
-		checkBoxes.clear(); toggles.clear(); buttons.clear();
+		checkBoxes.clear(); toggles.clear();
+		buttons.clear(); sliders.clear(); spinners.clear();
 		
 		for(View touchable : touchables) {
 			
+//			DEBUG
 //			System.out.println("Examining " + touchable + "...");
 			
 			if(touchable instanceof CheckBox) {
+//				DEBUG
 //				System.out.println("Processing " + touchable + " as CheckBox.");
 				checkBoxes.add((CheckBox)touchable);
 			}
 			else if(touchable instanceof ToggleButton) {
+//				DEBUG
 //				System.out.println("Processing " + touchable + " as ToggleButton.");
+//				System.out.println("Setting toggle " + touchable);
+				
+				switch(touchable.getId()) {
+				
+				case R.id.chrobars_settings_general_tglToggle3D:
+					((CompoundButton) touchable).setChecked(settings.isThreeD());
+					break;
+				case R.id.chrobars_settings_general_tglToggleDynLighting:
+					((CompoundButton) touchable).setChecked(settings.usesDynamicLighting());
+				}
 				toggles.add((ToggleButton)touchable);
 			}
 			else if(touchable instanceof Button) {
+//				DEBUG
 //				System.out.println("Processing " + touchable + " as Button.");
 				buttons.add((Button)touchable);
 			}
+			else if(touchable instanceof Spinner) {
+//				DEBUG
+//				System.out.println("Processing " + touchable + " as Spinner.");
+				Spinner spinner = (Spinner) touchable;
+				switch(spinner.getId()) {
+				case R.id.chrobars_settings_general_cmbEdges:
+					ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.settings_bars_edges_options, android.R.layout.simple_spinner_item);
+					adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+					spinner.setAdapter(adapter);
+					break;
+				}
+				spinners.add(spinner);
+			}
 			
-			touchable.setOnClickListener(this);
+			if(touchable instanceof AdapterView)
+				((AdapterView<?>) touchable).setOnItemSelectedListener(this);
+			else
+				touchable.setOnClickListener(this);
 		}
 		
 		//Only do this if we are in chrobars settings.
 		if(lastLayout == R.layout.chrobars_settings) {
-			
-			sliders.clear();
-			
-			SeekBar precision = (SeekBar) findViewById(R.id.chrobars_settings_general_slider_motionPrecision);
-			precision.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener (){
-	
-				@Override
-				public void onProgressChanged(SeekBar seekBar, int progress,
-															 boolean fromUser) {
+			sliderSearch(settingsLayoutContainer);
+			if(!sliders.isEmpty()) {
+				for(SeekBar slider : sliders) {
+					
+//					DEBUG
+//					System.out.println("Processing seekbar " + slider + "...");
+					
+					slider.setOnSeekBarChangeListener(this);
+					
+					switch(slider.getId()) {
+					case R.id.chrobars_settings_general_slider_motionPrecision:
+//						DEBUG
+//						System.out.println("Load precision slider " + slider + ", value " + slider.getProgress() + ".");
+						slider.setProgress(settings.getPrecision());
+						break;
+					case R.id.chrobars_settings_general_slider_barMargin:
+//						DEBUG
+//						System.out.println("Load bar margin slider " + slider + ", value " + slider.getProgress() + ".");
+						slider.setProgress(settings.getBarMarginMultiplier());
+						break;
+					case R.id.chrobars_settings_general_slider_edgeMargin:
+//						DEBUG
+//						System.out.println("Load edge margin slider " + slider + ", value " + slider.getProgress() + ".");
+						slider.setProgress(settings.getEdgeMarginMultiplier());
+						break;
+					}
 				}
-	
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) {
-					System.out.println("User currently adjusting motion precision...");
-				}
-	
-				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) {
-					System.out.println("Slider " + seekBar + " set to " + seekBar.getProgress() + "\nSaving...");
-					saveSliders();
-				}
-				
-			});
-			
-			precision.setProgress(settings.getPrecision());
-			
-			sliders.add(precision);
+			}
+			else
+				System.out.println("No sliders found :(");
 		}
 		
-		//System.out.println("Touchables found:\n" + checkBoxes + "\n" + sliders + "\n" + toggles + "\n" + buttons);
+//		DEBUG
+//		System.out.println("Touchables found:\n" + checkBoxes + "\n" + sliders + "\n" + toggles + "\n" + buttons);
 		
 		//Set onClick listener for layout switcher buttons
-		{
-			Button settingsLayoutSwitcher = (Button)findViewById(R.id.chrobars_settings_slidingDrawer_chrobarsGeneralHandleButton);
-			settingsLayoutSwitcher.setOnClickListener(this);
-			buttons.add(settingsLayoutSwitcher);
-			settingsLayoutSwitcher = (Button)findViewById(R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton);
-			settingsLayoutSwitcher.setOnClickListener(this);
-			buttons.add(settingsLayoutSwitcher);
-		}
+		Button generalHandle = (Button)findViewById(R.id.chrobars_settings_slidingDrawer_chrobarsGeneralHandleButton);
+		generalHandle.setOnClickListener(this);
+		buttons.add(generalHandle);
+		Button chroHandle = (Button)findViewById(R.id.chrobars_settings_slidingDrawer_chrobarsHandleButton);
+		chroHandle.setOnClickListener(this);
+		buttons.add(chroHandle);
+		
+//		DEBUG
+		System.out.println("Button general text: " + generalHandle.getText() + " Button bars text: " + chroHandle.getText());
+		System.out.println("Buttons added to the button store: " + generalHandle + " = Gneral settings button; " + chroHandle + " = ChroSettings button.");
 		
 		checkCheckBoxes();
+	}
+	
+	/**
+	 * 
+	 * @param container Recurse into container to look for children.
+	 */
+	private void sliderSearch(ViewGroup container) {
+
+		int containerChildCount = container.getChildCount();
+
+//		DEBUG
+//		System.out.println("Current container: " + container);
+//		System.out.println("Current visual children count: " + containerChildCount);
+//		System.out.println("Current visual children:");
 		
-		for(ToggleButton tB : toggles) {
+		//Search through the children of the current container looking for other containers or specific object types.
+		for(containerChildCount--; containerChildCount >=0; containerChildCount--) {
+			//Get the next child
+			View child = container.getChildAt(containerChildCount);
+
+//			DEBUG
+//			System.out.println("Current visual child: " + child);
 			
-			System.out.println("Setting toggle " + tB);
-			
-			switch(tB.getId()) {
-			
-			case R.id.chrobars_settings_general_tglToggle3D:
-				tB.setChecked(settings.isThreeD());
-				break;
-			case R.id.chrobars_settings_general_tglToggleDynLighting:
-				tB.setChecked(settings.usesDynamicLighting());
+			//If the child is a container, and has children, recurse into that container.
+			if(ViewGroup.class.isAssignableFrom(child.getClass()))
+				sliderSearch((ViewGroup) child);
+
+			//If we are not dealing with a container, check to see if it is what we are looking for.
+			// Slider, button, checkbox, etc.
+			else {
+				if(SeekBar.class.isAssignableFrom(child.getClass())) {
+//					DEBUG
+//					System.out.println("Found seekbar " + child);
+					
+					sliders.add((SeekBar)child);
+				}
 			}
 		}
 	}
@@ -494,25 +571,36 @@ public class ChroBarsSettingsActivity extends Activity
 	}
 	
 	/**
-	 * Updates the slider values in the preferences file.
+	 * Updates a slider value in the preferences file.
 	 */
-	private void saveSliders() {
-
-		for(SeekBar slider : sliders) {
-			
-			switch(slider.getId()) {
-			case R.id.chrobars_settings_general_slider_motionPrecision:
-				System.out.println("Save precision slider " + slider + ", value " + slider.getProgress() + ".");
-				settings.setPrefValue("precision", slider.getProgress());
-			}
+	private void saveSlider(SeekBar slider) {
+		
+		switch(slider.getId()) {
+		case R.id.chrobars_settings_general_slider_motionPrecision:
+			System.out.println("Save precision slider " + slider + ", value " + slider.getProgress() + ".");
+			settings.setPrefValue("precision", slider.getProgress());
+			break;
+		case R.id.chrobars_settings_general_slider_barMargin:
+			System.out.println("Save bar margin slider " + slider + ", value " + slider.getProgress() + ".");
+			settings.setPrefValue("barMargin", slider.getProgress());
+			break;
+		case R.id.chrobars_settings_general_slider_edgeMargin:
+			System.out.println("Save edge margin slider " + slider + ", value " + slider.getProgress() + ".");
+			settings.setPrefValue("edgeMargin", slider.getProgress());
+			break;
 		}
 	}
 
 	/**
-	 * 
+	 * Prevent possible divby0 errors.
 	 * @return
 	 */
 	private boolean atLeastOneCheckBoxChecked() {
+		
+		//If there aren't any checkboxes we shouldn't worry about this.
+		// False since there are no checkboxes.
+		if(checkBoxes.isEmpty())
+			return false;
 		
 		byte checkedBoxes = 0;
 		
@@ -521,5 +609,47 @@ public class ChroBarsSettingsActivity extends Activity
 				++checkedBoxes;
 		
 		return (checkedBoxes > 0);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void onItemSelected(AdapterView<?> spinner, View view, int spinnerSelectionPosition, long id) {
+		System.out.println("Spinner " + spinner + " set to " + spinner.getItemAtPosition(spinnerSelectionPosition) + " at index " + spinnerSelectionPosition + "\nSaving...");
+		settings.setPrefValue("barEdgeSetting", spinnerSelectionPosition);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		//Do nothing
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		//Do nothing
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		System.out.println("User currently adjusting motion precision...");
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		System.out.println("Slider " + seekBar + " set to " + seekBar.getProgress() + "\nSaving...");
+		saveSlider(seekBar);
 	}
 }

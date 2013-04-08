@@ -26,9 +26,10 @@ import com.ampsoft.chrobars.data.ChroBarStaticData;
 public final class ChroBarsSettings {
 	
 	//General bars application options
-	private int precision;
+	private int precision, barEdgeSetting;
+	private int barMargin, edgeMargin;
 	private int settingsActivityLayout;
-	private boolean threeD, displayNumbers, dynamicLighting;
+	private boolean threeD, dynamicLighting;
 	private ArrayList<Boolean> barsVisibility, numbersVisibility;
 	
 	//Colors
@@ -258,8 +259,10 @@ public final class ChroBarsSettings {
 		System.out.println("Setting general defaults...");
 		settingsActivityLayout = R.layout.chrobars_settings;
 		precision = ChroBarStaticData.precision;
+		barEdgeSetting = ChroBarStaticData.barEdgeSetting;
+		barMargin = ChroBarStaticData.barMargin;
+		edgeMargin = ChroBarStaticData.edgeMargin;
 		threeD = ChroBarStaticData.threeD;
-		displayNumbers = ChroBarStaticData.displayNumbers;
 		dynamicLighting = ChroBarStaticData.dynamicLighting;
 	}
 
@@ -318,9 +321,11 @@ public final class ChroBarsSettings {
 		System.out.println("Putting all default settings...");
 		
 		putPreference("precision", true);
+		putPreference("barEdgeSetting", true);
+		putPreference("barMargin", true);
+		putPreference("edgeMargin", true);
 		putPreference("settingsActivityLayout", true);
 		putPreference("threeD", false);
-		putPreference("displayNumbers", false);
 		putPreference("dynamicLighting", false);
 		
 		for(int barVis = 0; barVis < barsVisibility.size(); barVis++) {
@@ -397,13 +402,6 @@ public final class ChroBarsSettings {
 	 */
 	public final boolean isThreeD() {
 		return threeD;
-	}
-
-	/**
-	 * @return the displayNumbers
-	 */
-	public final boolean displayNumbers() {
-		return displayNumbers;
 	}
 	
 	/**
@@ -483,6 +481,30 @@ public final class ChroBarsSettings {
 	 */
 	private final int getMillisecondBarColor(boolean userDefault) {
 		return userDefault ? userDefault_millisecondBarColor : millisecondBarColor;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getBarEdgeSetting() {
+		return barEdgeSetting;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getBarMarginMultiplier() {
+		return barMargin;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getEdgeMarginMultiplier() {
+		return edgeMargin;
 	}
 
 	/**
