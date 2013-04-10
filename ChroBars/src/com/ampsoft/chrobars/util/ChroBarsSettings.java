@@ -30,6 +30,7 @@ public final class ChroBarsSettings {
 	private int barMargin, edgeMargin;
 	private int settingsActivityLayout;
 	private boolean threeD, dynamicLighting;
+	private boolean twelveHourTime;
 	private ArrayList<Boolean> barsVisibility, numbersVisibility;
 	
 	//Colors
@@ -264,6 +265,7 @@ public final class ChroBarsSettings {
 		edgeMargin = ChroBarStaticData.edgeMargin;
 		threeD = ChroBarStaticData.threeD;
 		dynamicLighting = ChroBarStaticData.dynamicLighting;
+		twelveHourTime = ChroBarStaticData.twelveHourTime;
 	}
 
 	/**
@@ -298,6 +300,7 @@ public final class ChroBarsSettings {
 	}
 	
 	/**
+	 * Try really hard to resolve issues  with null preference data at runtime.
 	 * 
 	 * @param pref
 	 */
@@ -306,8 +309,13 @@ public final class ChroBarsSettings {
 			pref.set(this, ChroBarStaticData.getDataInstance().getObject(pref.getName()));
 			try { putPreference(pref.getName(), false); }
 			catch(Exception unknownEx) {
-				putPreference(pref.getName(), true);
-				ChroUtils.printExDetails(unknownEx);
+				try {
+					putPreference(pref.getName(), true);
+				}
+				catch(Exception ex) {
+					ChroUtils.printExDetails(unknownEx);
+					ChroUtils.printExDetails(ex);
+				}
 			}
 		}
 		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
@@ -327,6 +335,7 @@ public final class ChroBarsSettings {
 		putPreference("settingsActivityLayout", true);
 		putPreference("threeD", false);
 		putPreference("dynamicLighting", false);
+		putPreference("twelveHourTime", false);
 		
 		for(int barVis = 0; barVis < barsVisibility.size(); barVis++) {
 			putVisibilityPreference("barsVisibility_" + barVis, barsVisibility.get(barVis));
@@ -402,6 +411,10 @@ public final class ChroBarsSettings {
 	 */
 	public final boolean isThreeD() {
 		return threeD;
+	}
+	
+	public final boolean usesTwelveHourTime() {
+		return twelveHourTime;
 	}
 	
 	/**

@@ -45,18 +45,48 @@
             android:text="@string/settings_general_EnableDisableDynLighting"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 	
-	        <ToggleButton
-	            android:id="@+id/chrobars_settings_general_tglToggleDynLighting"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_gravity="center_vertical"
-	            android:layout_marginBottom="5dp"
-	            android:layout_marginRight="20dp"
-	            android:layout_marginTop="15dp"
-	            android:checked="true"
-	            android:gravity="top|center_horizontal"
-	            android:textOff="@string/disabled"
-	            android:textOn="@string/enabled" />
+        <ToggleButton
+            android:id="@+id/chrobars_settings_general_tglToggleDynLighting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="15dp"
+            android:checked="true"
+            android:gravity="top|center_horizontal"
+            android:textOff="@string/disabled"
+            android:textOn="@string/enabled" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_twelveHourTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/chrobars_settings_general_lblTwelveHourTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/settings_general_EnableDisableTwelveHourTime"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+        <ToggleButton
+            android:id="@+id/chrobars_settings_general_tglToggleTwelveHourTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="15dp"
+            android:checked="true"
+            android:gravity="top|center_horizontal"
+            android:textOff="@string/disabled"
+            android:textOn="@string/enabled" />
 
     </TableRow>
 

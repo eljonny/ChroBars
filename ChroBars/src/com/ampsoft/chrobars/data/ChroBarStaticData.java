@@ -49,6 +49,7 @@ public final class ChroBarStaticData {
 	public static final boolean threeD = true;
 	public static final boolean displayNumbers = true;
 	public static final boolean dynamicLighting = false;
+	public static final boolean twelveHourTime = true;
 	public static final boolean[] visibleBars = {true, true, true, false};
 	public static final boolean[] visibleNumbers = {true, true, true, false};
 	
@@ -59,11 +60,11 @@ public final class ChroBarStaticData {
 	public static final float _max_precision = 3.0f;
 	public static final float _left_screen_edge = -1f;
 	
-	public static final float _msInDay = (float) ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
+	public static final int _msInDay = ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
 														ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-								 _msInHour = (float) ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
+								 _msInHour = ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
 										 				_SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-								 _msInMinute = (float) ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
+								 _msInMinute = ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
 	
 	//Vertex draw sequences for 3D and 2D
 	public static final short[] _vertexDrawSequence_2D = {	0, 1, 2,

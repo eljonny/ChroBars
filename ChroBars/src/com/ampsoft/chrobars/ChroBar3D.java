@@ -322,7 +322,7 @@ public class ChroBar3D extends ChroBar {
 		
 		setBarWidth();
 		
-		currentTime = Calendar.getInstance(TimeZone.getTimeZone("GMT-0800"), Locale.US);
+		currentTime = Calendar.getInstance(TimeZone.getDefault(), Locale.US);
 		float scalingFactor = 3.65f;
 		float barTopHeight = ChroBarStaticData._baseHeight + 0.01f;
 

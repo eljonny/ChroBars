@@ -90,8 +90,8 @@ public class ChroBar2D extends ChroBar {
 		//Gather required information
 		float screenWidth = (float)screen.widthPixels;
 		float barTypeCode = (float)barType.getType();
-		float barMargin = barsData.getFloat("barMargin");
-		float edgeMargin = barsData.getFloat("edgeMargin");
+		float barMargin = barsData.getFloat("barMarginBase");
+		float edgeMargin = barsData.getFloat("edgeMarginBase");
 		
 		//Update the bar margin to default ratio of screen width
 		barMargin /= screenWidth;

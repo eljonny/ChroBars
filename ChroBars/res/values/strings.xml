@@ -30,6 +30,7 @@
     <string name="settings_general_displayNumbers">Display numbers</string>
     <string name="settings_general_numberSettings">Format numbers</string>
     <string name="settings_general_EnableDisableDynLighting">Dynamic Lighting</string>
+    <string name="settings_general_EnableDisableTwelveHourTime">12 Hour Time</string>
     <string-array name="settings_bars_edges_options">
         <item>Off</item>
         <item>Lighter</item>

@@ -344,7 +344,11 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 * @return Whether to or to not use dynamic lighting.
 	 */
 	public boolean usesDynamicLighting() {
-		return (boolean)settings.usesDynamicLighting();
+		return settings.usesDynamicLighting();
+	}
+	
+	public boolean usesTwelveHourTime() {
+		return settings.usesTwelveHourTime();
 	}
 
 	/**

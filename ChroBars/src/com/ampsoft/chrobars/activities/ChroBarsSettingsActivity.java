@@ -152,6 +152,10 @@ public class ChroBarsSettingsActivity extends Activity
 			break;
 		case R.id.chrobars_settings_general_tglToggleDynLighting:
 			settings.setPrefValue("dynamicLighting", tButton.isChecked());
+			break;
+		case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
+			settings.setPrefValue("twelveHourTime", tButton.isChecked());
+			break;
 		}
 	}
 
@@ -413,6 +417,9 @@ public class ChroBarsSettingsActivity extends Activity
 					break;
 				case R.id.chrobars_settings_general_tglToggleDynLighting:
 					((CompoundButton) touchable).setChecked(settings.usesDynamicLighting());
+					break;
+				case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
+					((ToggleButton) touchable).setChecked(settings.usesTwelveHourTime());
 				}
 				toggles.add((ToggleButton)touchable);
 			}

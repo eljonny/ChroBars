@@ -133,7 +133,7 @@ public abstract class ChroBar {
 		
 		int t = barType.getType();
 		
-		float currentHour = (float)currentTime.get(Calendar.HOUR_OF_DAY),
+		float currentHour = (float)currentTime.get(renderer.usesTwelveHourTime() ? Calendar.HOUR : Calendar.HOUR_OF_DAY),
 				currentMinute = (float)currentTime.get(Calendar.MINUTE),
 				currentSecond = (float)currentTime.get(Calendar.SECOND),
 				currentMillisecond = (float)currentTime.get(Calendar.MILLISECOND);
@@ -141,6 +141,9 @@ public abstract class ChroBar {
 		float currentMSInDay = 0, currentMSInHour = 0, currentMSInMinute = 0;
 		
 		int precision = (int) renderer.getPrecision();
+		
+		float hoursInDay = renderer.usesTwelveHourTime() ? ChroBarStaticData._HOURS_IN_DAY >> 1 : ChroBarStaticData._HOURS_IN_DAY;
+		float msInDay = renderer.usesTwelveHourTime() ? ChroBarStaticData._msInDay >> 1 : ChroBarStaticData._msInDay;
 		
 		if(precision > 0) {
 			
@@ -163,7 +166,7 @@ public abstract class ChroBar {
 		switch(t > 3 ? t - 4 : t) {
 		
 		case 0:
-			return ( currentHour + (precisionRatio * currentMSInDay) ) / ( (float)ChroBarStaticData._HOURS_IN_DAY + (precisionRatio * ChroBarStaticData._msInDay)	);
+			return ( currentHour + (precisionRatio * currentMSInDay) ) / ( hoursInDay + (precisionRatio * msInDay)	);
 		case 1:
 			return ( currentMinute + (precisionRatio * currentMSInHour) ) / ( (float)ChroBarStaticData._MINUTES_IN_HOUR + (precisionRatio * ChroBarStaticData._msInHour) );
 		case 2:
