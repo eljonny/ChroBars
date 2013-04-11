@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.opengl;
+package com.psoft.chrobars.opengl;
 
 //import java.nio.ByteBuffer;
 //import java.nio.ByteOrder;
@@ -12,11 +12,11 @@ import java.util.HashMap;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.ampsoft.chrobars.ChroBar;
-import com.ampsoft.chrobars.ChroType;
-import com.ampsoft.chrobars.data.ChroBarStaticData;
-import com.ampsoft.chrobars.util.ChroBarsSettings;
-import com.ampsoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.ChroBar;
+import com.psoft.chrobars.ChroType;
+import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroUtils;
 
 import android.content.Context;
 import android.graphics.Color;

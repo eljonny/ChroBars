@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars;
+package com.psoft.chrobars;
 
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.ampsoft.chrobars.data.ChroBarStaticData;
-import com.ampsoft.chrobars.opengl.Vec3D;
+import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.opengl.Vec3D;
 
 /**
  * 

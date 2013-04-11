@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.util;
+package com.psoft.chrobars.util;
 
 import java.util.TimerTask;
 

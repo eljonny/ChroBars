@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.data;
+package com.psoft.chrobars.data;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -7,8 +7,8 @@ import java.util.HashMap;
 
 import android.view.WindowManager;
 
-import com.ampsoft.chrobars.opengl.BarsRenderer;
-import com.ampsoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.opengl.BarsRenderer;
+import com.psoft.chrobars.util.ChroUtils;
 
 /**
  * 

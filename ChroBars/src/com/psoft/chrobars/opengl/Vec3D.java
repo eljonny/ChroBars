@@ -10,7 +10,7 @@
 *   in designing and debugging my program.
 */
 
-package com.ampsoft.chrobars.opengl;
+package com.psoft.chrobars.opengl;
 
 //Import ArrayList and DecimalFormat from the JCF
 import java.util.Iterator;

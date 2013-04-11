@@ -1,9 +1,9 @@
-package com.ampsoft.chrobars.opengl;
+package com.psoft.chrobars.opengl;
 
 
 import java.util.Locale;
 
-import com.ampsoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroBarsSettings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

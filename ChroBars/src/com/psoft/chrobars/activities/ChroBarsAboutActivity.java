@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.activities;
+package com.psoft.chrobars.activities;
 
 import java.util.Date;
 import java.util.Timer;
@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.view.Window;
 import android.widget.TextSwitcher;
 
-import com.ampsoft.chrobars.R;
-import com.ampsoft.chrobars.util.ChroAboutTimerTask;
-import com.ampsoft.chrobars.util.ChroBarsCredits;
+import com.psoft.chrobars.R;
+import com.psoft.chrobars.util.ChroAboutTimerTask;
+import com.psoft.chrobars.util.ChroBarsCredits;
 
 /**
  * 

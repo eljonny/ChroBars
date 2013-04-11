@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.activities;
+package com.psoft.chrobars.activities;
 
 import java.util.ArrayList;
 

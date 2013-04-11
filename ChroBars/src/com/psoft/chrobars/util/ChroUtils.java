@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.util;
+package com.psoft.chrobars.util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -6,7 +6,7 @@ import java.util.Calendar;
 import android.app.Activity;
 import android.view.View;
 
-import com.ampsoft.chrobars.ChroBar;
+import com.psoft.chrobars.ChroBar;
 
 /**
  * 

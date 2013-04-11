@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars;
+package com.psoft.chrobars;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -8,7 +8,7 @@ import java.nio.ShortBuffer;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.ampsoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroBarStaticData;
 
 /**
  * 

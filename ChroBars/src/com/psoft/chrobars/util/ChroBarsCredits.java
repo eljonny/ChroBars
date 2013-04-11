@@ -1,11 +1,11 @@
-package com.ampsoft.chrobars.util;
+package com.psoft.chrobars.util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import android.content.Context;
 
-import com.ampsoft.chrobars.R;
+import com.psoft.chrobars.R;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.activities;
+package com.psoft.chrobars.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,10 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
-import com.ampsoft.chrobars.R;
-import com.ampsoft.chrobars.opengl.ChroSurface;
-import com.ampsoft.chrobars.util.ChroBarsSettings;
-import com.ampsoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.R;
+import com.psoft.chrobars.opengl.ChroSurface;
+import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroUtils;
 
 /**
  * 

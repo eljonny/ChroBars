@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.activities;
+package com.psoft.chrobars.activities;
 
 import java.util.ArrayList;
 
@@ -23,15 +23,15 @@ import android.widget.TableLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.ampsoft.chrobars.ChroBar;
-import com.ampsoft.chrobars.R;
-import com.ampsoft.chrobars.data.ChroBarStaticData;
-import com.ampsoft.chrobars.opengl.BarsRenderer;
-import com.ampsoft.chrobars.opengl.ChroSurface;
-import com.ampsoft.chrobars.util.ChroBarsSettings;
-import com.ampsoft.chrobars.util.ChroUtils;
-import com.ampsoft.chrobars.util.ColorPickerDialog;
-import com.ampsoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
+import com.psoft.chrobars.ChroBar;
+import com.psoft.chrobars.R;
+import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.opengl.BarsRenderer;
+import com.psoft.chrobars.opengl.ChroSurface;
+import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ColorPickerDialog;
+import com.psoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
 
 /**
  * 

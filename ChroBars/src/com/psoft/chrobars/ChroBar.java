@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars;
+package com.psoft.chrobars;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -15,10 +15,10 @@ import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.ampsoft.chrobars.data.ChroBarStaticData;
-import com.ampsoft.chrobars.opengl.BarsRenderer;
-import com.ampsoft.chrobars.opengl.ChroSurface;
-import com.ampsoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.opengl.BarsRenderer;
+import com.psoft.chrobars.opengl.ChroSurface;
+import com.psoft.chrobars.util.ChroUtils;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars.util;
+package com.psoft.chrobars.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -13,9 +13,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 
-import com.ampsoft.chrobars.ChroType;
-import com.ampsoft.chrobars.R;
-import com.ampsoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.ChroType;
+import com.psoft.chrobars.R;
+import com.psoft.chrobars.data.ChroBarStaticData;
 
 /**
  * This class manages settings for the ChroBars application.

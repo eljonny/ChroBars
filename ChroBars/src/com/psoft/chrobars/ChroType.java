@@ -1,4 +1,4 @@
-package com.ampsoft.chrobars;
+package com.psoft.chrobars;
 
 /**
  * 
