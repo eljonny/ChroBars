@@ -118,12 +118,37 @@ public class ChroBarsActivity extends Activity {
 	}
 	
 	/**
-	 * This allows other activities in the ChroBars activity package to obtain the settings instance object reference.
+	 * This allows other activities in the ChroBars activity package to obtain the settings instance object reference, if needed.
 	 * 
 	 * @param requester
 	 * @return
 	 */
-	protected static ChroBarsSettings requestSettingsObjectReference(Object requester) {
-		return requester.getClass().getSuperclass().getCanonicalName().equals(instance.getClass().getSuperclass().getCanonicalName()) ? settings : null;
+	protected static ChroBarsSettings requestSettingsObjectReference(Object requester) throws IllegalAccessException, NullPointerException {
+		
+		System.out.println(requester + " is requesting the settings object reference.");
+		if(settings == null) {
+			System.out.println("Settings object is null. Will try to get a new settings instance...");
+			try {
+				settings = ChroBarsSettings.getNewSettingsInstance(instance);
+				System.out.println("New settings instance retrieved: " + settings);
+			}
+			catch(Exception unknownEx) {
+				ChroUtils.printExDetails(unknownEx);
+				System.out.println("Trying to get existing settings instance...");
+				settings = ChroBarsSettings.getInstance(instance);
+				if(settings != null)
+					System.out.println("Existing settings instance retrieved.");
+				else
+					throw new NullPointerException("Cannot continue. The settings object is null.");
+			}
+		}
+		System.out.println("Checking that requester is allowed to access settings object...");
+		System.out.println("Requester info: " + requester.getClass().getPackage());
+		if(requester.getClass().getPackage().equals(ChroBarsActivity.class.getPackage())) {
+			System.out.println("Requester authenticated!");
+			return settings;
+		}
+		else
+			throw new IllegalAccessException("Class not authorized to receive settings object reference.");
 	}
 }

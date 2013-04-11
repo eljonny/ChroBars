@@ -175,9 +175,10 @@ public abstract class ChroBar {
 		//Gather required information
 		float screenWidth = screen.widthPixels;
 		//System.out.println("Screen width: " + screenWidth);
-		float barTypeCode = (float)barType.getType() - 4;
+		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMarginBase");
 		float edgeMargin = barsData.getFloat("edgeMarginBase");
+		ChroBar[] visible = renderer.refreshVisibleBars();
 		
 		//Update the bar margin to current pixel width ratio of screen.
 		barMargin /= screenWidth;
@@ -196,13 +197,15 @@ public abstract class ChroBar {
 		barWidth -= ((edgeMargin*2f)/(float)numberOfBars);
 		barWidth -= ((barMargin*((float)numberOfBars-1f))/(float)numberOfBars);
 		
+		if(barType.is3D())
+			barTypeCode -= 4f;
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
-		for(int i = barType.getType() - (barType.is3D() ? 3 : (-1));
+		for(int i = barType.getType() + (barType.is3D() ? (-3) : 1);
 							i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++) {
 //			DEBUG
 //			System.out.println("Current bar check index: " + i);
-			if(!renderer.refreshVisibleBars()[i].isDrawn())
+			if(!visible[i].isDrawn())
 				++barTypeCode;
 		}
 		

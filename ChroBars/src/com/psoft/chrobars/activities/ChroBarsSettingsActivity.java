@@ -84,11 +84,16 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		setContentView(R.layout.menu_settings_chro_bars);
 		
-		settings = ChroBarsActivity.requestSettingsObjectReference(this);
+		try {
+			System.out.println("Requesting settings instance...");
+			settings = ChroBarsActivity.requestSettingsObjectReference(this);
+		}
+		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		
 		renderer = ChroSurface.getRenderer();
 		
 		if(settings == null)
-			throw new RuntimeException(new Exception("Critical: Failed to get settings instance."));
+			throw new NullPointerException("Critical: Failed to get settings instance.");
 		
 		settingsDrawer = (SlidingDrawer)findViewById(R.id.chrobars_settings_slidingDrawer);
 		settingsLayoutContainer = (TableLayout) settingsDrawer.getContent();
@@ -119,6 +124,10 @@ public class ChroBarsSettingsActivity extends Activity
 	public void onResume() {
 		super.onResume();
 		settingsDrawer.animateOpen();
+	}
+	
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
 	/**
