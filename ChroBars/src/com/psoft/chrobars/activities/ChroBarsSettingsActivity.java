@@ -2,6 +2,7 @@ package com.psoft.chrobars.activities;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.psoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
  * @author jhyry
  *
  */
+@SuppressLint("ShowToast")
 public class ChroBarsSettingsActivity extends Activity
 									  implements OnClickListener,
 									  OnItemSelectedListener, OnSeekBarChangeListener {
@@ -148,6 +150,8 @@ public class ChroBarsSettingsActivity extends Activity
 		case R.id.chrobars_settings_general_tglToggle3D:
 			settings.setPrefValue("threeD", tButton.isChecked());
 			currentBars = renderer.refreshVisibleBars();
+			for(ChroBar bar : currentBars)
+				bar.updateEdgeColor(settings.getBarEdgeSetting());
 			checkCheckBoxes();
 			break;
 		case R.id.chrobars_settings_general_tglToggleDynLighting:
@@ -437,6 +441,7 @@ public class ChroBarsSettingsActivity extends Activity
 					ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.settings_bars_edges_options, android.R.layout.simple_spinner_item);
 					adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 					spinner.setAdapter(adapter);
+					spinner.setSelection(settings.getBarEdgeSetting());
 					break;
 				}
 				spinners.add(spinner);
@@ -623,9 +628,25 @@ public class ChroBarsSettingsActivity extends Activity
 	 * 
 	 */
 	@Override
-	public void onItemSelected(AdapterView<?> spinner, View view, int spinnerSelectionPosition, long id) {
-		System.out.println("Spinner " + spinner + " set to " + spinner.getItemAtPosition(spinnerSelectionPosition) + " at index " + spinnerSelectionPosition + "\nSaving...");
-		settings.setPrefValue("barEdgeSetting", spinnerSelectionPosition);
+	public void onItemSelected(AdapterView<?> spinner, View itemSelectedView, int spinnerSelectionPosition, long itemSelectedId) {
+
+		switch(spinner.getId()) {
+		case R.id.chrobars_settings_general_cmbEdges:
+			//If the setting didn't change, don't mess with it.
+			if(settings.getBarEdgeSetting() == spinnerSelectionPosition)
+				return;
+			
+//			DEBUG
+			System.out.println("Spinner " + spinner + " set to " + spinner.getItemAtPosition(spinnerSelectionPosition) + " at index " + spinnerSelectionPosition + "\nSaving...");
+			
+			//Save the selection then update the edge color for each bar.
+			settings.setPrefValue("barEdgeSetting", spinnerSelectionPosition);
+			
+			for(ChroBar bar : renderer.refreshVisibleBars())
+				bar.updateEdgeColor(spinnerSelectionPosition);
+			
+			break;
+		}
 	}
 
 	/**

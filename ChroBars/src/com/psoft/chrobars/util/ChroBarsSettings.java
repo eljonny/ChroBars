@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public final class ChroBarsSettings {
 	private int settingsActivityLayout;
 	private boolean threeD, dynamicLighting;
 	private boolean twelveHourTime;
-	private HashMap<ChroType, Boolean> barsVisibility, numbersVisibility;
+	private LinkedHashMap<ChroType, Boolean> barsVisibility, numbersVisibility;
 	
 	//Colors
 	private int backgroundColor;
@@ -96,8 +97,8 @@ public final class ChroBarsSettings {
 		
 		memberFields.clear();
 		
-		barsVisibility = new HashMap<ChroType, Boolean>(visSize);
-		numbersVisibility = new HashMap<ChroType, Boolean>(visSize);
+		barsVisibility = new LinkedHashMap<ChroType, Boolean>(visSize);
+		numbersVisibility = new LinkedHashMap<ChroType, Boolean>(visSize);
 		
 		for(Field setting : ChroBarsSettings.class.getDeclaredFields())
 			if(!Modifier.isFinal(setting.getModifiers()))
@@ -172,7 +173,7 @@ public final class ChroBarsSettings {
 					System.out.println("Parsing saved item " + tempKey);
 					String[] parsed = tempKey.split("_");
 					try {
-						HashMap<ChroType, Boolean> visMap = tempKey.startsWith(visList) ? barsVisibility : (tempKey.startsWith(visListNum) ? numbersVisibility : null);
+						LinkedHashMap<ChroType, Boolean> visMap = tempKey.startsWith(visList) ? barsVisibility : (tempKey.startsWith(visListNum) ? numbersVisibility : null);
 						if(visMap == null)
 							continue;
 						visMap.put(ChroType.valueByNumber(Integer.parseInt(parsed[parsed.length - 1])), (Boolean) prefsMap.get(tempKey));
@@ -335,8 +336,8 @@ public final class ChroBarsSettings {
 		putPreference("twelveHourTime", false);
 		
 		for(int barVis = 0; barVis < barsVisibility.size(); barVis++) {
-			putVisibilityPreference("barsVisibility_" + barVis, barsVisibility.get(barVis));
-			putVisibilityPreference("numbersVisibility_" + barVis, numbersVisibility.get(barVis));
+			putVisibilityPreference("barsVisibility_" + barVis, barsVisibility.get(ChroType.valueByNumber(barVis)));
+			putVisibilityPreference("numbersVisibility_" + barVis, numbersVisibility.get(ChroType.valueByNumber(barVis)));
 		}
 		
 		HashMap<String, Integer> defaultColors = ChroBarStaticData.getColorDefaults();

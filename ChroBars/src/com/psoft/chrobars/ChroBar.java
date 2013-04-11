@@ -1,6 +1,5 @@
 package com.psoft.chrobars;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
@@ -40,18 +39,18 @@ public abstract class ChroBar {
 	
 	/* Instance Variables */
 	
-	//The bar color is stored as a packed color int
-	protected int barColor;
+	//The bar and edge color is stored as a packed color int
+	protected int barColor, edgeColor;
 	//Whether this bar should be drawn
 	protected boolean drawBar, drawNumber;
-	protected float[] vertexColors, vertices;
-	protected float[] normals;
+	protected float[] barVertexColors, vertices;
+	protected float[] edgeVertexColors, normals;
 	//OpenGL Surface and drawing buffers
-	protected ByteBuffer rawBuffer;
-	protected ShortBuffer drawSequence;
-	protected ShortBuffer lineSequence;
+	protected ShortBuffer barDrawSequenceBuffer;
+	protected ShortBuffer edgeDrawSequenceBuffer;
 	protected FloatBuffer verticesBuffer;
-	protected FloatBuffer colorBuffer;
+	protected FloatBuffer barsColorBuffer;
+	protected FloatBuffer edgesColorBuffer;
 	protected FloatBuffer normalsBuffer;
 	//Type of data this represents
 	protected ChroType barType;
@@ -85,12 +84,11 @@ public abstract class ChroBar {
 		
 		barType = t;
 		
-		//Use the native machine byte order for raw buffers.
-		ByteOrder order_native = ByteOrder.nativeOrder();
-		
 		//Do the actual buffer allocation.
-		barGLAllocate(order_native);
+		barGLAllocate(ByteOrder.nativeOrder());
 	}
+	
+	/* Begin subclass Interface. */
 	
 	/**
 	 * 
@@ -108,6 +106,34 @@ public abstract class ChroBar {
 	 * 
 	 */
 	protected abstract void initNormals() throws Exception;
+	
+	/**
+	 * 
+	 * @param leftXCoord
+	 * @param rightXCoord
+	 */
+	protected abstract void setBarWidth(float leftXCoord, float rightXCoord);
+
+	/**
+	 * 
+	 * @param height
+	 */
+	protected abstract void setBarHeight(float height);
+	
+	/**
+	 * Accessor for the length of the
+	 *  bar-specific draw vertices sequence buffer to be used.
+	 * @return An integer representation of the length of the draw sequence buffer.
+	 */
+	protected abstract int getBarDrawSequenceBufferLength();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected abstract int getEdgeDrawSequenceBufferLength();
+	
+	/* End subclass Interface, Begin partial implementation. */
 	
 	/**
 	 * 
@@ -172,7 +198,10 @@ public abstract class ChroBar {
 		
 		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
 		
-		for(int i = barType.getType() - 3; i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++) {
+		for(int i = barType.getType() - (barType.is3D() ? 3 : (-1));
+							i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++) {
+//			DEBUG
+//			System.out.println("Current bar check index: " + i);
 			if(!renderer.refreshVisibleBars()[i].isDrawn())
 				++barTypeCode;
 		}
@@ -217,19 +246,6 @@ public abstract class ChroBar {
 			((FloatBuffer) normalsBuffer.clear()).put(normals).position(0);
 		}
 	}
-	
-	/**
-	 * 
-	 * @param leftXCoord
-	 * @param rightXCoord
-	 */
-	protected abstract void setBarWidth(float leftXCoord, float rightXCoord);
-
-	/**
-	 * 
-	 * @param height
-	 */
-	protected abstract void setBarHeight(float height);
 
 	/**
 	 * Returns the current time ratios for hours, minutes, seconds, and milliseconds.
@@ -325,26 +341,40 @@ public abstract class ChroBar {
 				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
 				
 				//Set the color material to the appropriate colors.
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, getColorBuffer());
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, getColorBuffer());
+				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
+				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
 				
 				//load the buffer of normals into the OpenGL draw object.
-				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, getNormals());
+				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, normalsBuffer);
 			}
 			
 			//Tell openGL where the vertex data is and how to use it
 			//System.out.println("Calling glVertexPointer");
 			drawSurface.glVertexPointer(ChroBarStaticData._DIMENSIONS, GL10.GL_FLOAT,
-										ChroBarStaticData._VERTEX_STRIDE, getVerticesBuffer());
+										ChroBarStaticData._VERTEX_STRIDE, verticesBuffer);
 			
-			//System.out.println("Calling glColorPointer");
+			//Color buffer for the bars.
+			//System.out.println("Calling glColorPointer for bars");
 	        drawSurface.glColorPointer(ChroBarStaticData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-	        							ChroBarStaticData._VERTEX_STRIDE, getColorBuffer());
+	        							ChroBarStaticData._VERTEX_STRIDE, barsColorBuffer);
 	        
 			//Draw the bar
-	        //System.out.println("Calling glDrawElements");
-			drawSurface.glDrawElements(GL10.GL_TRIANGLES, getDrawSequenceBufferLength(),
-										GL10.GL_UNSIGNED_SHORT, getDrawDirectionBuffer());
+	        //System.out.println("Calling glDrawElements for bars");
+			drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
+										GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+			
+			if(renderer.getBarEdgeSetting() != 0) {
+					
+				//Color buffer for the edges.
+				//System.out.println("Calling glColorPointer for edges");
+		        drawSurface.glColorPointer(ChroBarStaticData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+		        							ChroBarStaticData._VERTEX_STRIDE, edgesColorBuffer);
+				
+				//Draw the accented bar edges
+				//System.out.println("Calling glDrawElements for edges");
+				drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
+											GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
+			}
 			
 			//Clear the buffer space
 			//System.out.println("Calling glDisableClientState for vertex array");
@@ -369,47 +399,6 @@ public abstract class ChroBar {
 			calculateBarHeight();
 		}
 	}
-
-	/**
-	 * Accessor for the float array of normal vectors for the 3D bars.
-	 * @return
-	 */
-	protected abstract FloatBuffer getNormals();
-	
-	/**
-	 * Accessor for the length of the
-	 *  bar-specific draw vertices sequence buffer to be used.
-	 * @return An integer representation of the length of the draw sequence buffer.
-	 */
-	protected abstract int getDrawSequenceBufferLength();
-
-	/**
-	 * Accessor for the draw direction buffer
-	 *  for the current bar.
-	 * @return A FloatBuffer containing the draw sequence buffer.
-	 */
-	protected abstract ShortBuffer getDrawDirectionBuffer();
-
-	/**
-	 * Accessor for the vertices color buffer 
-	 * for the current bar.
-	 * @return A FloatBuffer that represents the colors of vertices.
-	 */
-	protected abstract FloatBuffer getColorBuffer();
-
-	/**
-	 * Accessor for the buffer defining the actual vertices
-	 *  that make up the current bar.
-	 * @return A FloatBuffer containing the vertex definitions.
-	 */
-	protected abstract FloatBuffer getVerticesBuffer();
-	
-	/**
-	 * Changes the barColor value and those of the vertices.
-	 * 
-	 * @param colorInt
-	 */
-	public abstract void changeChroBarColor(int colorInt);
 	
 	/**
 	 * Changes the color of this bar using ARGB parameters.
@@ -446,6 +435,113 @@ public abstract class ChroBar {
 
 		if(surface != null)
 			draw(surface);
+	}
+	
+	/**
+	 * Changes the barColor/edgeColor values and those of the vertices.
+	 * 
+	 * @param colorInt
+	 */
+	public void changeChroBarColor(int colorInt) {
+		
+		byte edgeColorDiff;
+		int colorArrayLength = barVertexColors.length;
+		barColor = colorInt;
+		
+		//If we change the color of the bar,
+		// we also need to change the edge color accordingly.
+		switch(renderer.getBarEdgeSetting()) {
+		//If the edges are supposed to be the same color
+		case 0:
+			edgeColor = barColor;
+			break;
+		//If the edges are supposed to be lighter than the bar
+		case 1:
+			edgeColorDiff = ChroBarStaticData._lighter_edgeColorDifference;
+			edgeColor = Color.argb( Color.alpha(barColor),
+								    Color.red(barColor) 	+ edgeColorDiff,
+								    Color.green(barColor) 	+ edgeColorDiff,
+								    Color.blue(barColor) 	+ edgeColorDiff   );
+			break;
+		//If the edges are supposed to be darker than the bar
+		case 2:
+			edgeColorDiff = ChroBarStaticData._darker_edgeColorDifference;
+			edgeColor = Color.argb( Color.alpha(barColor),
+								    Color.red(barColor) 	- edgeColorDiff,
+								    Color.green(barColor) 	- edgeColorDiff,
+								    Color.blue(barColor) 	- edgeColorDiff   );
+			break;
+		//We'll just set it to the bar color if it's an unknown edge color option to be safe.
+		default:
+			edgeColor = barColor;
+		}
+		
+		
+		for(int i = 0; i < colorArrayLength; i += 4) {
+			barVertexColors[i] = (float)Color.red(barColor)/255.0f;
+			edgeVertexColors[i] = (float)Color.red(edgeColor)/255.0f;
+		}
+		for(int i = 1; i < colorArrayLength; i += 4) {
+			barVertexColors[i] = (float)Color.green(barColor)/255.0f;
+			edgeVertexColors[i] = (float)Color.green(edgeColor)/255.0f;
+		}
+		for(int i = 2; i < colorArrayLength; i += 4) {
+			barVertexColors[i] = (float)Color.blue(barColor)/255.0f;
+			edgeVertexColors[i] = (float)Color.blue(edgeColor)/255.0f;
+		}
+		for(int i = 3; i < colorArrayLength; i += 4) {
+			barVertexColors[i] = (float)Color.alpha(barColor)/255.0f;
+			edgeVertexColors[i] = (float)Color.alpha(edgeColor)/255.0f;
+		}
+		
+		((FloatBuffer) barsColorBuffer.clear()).put(barVertexColors).position(0);
+		((FloatBuffer) edgesColorBuffer.clear()).put(edgeVertexColors).position(0);
+	}
+
+	/**
+	 * If a user changes the edge style setting, we only want to update the edges.
+	 */
+	public void updateEdgeColor(int edgeType) {
+		
+		byte edgeColorDiff;
+		int colorArrayLength = edgeVertexColors.length;
+		
+		switch(edgeType) {
+		//If the edges are supposed to be the same color
+		case 0:
+			edgeColor = barColor;
+			break;
+		//If the edges are supposed to be lighter than the bar
+		case 1:
+			edgeColorDiff = ChroBarStaticData._lighter_edgeColorDifference;
+			edgeColor = Color.argb( Color.alpha(barColor),
+								    Color.red(barColor) 	+ edgeColorDiff,
+								    Color.green(barColor) 	+ edgeColorDiff,
+								    Color.blue(barColor) 	+ edgeColorDiff   );
+			break;
+		//If the edges are supposed to be darker than the bar
+		case 2:
+			edgeColorDiff = ChroBarStaticData._darker_edgeColorDifference;
+			edgeColor = Color.argb( Color.alpha(barColor),
+								    Color.red(barColor) 	- edgeColorDiff,
+								    Color.green(barColor) 	- edgeColorDiff,
+								    Color.blue(barColor) 	- edgeColorDiff   );
+			break;
+		//We'll just set it to the bar color if it's an unknown edge color option to be safe.
+		default:
+			edgeColor = barColor;
+		}
+		
+		for(int i = 0; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)Color.red(edgeColor)/255.0f;
+		for(int i = 1; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)Color.green(edgeColor)/255.0f;
+		for(int i = 2; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)Color.blue(edgeColor)/255.0f;
+		for(int i = 3; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)Color.alpha(edgeColor)/255.0f;
+		
+		((FloatBuffer) edgesColorBuffer.clear()).put(edgeVertexColors).position(0);
 	}
 
 	/**

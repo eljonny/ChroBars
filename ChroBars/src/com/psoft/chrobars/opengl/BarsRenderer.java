@@ -45,69 +45,27 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		refreshVisibleBars();
 		
 		ByteOrder order_native = ByteOrder.nativeOrder();
-		int bytesInFloat = ChroBarStaticData._BYTES_IN_FLOAT;
 		
 		//Set up local ambient light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_0_ambient.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		ambientLight0Buffer = lightBufferTemp.asFloatBuffer();
-		ambientLight0Buffer.put(ChroBarStaticData._light_0_ambient).position(0);
-		
-		
+		ambientLight0Buffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_0_ambient.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_0_ambient).position(0);
 		//Set up diffuse light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_0_diffuse.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		diffuseLight0Buffer = lightBufferTemp.asFloatBuffer();
-		diffuseLight0Buffer.put(ChroBarStaticData._light_0_diffuse).position(0);
-		
+		diffuseLight0Buffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_0_diffuse.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_0_diffuse).position(0);
 		//Set up the emission buffer
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_0_emission.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		emissionLightBuffer = lightBufferTemp.asFloatBuffer();
-		emissionLightBuffer.put(ChroBarStaticData._light_0_emission).position(0);
-		
+		emissionLightBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_0_emission.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_0_emission).position(0);
 		//Set up specular light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_0_specular.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		specularLightBuffer = lightBufferTemp.asFloatBuffer();
-		specularLightBuffer.put(ChroBarStaticData._light_0_specular).position(0);
-		
+		specularLightBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_0_specular.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_0_specular).position(0);
 		//Set up the position of the light in the scene.
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_0_position.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		light0PositionBuffer = lightBufferTemp.asFloatBuffer();
-		light0PositionBuffer.put(ChroBarStaticData._light_0_position).position(0);
-		
+		light0PositionBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_0_position.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_0_position).position(0);
 		//Set up local ambient light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_1_ambient.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		ambientLight1Buffer = lightBufferTemp.asFloatBuffer();
-		ambientLight1Buffer.put(ChroBarStaticData._light_1_ambient).position(0);
-		
-		
+		ambientLight1Buffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_1_ambient.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_1_ambient).position(0);
 		//Set up diffuse light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_1_diffuse.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		diffuseLight1Buffer = lightBufferTemp.asFloatBuffer();
-		diffuseLight1Buffer.put(ChroBarStaticData._light_1_diffuse).position(0);
-		
+		diffuseLight1Buffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_1_diffuse.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_1_diffuse).position(0);
 		//Set up the position of the light in the scene.
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_1_position.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		light1PositionBuffer = lightBufferTemp.asFloatBuffer();
-		light1PositionBuffer.put(ChroBarStaticData._light_1_position).position(0);
-		
+		light1PositionBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_1_position.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_1_position).position(0);
 		//Set up material shininess buffer
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._specular_shininess.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		specularShininessBuffer = lightBufferTemp.asFloatBuffer();
-		specularShininessBuffer.put(ChroBarStaticData._specular_shininess).position(0);
-		
+		specularShininessBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._specular_shininess.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._specular_shininess).position(0);
 		//Set up global ambient light parameters
-		lightBufferTemp = ByteBuffer.allocateDirect(ChroBarStaticData._light_global_ambient.length*bytesInFloat);
-		lightBufferTemp.order(order_native);
-		globalAmbientLightBuffer = lightBufferTemp.asFloatBuffer();
-		globalAmbientLightBuffer.put(ChroBarStaticData._light_global_ambient).position(0);
+		globalAmbientLightBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._light_global_ambient.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(ChroBarStaticData._light_global_ambient).position(0);
 		
 		//Apply the buffered light parameters to the appropriate lighting GL object
 		gl.glLightfv(GL10.GL_LIGHT0, GL10.GL_AMBIENT, ambientLight0Buffer);
@@ -322,6 +280,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		return (float)settings.getPrecision();
 	}
 	
+	public int getBarEdgeSetting() {
+		return settings.getBarEdgeSetting();
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -409,8 +371,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	// either 2D or 3D
 	private static ChroBar[] visibleBars = new ChroBar[ChroBarStaticData._MAX_BARS_TO_DRAW];
 	
-	//For OpenGL Lighting
-	private static ByteBuffer lightBufferTemp;
+	//Buffers for OpenGL Lighting
 	private static FloatBuffer ambientLight0Buffer, globalAmbientLightBuffer, emissionLightBuffer,
 									diffuseLight0Buffer, specularLightBuffer, light0PositionBuffer,
 									specularShininessBuffer, ambientLight1Buffer, diffuseLight1Buffer, light1PositionBuffer;

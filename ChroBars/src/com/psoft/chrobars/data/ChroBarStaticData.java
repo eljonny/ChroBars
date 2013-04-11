@@ -37,27 +37,29 @@ public final class ChroBarStaticData {
 	public static final byte _MAX_BARS_TO_DRAW = 4;
 	
 	//Application default settings, immutable
-	public static final byte precision = 0;
-	public static final byte barEdgeSetting = 0;
-	public static final byte barMargin = 4;
-	public static final byte edgeMargin = 4;
-	public static final int backgroundColor = 0x6C6C6C;
-	public static final int hourBarColor = 0xB7E7FF;
-	public static final int minuteBarColor = 0xFFAF4E;
-	public static final int secondBarColor = 0x9FFF9F;
-	public static final int millisecondBarColor = 0xFF5757;
-	public static final boolean threeD = true;
-	public static final boolean displayNumbers = true;
-	public static final boolean dynamicLighting = false;
-	public static final boolean twelveHourTime = true;
-	public static final boolean[] visibleBars = {true, true, true, false};
-	public static final boolean[] visibleNumbers = {true, true, true, false};
+	public static final byte precision = 0; //No precision. Tick-Tock style.
+	public static final byte barEdgeSetting = 2; //Darker edges, since the bars are a bright color.
+	public static final byte barMargin = 4; //Medium bar margin. Max is 8
+	public static final byte edgeMargin = 4; //Medium edge margin Max is 8
+	public static final int backgroundColor = 0x6C6C6C; //Gray background
+	public static final int hourBarColor = 0xB7E7FF; //Sky blue hour bar
+	public static final int minuteBarColor = 0xFFAF4E; //Tangerine minute bar
+	public static final int secondBarColor = 0x9FFF9F; //Bright green second bar
+	public static final int millisecondBarColor = 0xFF5757; // Light red millisecond bar
+	public static final boolean threeD = true; //Enable 3D
+	public static final boolean displayNumbers = true; //Display time numbers
+	public static final boolean dynamicLighting = false; //Disable dynamic lighting; very CPU intensive.
+	public static final boolean twelveHourTime = true; //Enable 12-hour mode
+	public static final boolean[] visibleBars = {true, true, true, false}; //Show h/m/s by default
+	public static final boolean[] visibleNumbers = {true, true, true, false}; //Show h/m/s numbers by default
 	
 	//Base Y-Coordinate from which to draw a ChroBar
 	public static final float _baseHeight = -1.8f;
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
 	public static final float _baseDepth = -0.5f;
 	//Other constants
+	public static final byte _lighter_edgeColorDifference = 25; //Adds 25 to all components of bar color
+	public static final byte _darker_edgeColorDifference = 35; //Subtracts 35 to all components of bar color
 	public static final float _max_precision = 3.0f;
 	public static final float _left_screen_edge = -1f;
 	//Millisecond values
@@ -68,21 +70,28 @@ public final class ChroBarStaticData {
 							   _msInMinute = ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
 	
 	//Vertex draw sequences for 2D and 3D, respectively.
-	public static final short[] _vertexDrawSequence_2D = {	0, 1, 2,
-																0, 2, 3  };
+	public static final short[] _bar_vertexDrawSequence_2D = {	0, 1, 2,
+																	0, 2, 3  };
 	
-	public static final short[] _vertexDrawSequence_3D = {	0, 4, 5,
-													           	0, 5, 1,
-													           	1, 5, 6,
-													           	1, 6, 2,
-														        2, 6, 7,
-														        2, 7, 3,
-														        3, 7, 4,
-														        3, 4, 0,
-														        4, 7, 6,
-														        4, 6, 5,
-														        3, 0, 1,
-														        3, 1, 2  };
+	public static final short[] _bar_vertexDrawSequence_3D = {	0, 4, 5,
+														           	0, 5, 1,
+														           	1, 5, 6,
+														           	1, 6, 2,
+															        2, 6, 7,
+															        2, 7, 3,
+															        3, 7, 4,
+															        3, 4, 0,
+															        4, 7, 6,
+															        4, 6, 5,
+															        3, 0, 1,
+															        3, 1, 2  };
+	
+	//Edge draw sequences for 2D and 3D, respectively.
+	public static final short[] _edges_vertexDrawSequence_2D = { 0, 1, 1, 2, 2, 3, 3, 0 };	//2D bar
+	public static final short[] _edges_vertexDrawSequence_3D = { 0, 1, 1, 2, 2, 3, 3, 0,		//Front side
+																	0, 4, 4, 5, 5, 1,			//Left side
+																	2, 6, 6, 7,					//Right side
+																					  7, 4 };	//Top side
 	//GL Light buffer defaults
 	public static final float[] //Parameters for light 0
 								   _light_0_ambient = {0.05f, 0.05f, 0.05f, 1.0f},

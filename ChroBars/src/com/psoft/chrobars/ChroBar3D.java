@@ -5,11 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.content.Context;
-import android.graphics.Color;
 
 import com.psoft.chrobars.data.ChroBarStaticData;
 import com.psoft.chrobars.opengl.Vec3D;
@@ -55,27 +54,21 @@ public class ChroBar3D extends ChroBar {
 		alClassVec3D = new ArrayList<ArrayList<Vec3D>>();
 		
 		//Set 3D vertex arrays
-		vertexColors = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
+		barVertexColors = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
+		edgeVertexColors = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
 		vertices = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
 		normals = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
 		
 		//Allocate the vertex buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertices.length*ChroBarStaticData._BYTES_IN_FLOAT);
-		rawBuffer.order(order_native);
-		verticesBuffer = rawBuffer.asFloatBuffer();
-		verticesBuffer.put(vertices).position(0);
-		
+		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
 		//Allocate the color buffer
-		rawBuffer = ByteBuffer.allocateDirect(vertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT);
-		rawBuffer.order(order_native);
-		colorBuffer = rawBuffer.asFloatBuffer();
-		colorBuffer.put(vertexColors).position(0);
-		
+		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
 		//Allocate the vertex draw sequence buffer
-		rawBuffer = ByteBuffer.allocateDirect(ChroBarStaticData._vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT);
-		rawBuffer.order(order_native);
-		drawSequence = rawBuffer.asShortBuffer();
-		drawSequence.put(ChroBarStaticData._vertexDrawSequence_3D).position(0);
+		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._bar_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._bar_vertexDrawSequence_3D).position(0);
+		//Allocate the edges color buffer
+		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
+		//Allocate the vertex edge draw sequence buffer
+		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._edges_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._edges_vertexDrawSequence_3D).position(0);
 		
 		System.out.println("Intializing vertices in " + this + "...");
 		//Initialize the vertex array with default values
@@ -89,10 +82,7 @@ public class ChroBar3D extends ChroBar {
 		System.gc();
 	
 		//Set up the buffer of vertex normal vectors
-		rawBuffer = ByteBuffer.allocateDirect(normals.length*ChroBarStaticData._BYTES_IN_FLOAT);
-		rawBuffer.order(order_native);
-		normalsBuffer = rawBuffer.asFloatBuffer();
-		normalsBuffer.put(normals).position(0);
+		normalsBuffer = (FloatBuffer) ByteBuffer.allocateDirect(normals.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(normals).position(0);
 	}
 
 	/**
@@ -128,7 +118,7 @@ public class ChroBar3D extends ChroBar {
 		
 //		System.out.println("Separating vertices...");
 		
-		ArrayList<Short>[] drawSequences = (ArrayList<Short>[]) Array.newInstance(alClassShort.getClass(), ChroBarStaticData._vertexDrawSequence_3D.length/3);
+		ArrayList<Short>[] drawSequences = (ArrayList<Short>[]) Array.newInstance(alClassShort.getClass(), ChroBarStaticData._bar_vertexDrawSequence_3D.length/3);
 		ArrayList<Float>[] vertexTriples = (ArrayList<Float>[]) Array.newInstance(alClassFloat.getClass(), vertices.length/3);
 		
 		int i, j;
@@ -140,7 +130,7 @@ public class ChroBar3D extends ChroBar {
 			ArrayList<Short> drawSequence = new ArrayList<Short>();
 			for(j = 0; j < 3; j++) {
 				vertex.add(vertices[i*3 + j]);
-				drawSequence.add(ChroBarStaticData._vertexDrawSequence_3D[i*3 + j]);
+				drawSequence.add(ChroBarStaticData._bar_vertexDrawSequence_3D[i*3 + j]);
 			}
 			drawSequences[i] = drawSequence;
 			vertexTriples[i] = vertex;
@@ -152,7 +142,7 @@ public class ChroBar3D extends ChroBar {
 		for(; i < drawSequences.length; i++) {
 			ArrayList<Short> drawSequence = new ArrayList<Short>();
 			for(j = 0; j < 3; j++) {
-				drawSequence.add(ChroBarStaticData._vertexDrawSequence_3D[i*3 + j]);
+				drawSequence.add(ChroBarStaticData._bar_vertexDrawSequence_3D[i*3 + j]);
 			}
 			drawSequences[i] = drawSequence;
 		}
@@ -286,67 +276,20 @@ public class ChroBar3D extends ChroBar {
 	protected void setBarHeight(float barTopHeight) {
 		vertices[1] = vertices[10] = vertices[13] = vertices[22] = barTopHeight;
 	}
+
+	/**
+	 * 
+	 */
+	@Override
+	protected int getBarDrawSequenceBufferLength() {
+		return ChroBarStaticData._bar_vertexDrawSequence_3D.length;
+	}
 	
 	/**
-	 * Changes the barColor value and those of the vertices.
-	 * 
-	 * @param colorInt
-	 */
-	public void changeChroBarColor(int colorInt) {
-		
-		barColor = colorInt;
-		
-		int color3DArrayLength = vertexColors.length;
-		
-		for(int i = 0; i < color3DArrayLength; i += 4)
-			vertexColors[i] = (float)Color.red(barColor)/255.0f;
-		for(int i = 1; i < color3DArrayLength; i += 4)
-			vertexColors[i] = (float)Color.green(barColor)/255.0f;
-		for(int i = 2; i < color3DArrayLength; i += 4)
-			vertexColors[i] = (float)Color.blue(barColor)/255.0f;
-		for(int i = 3; i < color3DArrayLength; i += 4)
-			vertexColors[i] = (float)Color.alpha(barColor)/255.0f;
-		
-		((FloatBuffer) colorBuffer.clear()).put(vertexColors).position(0);
-	}
-
-	/**
 	 * 
 	 */
 	@Override
-	protected int getDrawSequenceBufferLength() {
-		return ChroBarStaticData._vertexDrawSequence_3D.length;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	protected ShortBuffer getDrawDirectionBuffer() {
-		return drawSequence;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	protected FloatBuffer getColorBuffer() {
-		return colorBuffer;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	protected FloatBuffer getVerticesBuffer() {
-		return verticesBuffer;
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	protected FloatBuffer getNormals() {
-		return normalsBuffer;
+	protected int getEdgeDrawSequenceBufferLength() {
+		return ChroBarStaticData._edges_vertexDrawSequence_3D.length;
 	}
 }
