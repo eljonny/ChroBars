@@ -58,7 +58,7 @@ public final class ChroBarStaticData {
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
 	public static final float _baseDepth = -0.5f;
 	//Other constants
-	public static final byte _lighter_edgeColorDifference = 25; //Adds 25 to all components of bar color
+	public static final byte _lighter_edgeColorDifference = 35; //Adds 35 to all components of bar color
 	public static final byte _darker_edgeColorDifference = 35; //Subtracts 35 to all components of bar color
 	public static final float _max_precision = 3.0f;
 	public static final float _left_screen_edge = -1f;
@@ -91,7 +91,7 @@ public final class ChroBarStaticData {
 	public static final short[] _edges_vertexDrawSequence_3D = { 0, 1, 1, 2, 2, 3, 3, 0,		//Front side
 																	0, 4, 4, 5, 5, 1,			//Left side
 																	2, 6, 6, 7,					//Right side
-																					  7, 4 };	//Top side
+																				7, 4, 7, 3 };	//Top side
 	//GL Light buffer defaults
 	public static final float[] //Parameters for light 0
 								   _light_0_ambient = {0.05f, 0.05f, 0.05f, 1.0f},

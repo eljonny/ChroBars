@@ -66,7 +66,7 @@ public class ChroBar3D extends ChroBar {
 		//Allocate the vertex draw sequence buffer
 		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._bar_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._bar_vertexDrawSequence_3D).position(0);
 		//Allocate the edges color buffer
-		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
+		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(edgeVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
 		//Allocate the vertex edge draw sequence buffer
 		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._edges_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._edges_vertexDrawSequence_3D).position(0);
 		
