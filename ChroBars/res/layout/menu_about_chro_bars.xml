@@ -9,9 +9,9 @@
         android:id="@+id/chrobars_settings_general_lblChgBGColor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_above="@id/txtswitchCredits"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
+        android:layout_marginBottom="50dp"
         android:text="@string/about_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -19,9 +19,8 @@
         android:id="@+id/txtswitchCredits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/chrobars_settings_general_lblChgBGColor"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:contentDescription="@string/about_title"
         android:inAnimation="@anim/anim_fade_in"
         android:outAnimation="@anim/anim_fade_out" >
