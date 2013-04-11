@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView1"
+    android:id="@+id/chrobars_settings_scrollview"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
     android:layout_weight="0.58" >
-    
 	<TableLayout
 	    android:id="@+id/chrobars_settings_slidingDrawer_chrobars_contentTableLayout"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical"
 	    android:stretchColumns="0,1,2,3" >
-	
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_columnTitles" >
 	
 	        <TextView
@@ -45,8 +44,8 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:text="@string/settings_bars_pick_color"
 	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	        
 	    </TableRow>
-	
 	    <TableRow
 	        android:id="@+id/chrobars_settings_slidingDrawer_tableRow_hoursBar_settings"
 	        android:layout_marginTop="10dp" >
@@ -78,8 +77,8 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:longClickable="false"
 	            android:text="@string/settings_colorPickerButton" />
+	        
 	    </TableRow>
-	
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_minutesBar_settings" >
 	
 	        <TextView
@@ -108,8 +107,8 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:longClickable="false"
 	            android:text="@string/settings_colorPickerButton" />
+	        
 	    </TableRow>
-	
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_secondsBar_settings" >
 	
 	        <TextView
@@ -138,8 +137,8 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:longClickable="false"
 	            android:text="@string/settings_colorPickerButton" />
+	        
 	    </TableRow>
-	
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_millisecondsBar_settings" >
 	
 	        <TextView
@@ -171,13 +170,11 @@
 	            android:text="@string/settings_colorPickerButton" />
 	
 	    </TableRow>
-	
 	    <TableLayout
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:orientation="vertical"
 	        android:stretchColumns="0,1" >
-	
 	        <TableRow
 	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_precision"
 	            android:layout_width="wrap_content"
@@ -205,8 +202,8 @@
 	                android:layout_marginTop="10dp"
 	                android:max="3"
 	                android:progress="0" />
+	            
 	        </TableRow>
-	
 	        <TableRow
 	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_barMargin"
 	            android:layout_width="wrap_content"
@@ -234,8 +231,8 @@
 	                android:layout_marginTop="0dp"
 	                android:max="8"
 	                android:progress="0" />
+	            
 	        </TableRow>
-	
 	        <TableRow
 	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_edgeMargin"
 	            android:layout_width="wrap_content"
@@ -263,61 +260,7 @@
 	                android:layout_marginTop="0dp"
 	                android:max="8"
 	                android:progress="0" />
-	        </TableRow>
-	
-	        <TableRow
-	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_edges"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content" >
-	
-	            <TextView
-	                android:id="@+id/chrobars_settings_general_lblBarEdges"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_gravity="center_vertical"
-	                android:layout_marginBottom="8dp"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginTop="5dp"
-	                android:gravity="center_vertical"
-	                android:text="@string/settings_general_edges"
-	                android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	            <Spinner
-	                android:id="@+id/chrobars_settings_general_cmbEdges"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_gravity="center_vertical"
-	                android:layout_marginLeft="0dp"
-	                android:layout_marginRight="5dp"
-	                android:layout_marginTop="0dp" />
-
-	        </TableRow>
-	
-	        <TableRow
-	            android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_twoD_threeD"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content" >
-	
-	            <TextView
-	                android:id="@+id/chrobars_settings_general_lbl3DBars"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="95dp"
-	                android:layout_marginTop="20dp"
-	                android:text="@string/settings_general_dimensions"
-	                android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	            <ToggleButton
-	                android:id="@+id/chrobars_settings_general_tglToggle3D"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="62dp"
-	                android:layout_marginRight="7dp"
-	                android:layout_marginTop="10dp"
-	                android:checked="true"
-	                android:textOff="@string/disabled"
-	                android:textOn="@string/enabled" />
+	            
 	        </TableRow>
 	    </TableLayout>
 	</TableLayout>

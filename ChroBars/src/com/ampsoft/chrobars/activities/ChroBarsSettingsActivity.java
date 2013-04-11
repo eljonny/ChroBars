@@ -501,6 +501,7 @@ public class ChroBarsSettingsActivity extends Activity
 	}
 	
 	/**
+	 * Searchs the View heirarchy recursively for SeekBar objects.
 	 * 
 	 * @param container Recurse into container to look for children.
 	 */

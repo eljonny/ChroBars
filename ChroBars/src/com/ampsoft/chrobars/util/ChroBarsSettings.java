@@ -18,9 +18,9 @@ import com.ampsoft.chrobars.R;
 import com.ampsoft.chrobars.data.ChroBarStaticData;
 
 /**
+ * This class manages settings for the ChroBars application.
  * 
  * @author jhyry
- *
  */
 @SuppressLint("CommitPrefEdits")
 public final class ChroBarsSettings {
@@ -31,7 +31,7 @@ public final class ChroBarsSettings {
 	private int settingsActivityLayout;
 	private boolean threeD, dynamicLighting;
 	private boolean twelveHourTime;
-	private ArrayList<Boolean> barsVisibility, numbersVisibility;
+	private HashMap<ChroType, Boolean> barsVisibility, numbersVisibility;
 	
 	//Colors
 	private int backgroundColor;
@@ -96,16 +96,8 @@ public final class ChroBarsSettings {
 		
 		memberFields.clear();
 		
-		barsVisibility = new ArrayList<Boolean>(visSize);
-		barsVisibility.ensureCapacity(visSize);
-		
-		numbersVisibility = new ArrayList<Boolean>(visSize);
-		numbersVisibility.ensureCapacity(visSize);
-		
-		for(int i = visSize; i > 0; i--) {
-			barsVisibility.add(false);
-			numbersVisibility.add(false);
-		}
+		barsVisibility = new HashMap<ChroType, Boolean>(visSize);
+		numbersVisibility = new HashMap<ChroType, Boolean>(visSize);
 		
 		for(Field setting : ChroBarsSettings.class.getDeclaredFields())
 			if(!Modifier.isFinal(setting.getModifiers()))
@@ -163,32 +155,37 @@ public final class ChroBarsSettings {
 			
 			System.out.println("Loading preference " + pref.getName());
 			
+			//We already dealt with the user defaults, so continue.
 			if(pref.getName().startsWith(userDef))
 				continue;
 			
-			if(pref.getName().startsWith(visList)) {
+			//If it is a visibility pref value, parse it.
+			if(pref.getName().startsWith(visList) ||
+				pref.getName().startsWith(visListNum)) {
+				
 				while(keyz.hasNext()) {
 					
 					tempKey = keyz.next();
 					
 					//If we have a visibility preference key,
 					// parse the key and set the value.
-					if(tempKey.startsWith(visList)) {
-						System.out.println("Parsing saved item " + tempKey);
-						String[] parsed = tempKey.split("_");
-						barsVisibility.set(Integer.parseInt(parsed[parsed.length - 1]), (Boolean) prefsMap.get(tempKey));
+					System.out.println("Parsing saved item " + tempKey);
+					String[] parsed = tempKey.split("_");
+					try {
+						HashMap<ChroType, Boolean> visMap = tempKey.startsWith(visList) ? barsVisibility : (tempKey.startsWith(visListNum) ? numbersVisibility : null);
+						if(visMap == null)
+							continue;
+						visMap.put(ChroType.valueByNumber(Integer.parseInt(parsed[parsed.length - 1])), (Boolean) prefsMap.get(tempKey));
 					}
-					else if(tempKey.startsWith(visListNum)) {
-						System.out.println("Parsing saved item " + tempKey);
-						String[] parsed = tempKey.split("_");
-						numbersVisibility.set(Integer.parseInt(parsed[parsed.length - 1]), (Boolean) prefsMap.get(tempKey));
-					}
+					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 				}
 			}
 			
+			//Set the 
 			for(String prefKey : preferenceKeys)
 				if(prefKey.equals(pref.getName())) {
 					try { pref.set(this, prefsMap.get(prefKey)); }
+					//If the preference is not in the map, try to set it to default.
 					catch(IllegalArgumentException illArgEx) {
 						if(prefsMap.get(prefKey) == null) {
 							System.err.println("It looks like this setting isn't in the map." +
@@ -247,8 +244,8 @@ public final class ChroBarsSettings {
 		System.out.println("Setting visibilities to default values...");
 		
 		for(int visIndex = 0; visIndex < visSize; visIndex++) {
-			barsVisibility.set(visIndex, ChroBarStaticData.visibleBars[visIndex < 4 ? visIndex : visIndex - 4]);
-			numbersVisibility.set(visIndex, ChroBarStaticData.visibleNumbers[visIndex < 4 ? visIndex : visIndex - 4]);
+			barsVisibility.put(ChroType.valueByNumber(visIndex), ChroBarStaticData.visibleBars[visIndex < 4 ? visIndex : visIndex - 4]);
+			numbersVisibility.put(ChroType.valueByNumber(visIndex), ChroBarStaticData.visibleNumbers[visIndex < 4 ? visIndex : visIndex - 4]);
 		}
 	}
 
@@ -430,7 +427,7 @@ public final class ChroBarsSettings {
 	 */
 	public final ArrayList<Boolean> getBarsVisibility() {
 		System.gc();
-		return new ArrayList<Boolean>(barsVisibility);
+		return new ArrayList<Boolean>(barsVisibility.values());
 	}
 	
 	/**
@@ -438,7 +435,7 @@ public final class ChroBarsSettings {
 	 */
 	public final ArrayList<Boolean> getNumbersVisibility() {
 		System.gc();
-		return new ArrayList<Boolean>(numbersVisibility);
+		return new ArrayList<Boolean>(numbersVisibility.values());
 	}
 
 	/**
@@ -566,14 +563,9 @@ public final class ChroBarsSettings {
 	 */
 	public final void setVisibilityPrefValue(ChroType t, boolean textDraw, boolean visibility) {
 
-		System.out.println("Setting Visibility for bar type " + t + " to " + visibility + ".");
-		System.out.println("Visibility list def: " + barsVisibility);
-		barsVisibility.set(t.getType(), visibility);
-		
-		if(!textDraw)
-			putVisibilityPreference("barsVisibility_" + t.getType(), visibility);
-		else
-			putVisibilityPreference("numbersVisibility_" + t.getType(), visibility);
+		System.out.println("Setting Visibility for bar type " + t + " to " + visibility + ". Number? " + textDraw);
+		(textDraw ? numbersVisibility : barsVisibility).put(t, visibility);
+		putVisibilityPreference((textDraw ? "numbersVisibility_" : "barsVisibility_") + t.getType(), visibility);
 	}
 	
 	/**

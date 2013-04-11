@@ -57,16 +57,17 @@ public final class ChroBarStaticData {
 	public static final float _baseHeight = -1.8f;
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
 	public static final float _baseDepth = -0.5f;
+	//Other constants
 	public static final float _max_precision = 3.0f;
 	public static final float _left_screen_edge = -1f;
-	
+	//Millisecond values
 	public static final int _msInDay = ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
 														ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-								 _msInHour = ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
+							   _msInHour = ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
 										 				_SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-								 _msInMinute = ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
+							   _msInMinute = ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
 	
-	//Vertex draw sequences for 3D and 2D
+	//Vertex draw sequences for 2D and 3D, respectively.
 	public static final short[] _vertexDrawSequence_2D = {	0, 1, 2,
 																0, 2, 3  };
 	
@@ -122,7 +123,8 @@ public final class ChroBarStaticData {
 	private static float edgeMarginBase = 5.0f;
 	
 	/**
-	 * Perspective adjustment for rear portion of bar
+	 * Perspective adjustment for rear portion of bar. 
+	 * Pushes the rear x-coordinates left (neg value) or right (pos value).
 	 */
 	@SuppressWarnings("unused")
 	private static float bar_3D_offset = 0.1f;

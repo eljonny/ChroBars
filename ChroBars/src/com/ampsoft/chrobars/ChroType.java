@@ -16,9 +16,6 @@ public enum ChroType {
 	MINUTE(1),
 	HOUR(0);
 	
-	private final static byte MAX_TYPE_VALUE = 7;
-	private final static byte MIN_TYPE_VALUE = 0;
-	
 	private int chroType;
 	
 	/**
@@ -26,14 +23,7 @@ public enum ChroType {
 	 * @param type
 	 */
 	private ChroType(int type) {
-		
-		if(type < MIN_TYPE_VALUE || type > MAX_TYPE_VALUE) {
-			System.err.print("\nEnumeration failed. " +
-							type + " is not a valid type.");
-			chroType = -1;
-		}
-		else
-			chroType = type;
+		chroType = type;
 	}
 	
 	/**
@@ -42,14 +32,6 @@ public enum ChroType {
 	 */
 	public int getType() {
 		return chroType;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public static int types() {
-		return MAX_TYPE_VALUE + 1;
 	}
 	
 	/**
@@ -73,6 +55,24 @@ public enum ChroType {
 		default:
 			return "unknown";
 		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static ChroType[] types() {
+		return values();
+	}
+	
+	public static ChroType valueByNumber(int typeCode)
+							throws IllegalArgumentException {
+		
+		for(ChroType t : values())
+			if(t.getType() == typeCode)
+				return t;
+		
+		throw new IllegalArgumentException("The type code " + typeCode + " is not a valid enum constant in " + ChroType.class.getCanonicalName());
 	}
 	
 	/**

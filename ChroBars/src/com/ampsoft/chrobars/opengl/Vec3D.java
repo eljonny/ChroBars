@@ -14,7 +14,7 @@ package com.ampsoft.chrobars.opengl;
 
 //Import ArrayList and DecimalFormat from the JCF
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -110,7 +110,7 @@ public class Vec3D
 	 * 
 	 * @param vecValues The X Y and Z components of the vector in an ArrayList.
 	 */
-	public Vec3D(LinkedList<Float> vecValues) {
+	public Vec3D(ArrayList<Float> vecValues) {
 		
 		Iterator<Float> vectItr = vecValues.iterator();
 		x = vectItr.next();
@@ -268,7 +268,7 @@ public class Vec3D
 	 * @param vectors An ArrayList of vectors of which you want to find the average.
 	 * @return A vector that is the average of all vectors in the collection of vectors.
 	 */
-	public static Vec3D average(LinkedList<Vec3D> vectors) {
+	public static Vec3D average(ArrayList<Vec3D> vectors) {
 		
 		float xAvg = 0, yAvg = 0, zAvg = 0;
 		
