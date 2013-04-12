@@ -222,6 +222,16 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 			ChroUtils.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
 	}
+	
+	/**
+	 * This should only be called if colors are indirectly changed,
+	 *  aka not through the bars or renderer. This is the case when 
+	 *  settings are reset to defaults in the settings menu, so we
+	 *   need this to reload the settings from the settings object.
+	 */
+	public void reloadSettings() {
+		loadSettings();
+	}
 
 	/**
 	 * 

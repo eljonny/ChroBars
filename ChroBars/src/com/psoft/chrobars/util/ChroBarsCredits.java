@@ -24,25 +24,15 @@ public class ChroBarsCredits {
 	 */
 	public ChroBarsCredits(Context chroContext) {
 		
-		for(Field stringId : R.string.class.getFields())
+		for(Field stringId : R.string.class.getFields()) {
 			if(stringId.getName().startsWith("about_team")) {
 				try {
 					credit = chroContext.getString(R.string.class.getField(stringId.getName()).getInt(null));
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (NoSuchFieldException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
+				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 				credits.add(credit);
 			}
+		}
 		
 		credits.trimToSize();
 	}

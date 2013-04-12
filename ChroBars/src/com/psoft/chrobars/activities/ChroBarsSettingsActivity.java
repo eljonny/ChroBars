@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -60,6 +62,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private static int lastLayout;
 	
 	private static Toast noneChecked, colorPickerInfo;
+	private static AlertDialog resetConfirmDialog;
 	
 	private static ChroBarsSettings settings;
 	private static BarsRenderer renderer;
@@ -106,6 +109,28 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		noneChecked = Toast.makeText(this, R.string.settings_bars_toastMessage_noneChecked, Toast.LENGTH_SHORT);
 		colorPickerInfo = Toast.makeText(this, R.string.settings_bars_toastMessage_colorPickerInfo, Toast.LENGTH_LONG);
+		
+		AlertDialog.Builder resetDialogBuilder = new AlertDialog.Builder(this);
+		
+		resetDialogBuilder.setTitle(R.string.settings_general_reset_confirmTitle)
+						  .setMessage(R.string.settings_general_reset_confirmMessage)
+						  .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								settings.resetToDefaults();
+								renderer.reloadSettings();
+								processTouchableUIElements();
+							}
+						  })
+						  .setNegativeButton(R.string.deny, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						  });
+		resetConfirmDialog = resetDialogBuilder.create();
 	}
 	
 	/**
@@ -230,7 +255,30 @@ public class ChroBarsSettingsActivity extends Activity
 			processTouchableUIElements();
 			settingsDrawer.animateOpen();
 			break;
+		default:
+			setDefaults(button);
 		}
+	}
+
+	/**
+	 * 
+	 * @param button
+	 */
+	private void setDefaults(Button button) {
+		switch(button.getId()) {
+		case R.id.chrobars_settings_drawer_general_resetButton:
+			resetConfirmDialog.show();
+		default:
+			unknownViewWarning(button);
+		}
+	}
+
+	/**
+	 * 
+	 * @param v
+	 */
+	private void unknownViewWarning(View v) {
+		System.err.println("Error: " + v + " is unknown.");
 	}
 
 	/**

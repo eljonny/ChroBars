@@ -2,6 +2,7 @@ package com.psoft.chrobars.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,8 +38,10 @@ public class ChroBarsActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		
-		//Remove the title bar, get ViewGroup access
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//Remove the title bar if SDK version is below Honeycomb.
+		//If it is 0xB or higher, we need the title for access to the ActionBar.
+		if(Build.VERSION.SDK_INT < 0xB)
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		try {
 			settings = ChroBarsSettings.getNewSettingsInstance(this);

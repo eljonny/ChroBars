@@ -31,7 +31,8 @@ public class ChroAboutTimerTask extends TimerTask {
 	public void run() {
 		creditsRoller.post(new Runnable() {
 			public void run() {
-				System.out.println("Setting text...");
+//				DEBUG
+//				System.out.println("Setting text...");
 				creditsRoller.setText(credits.nextCredit());
 			}
 		});

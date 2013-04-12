@@ -29,6 +29,9 @@
     <string name="settings_general_margin_edge">Edge Gap</string>
     <string name="settings_general_displayNumbers">Display numbers</string>
     <string name="settings_general_numberSettings">Format numbers</string>
+    <string name="settings_general_resetSettings">Load default settings</string>
+    <string name="settings_general_reset_confirmTitle">Please confirm settings reset</string>
+    <string name="settings_general_reset_confirmMessage">Are you sure you want to reset all settings to default values?</string>
     <string name="settings_general_EnableDisableDynLighting">Dynamic Lighting</string>
     <string name="settings_general_EnableDisableTwelveHourTime">12 Hour Time</string>
     <string-array name="settings_bars_edges_options">
@@ -41,15 +44,16 @@
     <string name="about_title">ChroBars Credits</string>
     <string name="about_team_member_jhyry">Jonathan Hyry\nLead Developer/Tester\nProject Management</string>
     <string name="about_team_member_tdolen">Travis Dolen\nTesting</string>
-    <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management</string>
+    <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management - Alpha Phase</string>
     <string name="about_team_member_dpolage">Daniel Polage\nExecutive Producer</string>
     <string name="about_copyright">Copyright Daniel Polage, 2013</string>
-    <string name="about_version">0.7.128 - ChroBars Beta</string>
     
     <!-- Utility strings -->
 	<string name="empty_str"></string>
 	<string name="newline_str">/n</string>
 	<string name="enabled">Enabled</string>
 	<string name="disabled">Disabled</string>
+	<string name="confirm">Yes</string>
+	<string name="deny">No</string>
 	
 </resources>

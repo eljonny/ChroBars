@@ -3,7 +3,7 @@
     android:id="@+id/chrobars_settings_relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DEDEDE"
+    android:background="#5A5A5A"
     android:gravity="top" >
 
     <TextView
@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:text="@string/settings_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 

@@ -524,6 +524,14 @@ public final class ChroBarsSettings {
 	public int getSettingsActivityLayout() {
 		return settingsActivityLayout;
 	}
+	
+	/**
+	 * Call this to reset all current settings to default values.
+	 */
+	public void resetToDefaults() {
+		defaultInit();
+		loadSavedPrefs();
+	}
 
 	/**
 	 * 

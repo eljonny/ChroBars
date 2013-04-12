@@ -158,8 +158,18 @@
 	        android:layout_gravity="center_vertical|center_horizontal"
 	        android:layout_marginLeft="50dp"
 	        android:layout_marginRight="50dp"
-	        android:layout_marginTop="20dp"
+	        android:layout_marginTop="10dp"
 	        android:text="@string/settings_general_numberSettings" />
+	
+	    <Button
+	        android:id="@+id/chrobars_settings_drawer_general_resetButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical|center_horizontal"
+	        android:layout_marginLeft="50dp"
+	        android:layout_marginRight="50dp"
+	        android:layout_marginTop="10dp"
+	        android:text="@string/settings_general_resetSettings" />
 	
 	</TableLayout>
 </ScrollView>
