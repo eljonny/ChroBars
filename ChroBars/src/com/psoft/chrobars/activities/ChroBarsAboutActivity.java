@@ -20,7 +20,7 @@ import com.psoft.chrobars.util.ChroUtils;
  * @author jhyry
  *
  */
-public class ChroBarsAboutActivity extends Activity {
+public class ChroBarsAboutActivity extends Activity{
 
 	private static final short _switcher_period = 3500;
 	private static final String _chrobarsAppName = "com.psoft.chrobars";
@@ -47,7 +47,8 @@ public class ChroBarsAboutActivity extends Activity {
 		try {
 			PackageInfo chroInfo = getPackageManager().getPackageInfo(_chrobarsAppName, 0x0);
 			String versionName = chroInfo.versionCode + "." + chroInfo.versionName;
-			((TextView) findViewById(R.id.lblAboutVersion)).setText(versionName);
+			TextView versionTView = (TextView) findViewById(R.id.lblAboutVersion);
+			versionTView.setText(versionTView.getText() + versionName);
 		}
 		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
 		

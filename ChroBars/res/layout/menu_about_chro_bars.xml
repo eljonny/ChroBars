@@ -56,12 +56,38 @@
     </TextSwitcher>
 
     <TextView
-        android:id="@+id/lblCreditsCopyright"
+        android:id="@+id/chrobars_about_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
+        android:autoLink="email"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:linksClickable="true"
+        android:text="@string/about_email"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#6969FF"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/chrobars_about_emailDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/chrobars_about_email"
+        android:layout_centerHorizontal="true"
+        android:text="@string/about_email_description"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/lblCreditsCopyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/chrobars_about_emailDescription"
+        android:layout_centerHorizontal="true"
         android:text="@string/about_copyright"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="12sp"
@@ -71,8 +97,9 @@
         android:id="@+id/lblAboutVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/lblCreditsCopyright"
+        android:layout_above="@id/lblCreditsCopyright"
         android:layout_centerHorizontal="true"
+        android:text="@string/about_version"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textSize="12sp"
         android:typeface="sans" />
