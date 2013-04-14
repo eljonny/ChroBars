@@ -108,7 +108,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		
-		gl.glPushMatrix();
+		gl.glPushMatrix(); {
 		
 			gl.glLoadIdentity();
 			
@@ -123,8 +123,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 			
 			for(ChroBar cb : visibleBars) {
 				
-	//			DEBUG
-	//			System.out.println("Drawing " + cb);
+//				DEBUG
+//				System.out.println("Drawing " + cb);
 				
 				if(cb.getBarType().is3D()) {
 					
@@ -153,9 +153,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 					gl.glDisable(GL10.GL_LIGHTING);
 				}
 			}
-	
 			gl.glLoadIdentity();
-		
+		}
 		gl.glPopMatrix();
 	}
 

@@ -44,9 +44,10 @@
     <string name="about_title">ChroBars Credits</string>
     <string name="about_team_member_jhyry">Jonathan Hyry\nLead Developer/Tester\nProject Management</string>
     <string name="about_team_member_tdolen">Travis Dolen\nTesting</string>
+    <string name="about_team_member_klittle">Keith Little\nTesting</string>
     <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management - Alpha Phase</string>
     <string name="about_team_member_dpolage">Daniel Polage\nExecutive Producer</string>
-    <string name="about_version">Version </string>
+    <string name="about_version">Version</string>
     <string name="about_copyright">Copyright Daniel Polage, 2013</string>
     <string name="about_email">chrobars@gmail.com</string>
     <string name="about_email_description">To contact the team, please send us an email at:</string>
