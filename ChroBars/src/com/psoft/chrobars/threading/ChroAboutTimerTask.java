@@ -1,6 +1,8 @@
-package com.psoft.chrobars.util;
+package com.psoft.chrobars.threading;
 
 import java.util.TimerTask;
+
+import com.psoft.chrobars.util.ChroBarsCredits;
 
 import android.widget.TextSwitcher;
 

@@ -1,12 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        
         android:id="@+id/menu_settings"
         android:title="@string/menu_settings" />
     
     <item
         android:id="@+id/menu_about"
         android:title="@string/menu_about" />
+    
+    <item 
+        android:id="@+id/menu_modes"
+        android:title="@string/menu_mode_switch">
+        <menu>
+            <item 
+                android:id="@+id/mode_item_stopwatch"
+                android:title="@string/menu_mode_stopwatch" />
+            <item 
+                android:id="@+id/mode_item_timer"
+                android:title="@string/menu_mode_timer" />
+        </menu>
+    </item>
     
 </menu>

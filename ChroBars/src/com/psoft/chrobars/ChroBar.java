@@ -11,9 +11,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroBarStaticData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
@@ -31,11 +31,10 @@ public abstract class ChroBar {
 	protected static ChroBarStaticData barsData = null;
 	protected static BarsRenderer renderer;
 	protected static GL10 surface = null;
-	//Screen size for the current device is
-	//found using these objects
-	protected static DisplayMetrics screen;
 	//Used in determining bar height
 	protected static Calendar currentTime;
+	
+	/* End static fields */
 	
 	/* Instance Variables */
 	
@@ -55,6 +54,8 @@ public abstract class ChroBar {
 	//Type of data this represents
 	protected ChroType barType;
 	
+	/* End instance variables */
+	
 	/**
 	 * 
 	 * @param t
@@ -68,7 +69,6 @@ public abstract class ChroBar {
 			barsData = ChroBarStaticData.getNewDataInstance();
 		
 		renderer = ChroSurface.getRenderer();
-		screen = new DisplayMetrics();
 		
 		//Set the data class object refs.
 		synchronized(barsData) {
@@ -77,7 +77,7 @@ public abstract class ChroBar {
 				barsData.setObjectReference("renderer", ChroSurface.getRenderer());
 				barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
 
-				((WindowManager)barsData.getObject("wm")).getDefaultDisplay().getMetrics(screen);
+				((WindowManager)barsData.getObject("wm")).getDefaultDisplay().getMetrics(ChroBarsActivity.screen);
 			}
 			barsData.modifyIntegerField("barsCreated", 1);
 		}
@@ -139,7 +139,7 @@ public abstract class ChroBar {
 	 * 
 	 * @param toDraw
 	 */
-	public void setDrawBar(boolean toDraw) {
+	public final void setDrawBar(boolean toDraw) {
 		drawBar = toDraw;
 	}
 	
@@ -147,7 +147,7 @@ public abstract class ChroBar {
 	 * 
 	 * @param drawNum
 	 */
-	public void setDrawNumber(boolean drawNum) {
+	public final void setDrawNumber(boolean drawNum) {
 		drawNumber = drawNum;
 	}
 	
@@ -155,7 +155,7 @@ public abstract class ChroBar {
 	 * 
 	 * @return
 	 */
-	public boolean isDrawn() {
+	public final boolean isDrawn() {
 		return drawBar;
 	}
 	
@@ -163,7 +163,7 @@ public abstract class ChroBar {
 	 * 
 	 * @return
 	 */
-	public boolean isNumberDrawn() {
+	public final boolean isNumberDrawn() {
 		return drawNumber;
 	}
 	
@@ -173,7 +173,7 @@ public abstract class ChroBar {
 	protected void calculateBarWidth() {
 
 		//Gather required information
-		float screenWidth = screen.widthPixels;
+		float screenWidth = ChroBarsActivity.screen.widthPixels;
 		//System.out.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMarginBase");

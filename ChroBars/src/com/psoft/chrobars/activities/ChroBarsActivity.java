@@ -4,12 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.ViewFlipper;
+import android.widget.ViewSwitcher;
 
 import com.psoft.chrobars.R;
+import com.psoft.chrobars.data.ChroConstructionParams;
+import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
+import com.psoft.chrobars.threading.ChroConstructionThread;
 import com.psoft.chrobars.util.ChroBarsSettings;
 import com.psoft.chrobars.util.ChroUtils;
 
@@ -19,16 +25,22 @@ import com.psoft.chrobars.util.ChroUtils;
  *
  */
 public class ChroBarsActivity extends Activity {
-
-	private static ChroSurface chronos;
 	
+	public static DisplayMetrics screen;
+
+	private static ViewSwitcher loadToGL;
+	private static ViewFlipper chroModeFlipper;
+	private static ChroConstructionParams params;
+	private static ChroSurface chronos;
+	private static ChroBarsActivity instance;
 	private static ChroBarsSettings settings;
 	
 	//Intents for starting the other Activities
 	private Intent settingsIntent;
 	private Intent aboutIntent;
 	
-	private static ChroBarsActivity instance;
+	//For maintaining app startup progress
+	private Integer startupProgress = 0;
 	
 	/**
 	 * 
@@ -38,28 +50,32 @@ public class ChroBarsActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		
+		loadToGL = new ViewSwitcher(this);
+		chroModeFlipper = new ViewFlipper(this);
+		
+		screen = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(screen);
+		
 		//Remove the title bar if SDK version is below Honeycomb.
 		//If it is 0xB or higher, we need the title for access to the ActionBar.
 		if(Build.VERSION.SDK_INT < 0xB)
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		try {
-			settings = ChroBarsSettings.getNewSettingsInstance(this);
-		}
-		catch(Exception unknownEx) {
-			ChroUtils.printExDetails(unknownEx);
-			System.out.println("Trying to get existing settings instance...");
-			settings = ChroBarsSettings.getInstance(this);
-			if(settings != null)
-				System.out.println("Existing settings instance retrieved.");
-			else
-				throw new NullPointerException("Cannot continue. The settings object is null.");
-		}
+		ChroLoad  loadingCanvas = new ChroLoad(this, null);
 		
-		//Create the GLSurfaceView and set it as the content view
-		chronos = new ChroSurface(this);
-		chronos.setSettingsInstance(settings);
-		setContentView(chronos);
+		loadToGL.addView(loadingCanvas,0);
+		loadToGL.addView(chroModeFlipper,1);
+		
+		setContentView(loadToGL);
+		loadToGL.showNext();
+		
+		params = new ChroConstructionParams(this, chronos, settings);
+		new ChroConstructionThread().execute(params);
+		
+		settings = params.getSettings();
+		chronos = params.getRenderSurface();
+		
+		chroModeFlipper.addView(chronos);
 		
 		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
 		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
@@ -118,6 +134,24 @@ public class ChroBarsActivity extends Activity {
 	    }
 		
 		return true;
+	}
+	
+	/**
+	 * The loading background task sets this during app loading.
+	 * @param progress
+	 */
+	public void setProgressPercent(int progress) {
+		startupProgress = progress;
+		if(progress == 100)
+			loadToGL.showNext();
+	}
+	
+	/**
+	 * Accessor for the field holding the current progress of the loading thread.
+	 * @return
+	 */
+	public int getProgress() {
+		return startupProgress;
 	}
 	
 	/**
