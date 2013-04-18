@@ -14,7 +14,6 @@ import android.os.Build;
 /**
  * 
  * @author jhyry
- *
  */
 @SuppressLint("DefaultLocale")
 public class ChroSurface extends GLSurfaceView {

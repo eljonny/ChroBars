@@ -73,11 +73,7 @@ public abstract class ChroBar {
 		//Set the data class object refs.
 		synchronized(barsData) {
 			if(barsData.getInt("barsCreated") < 1) {
-				
 				barsData.setObjectReference("renderer", ChroSurface.getRenderer());
-				barsData.setObjectReference("wm", (WindowManager) activityContext.getSystemService(Context.WINDOW_SERVICE));
-
-				((WindowManager)barsData.getObject("wm")).getDefaultDisplay().getMetrics(ChroBarsActivity.screen);
 			}
 			barsData.modifyIntegerField("barsCreated", 1);
 		}
@@ -173,7 +169,7 @@ public abstract class ChroBar {
 	protected void calculateBarWidth() {
 
 		//Gather required information
-		float screenWidth = ChroBarsActivity.screen.widthPixels;
+		float screenWidth = ChroBarsActivity.getDisplayMetrics().widthPixels;
 		//System.out.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMarginBase");

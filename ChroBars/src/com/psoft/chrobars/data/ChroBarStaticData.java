@@ -5,8 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.view.WindowManager;
-
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.util.ChroUtils;
 
@@ -35,6 +33,8 @@ public final class ChroBarStaticData {
 	public static final byte _3D_FACES = 6;
 	public static final byte _VERTEX_STRIDE = 0;
 	public static final byte _MAX_BARS_TO_DRAW = 4;
+	public static final byte _LOGO_TEXT_HEIGHT = 56;
+	public static final byte _LOADING_BAR_HEIGHT = 35;
 	
 	//Application default settings, immutable
 	public static final byte precision = 0; //No precision. Tick-Tock style.
@@ -143,12 +143,6 @@ public final class ChroBarStaticData {
 	 */
 	@SuppressWarnings("unused")
 	private static BarsRenderer renderer;
-	
-	/**
-	 * Object reference to the current window manager
-	 */
-	@SuppressWarnings("unused")
-	private static WindowManager wm;
 	
 	/**
 	 * Instance object for the data object.
