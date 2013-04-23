@@ -29,7 +29,7 @@ public class ChroBarsCredits {
 				try {
 					credit = chroContext.getString(R.string.class.getField(stringId.getName()).getInt(null));
 				}
-				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+				catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 				credits.add(credit);
 			}
 		}

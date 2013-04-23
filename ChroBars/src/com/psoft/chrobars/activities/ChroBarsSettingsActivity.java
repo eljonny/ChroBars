@@ -28,11 +28,11 @@ import android.widget.ToggleButton;
 
 import com.psoft.chrobars.ChroBar;
 import com.psoft.chrobars.R;
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.util.ChroBarsSettings;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroUtilities;
 import com.psoft.chrobars.util.ColorPickerDialog;
 import com.psoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
 
@@ -70,7 +70,7 @@ public class ChroBarsSettingsActivity extends Activity
 	/**
 	 * For this instance, get the currently drawn ChroBars.
 	 */
-	private static ChroBar[] currentBars = new ChroBar[ChroBarStaticData._MAX_BARS_TO_DRAW];
+	private static ChroBar[] currentBars = new ChroBar[ChroData._MAX_BARS_TO_DRAW];
 	
 	/**
 	 * 
@@ -91,7 +91,7 @@ public class ChroBarsSettingsActivity extends Activity
 			System.out.println("Requesting settings instance...");
 			settings = ChroBarsActivity.requestSettingsObjectReference(this);
 		}
-		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
 		renderer = ChroSurface.getRenderer();
 		
@@ -352,10 +352,10 @@ public class ChroBarsSettingsActivity extends Activity
 								
 								int colorInt = Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb));
 								
-								ChroUtils.barColorChosen(colorInt);
-								ChroUtils.changeChroBarColor(bar, colorInt);
+								ChroUtilities.barColorChosen(colorInt);
+								ChroUtilities.changeChroBarColor(bar, colorInt);
 								
-								settingsRef.setPrefValue(ChroUtils.getChroBarColorVarString(bar), colorInt);
+								settingsRef.setPrefValue(ChroUtilities.getChroBarColorVarString(bar), colorInt);
 							}
 						};
 						

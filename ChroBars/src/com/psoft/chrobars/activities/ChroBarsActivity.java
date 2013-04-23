@@ -17,7 +17,7 @@ import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.threading.ChroConstructionThread;
 import com.psoft.chrobars.util.ChroBarsSettings;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * This is the main application Activity.
@@ -319,7 +319,7 @@ public class ChroBarsActivity extends Activity {
 			}
 			catch(Exception unknownEx) {
 				
-				ChroUtils.printExDetails(unknownEx);
+				ChroUtilities.printExDetails(unknownEx);
 //				DEBUG
 //				System.out.println("Trying to get existing settings instance...");
 				settings = ChroBarsSettings.getInstance(instance);

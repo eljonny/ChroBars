@@ -17,7 +17,7 @@ import android.view.SurfaceView;
 
 import com.psoft.chrobars.R;
 import com.psoft.chrobars.activities.ChroBarsActivity;
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.threading.ChroLoadThread;
 
 /**
@@ -70,7 +70,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 		loadingBarFramePaint.setStrokeWidth(3);
 		
 		loadingBarPaint = new Paint(loadingBarFramePaint);
-		loadingBarPaint.setStrokeWidth((float)ChroBarStaticData._LOADING_BAR_HEIGHT - 10f);
+		loadingBarPaint.setStrokeWidth((float)ChroData._LOADING_BAR_HEIGHT - 10f);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 		float left = logoLocation.left + 30f,
 			  top = logoLocation.bottom + textDraw.getTextSize(), //Below the text
 			  right = logoLocation.right - 30f,
-			  bottom = top + ChroBarStaticData._LOADING_BAR_HEIGHT;
+			  bottom = top + ChroData._LOADING_BAR_HEIGHT;
 		
 		loadingBarFrame = new RectF(left, top, right, bottom);
 	}
@@ -95,7 +95,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 		textDraw.setColor(Color.WHITE);
 		textDraw.setTextAlign(Align.CENTER);
 		textDraw.setTypeface(Typeface.DEFAULT);
-		textDraw.setTextSize(ChroBarStaticData._LOGO_TEXT_HEIGHT);
+		textDraw.setTextSize(ChroData._LOGO_TEXT_HEIGHT);
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 								logoLocation.bottom + 10f, textDraw);
 		loading.drawRect(loadingBarFrame, loadingBarFramePaint);
     	float startX = loadingBarFrame.left + 5f,
-    		  startY = loadingBarFrame.top + ((float)ChroBarStaticData._LOADING_BAR_HEIGHT/2f),
+    		  startY = loadingBarFrame.top + ((float)ChroData._LOADING_BAR_HEIGHT/2f),
     		  stopX = startX + (loadingBarFrame.right -
     				  	loadingBarFrame.left - 10f) * progPercent;
     	

@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.psoft.chrobars.opengl.BarsRenderer;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * 
  * @author jhyry
  *
  */
-public final class ChroBarStaticData {
+public final class ChroData {
 
 	/*
 	 * ChroBars static constant application data
@@ -58,16 +58,16 @@ public final class ChroBarStaticData {
 	//Base Z-Coordinate from which to extend a ChroBar into 3D
 	public static final float _baseDepth = -0.5f;
 	//Other constants
-	public static final byte _lighter_edgeColorDifference = 35; //Adds 35 to all components of bar color
-	public static final byte _darker_edgeColorDifference = 35; //Subtracts 35 to all components of bar color
+	public static final byte _lighter_edgeColorDifference = 55; //Adds 55 to all components of bar color
+	public static final byte _darker_edgeColorDifference = 45; //Subtracts 45 to all components of bar color
 	public static final float _max_precision = 3.0f;
 	public static final float _left_screen_edge = -1f;
 	//Millisecond values
-	public static final int _msInDay = ( ChroBarStaticData._HOURS_IN_DAY * ChroBarStaticData._MINUTES_IN_HOUR *
-														ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-							   _msInHour = ( ChroBarStaticData._MINUTES_IN_HOUR * ChroBarStaticData.
-										 				_SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND ),
-							   _msInMinute = ( ChroBarStaticData._SECONDS_IN_MINUTE * ChroBarStaticData._MILLIS_IN_SECOND );
+	public static final int _msInDay = ( ChroData._HOURS_IN_DAY * ChroData._MINUTES_IN_HOUR *
+														ChroData._SECONDS_IN_MINUTE * ChroData._MILLIS_IN_SECOND ),
+							   _msInHour = ( ChroData._MINUTES_IN_HOUR * ChroData.
+										 				_SECONDS_IN_MINUTE * ChroData._MILLIS_IN_SECOND ),
+							   _msInMinute = ( ChroData._SECONDS_IN_MINUTE * ChroData._MILLIS_IN_SECOND );
 	
 	//Vertex draw sequences for 2D and 3D, respectively.
 	public static final short[] _bar_vertexDrawSequence_2D = {	0, 1, 2,
@@ -147,7 +147,7 @@ public final class ChroBarStaticData {
 	/**
 	 * Instance object for the data object.
 	 */
-	private static ChroBarStaticData _inst;
+	private static ChroData _inst;
 	
 	/*
 	 * End ChroBars application data
@@ -176,14 +176,14 @@ public final class ChroBarStaticData {
 	 * 
 	 * @return
 	 */
-	public static ChroBarStaticData getNewDataInstance() {
+	public static ChroData getNewDataInstance() {
 		
 		if(_instance) {
 			System.err.println("Data class instance already exists. Returning current instance.");
 			return _inst;
 		}
 		else {
-			_inst = new ChroBarStaticData();
+			_inst = new ChroData();
 			return _inst;
 		}
 	}
@@ -192,14 +192,14 @@ public final class ChroBarStaticData {
 	 * 
 	 * @return
 	 */
-	public static ChroBarStaticData getDataInstance() {
+	public static ChroData getDataInstance() {
 		return _instance ? _inst : getNewDataInstance();
 	}
 	
 	/**
 	 * 
 	 */
-	private ChroBarStaticData() {
+	private ChroData() {
 		updateNonFinalFields();
 		_instance = true;
 		
@@ -211,7 +211,7 @@ public final class ChroBarStaticData {
 	 */
 	private synchronized void updateNonFinalFields() {
 		
-		for(Field f : ChroBarStaticData.class.getDeclaredFields())
+		for(Field f : ChroData.class.getDeclaredFields())
 			if(!Modifier.isFinal(f.getModifiers()))
 				if(Modifier.isStatic(f.getModifiers())) {
 					try {
@@ -223,7 +223,7 @@ public final class ChroBarStaticData {
 								}
 							}
 					}
-					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+					catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 				}
 	}
 
@@ -266,7 +266,7 @@ public final class ChroBarStaticData {
 				if(f.getName().equals(floatFieldName))
 					return f.get(null);
 		}
-		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
 		return null;
 	}
@@ -279,10 +279,10 @@ public final class ChroBarStaticData {
 		
 		_colors = new HashMap<String, Integer>();
 		
-		for(Field data : ChroBarStaticData.class.getFields())
+		for(Field data : ChroData.class.getFields())
 			if(data.getName().endsWith("Color")) {
 				try { _colors.put(data.getName(), data.getInt(null)); }
-				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+				catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 			}
 		
 		return _colors;
@@ -302,7 +302,7 @@ public final class ChroBarStaticData {
 							f.setInt(null, f.getInt(null) + modBy);
 						}
 					}
-					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+					catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 				}
 			}
 		}
@@ -323,7 +323,7 @@ public final class ChroBarStaticData {
 						f.set(null, ref);
 					}
 				}
-				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+				catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 			}
 		}
 	}

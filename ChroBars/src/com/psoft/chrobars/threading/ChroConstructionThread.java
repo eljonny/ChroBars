@@ -4,10 +4,14 @@ import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroConstructionParams;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.util.ChroBarsSettings;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroPrint;
+import com.psoft.chrobars.util.ChroUtilities;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.util.Printer;
 
 /**
  * This defines a background task for constructing the 
@@ -44,17 +48,31 @@ public class ChroConstructionThread extends
 				Thread.sleep(650);
 			}
 			catch(InterruptedException intEx) {
-				ChroUtils.printExDetails(intEx);
+				ChroUtilities.printExDetails(intEx);
 			}
 		}
 		
 		progress = 0; //Initial progress is 0%
 		paramsData = paramObjs[0]; //Set the parameter object.
 		UIThread = paramsData.getMainActivity(); //Set the main Activity reference.
+		//This is necessary to give this thread control of the GLSurfaceView creation process.
+		if(Looper.myLooper() == null) {
+			ChroPrint.println("Currently no Looper. Preparing looper...", System.out);
+			Looper.prepare();
+			ChroPrint.println("Done.", System.out);
+		}
+		else
+			ChroPrint.println("Will use current looper for " + Thread.currentThread() + "...", System.out);
+		incProgress(5);
 		getSettingsInstance();
+		incProgress(3);
 		//Create the GLSurfaceView and set it as the content view
 		buildSurface(); //Load settings into the OpenGL renderer.
+		incProgress(3);
 		setReturnData();
+		incProgress(3);
+		Looper.myLooper().quit();
+		incProgress(4);
 		
 		return paramsData;
     }
@@ -76,13 +94,18 @@ public class ChroConstructionThread extends
 	 *  into the renderer.
 	 */
 	private void buildSurface() {
-		//This is necessary to give this thread control of the GLSurfaceView creation process.
-		Looper.prepare();
-		incProgress(17);
+		ChroPrint looperp = new ChroPrint();
+		incProgress(6);
+		Looper.myLooper().setMessageLogging(looperp);
+		incProgress(11);
+		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
+		incProgress(4);
 		time = new ChroSurface(UIThread); //Construct the surface and bars.
-		incProgress(14);
+		incProgress(11);
 		time.setSettingsInstance(settings); //Load the application settings into the renderer.
-		incProgress(44);
+		incProgress(21);
+		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
+		incProgress(4);
 	}
 
 	/**
@@ -94,7 +117,7 @@ public class ChroConstructionThread extends
 		incProgress(5); //progress is now 5%
 		
 		try {
-			//Load a settings instance, which in turn loads the settings into ChroBars.
+			//Load a settings instance, which in turn loads the settings into the ChroBars.
 //			DEBUG
 //			System.out.println("Getting new settings instance...");
 			settings = ChroBarsSettings.getNewSettingsInstance(UIThread);
@@ -103,7 +126,7 @@ public class ChroConstructionThread extends
 		catch(Exception unknownEx) {
 			//Something went wrong that can possibly be corrected by attempting
 			// to get the current settings instance.
-			ChroUtils.printExDetails(unknownEx);
+			ChroUtilities.printExDetails(unknownEx);
 			incProgress(2); //progress is now 7%
 			System.out.println("Trying to get existing settings instance...");
 			settings = ChroBarsSettings.getInstance(UIThread);

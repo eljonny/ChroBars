@@ -7,7 +7,7 @@ import java.nio.ShortBuffer;
 
 import android.content.Context;
 
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 
 /**
  * 
@@ -34,20 +34,20 @@ public class ChroBar2D extends ChroBar {
 	protected void barGLAllocate(ByteOrder order_native) {
 
 		//Set 2D vertex arrays
-		barVertexColors = new float[ChroBarStaticData._2D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
-		edgeVertexColors = new float[ChroBarStaticData._2D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
-		vertices = new float[ChroBarStaticData._2D_VERTEX_COMPONENTS];
+		barVertexColors = new float[ChroData._2D_VERTICES*ChroData._RGBA_COMPONENTS];
+		edgeVertexColors = new float[ChroData._2D_VERTICES*ChroData._RGBA_COMPONENTS];
+		vertices = new float[ChroData._2D_VERTEX_COMPONENTS];
 		
 		//Allocate the vertex buffer
-		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
+		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
 		//Allocate the bar's color buffer
-		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
+		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
 		//Allocate the vertex bar draw sequence buffer
-		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._bar_vertexDrawSequence_2D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._bar_vertexDrawSequence_2D).position(0);
+		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroData._bar_vertexDrawSequence_2D.length*ChroData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroData._bar_vertexDrawSequence_2D).position(0);
 		//Allocate the edges color buffer
-		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(edgeVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
+		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(edgeVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
 		//Allocate the vertex edge draw sequence buffer
-		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._edges_vertexDrawSequence_2D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._edges_vertexDrawSequence_2D).position(0);
+		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroData._edges_vertexDrawSequence_2D.length*ChroData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroData._edges_vertexDrawSequence_2D).position(0);
 
 		System.out.println("Intializing vertices in " + this + "...");
 		//Initialize the vertex array with default values
@@ -60,14 +60,14 @@ public class ChroBar2D extends ChroBar {
 	@Override
 	protected void initVertices() {
 		
-		float _baseHeight = ChroBarStaticData._baseHeight;
+		float _baseHeight = ChroData._baseHeight;
 		
 		float[] verts_2D = { 	 -0.5f, 1.0f, 		 0.0f,    	// Upper Left  | 0
 						  		 -0.5f, _baseHeight, 0.0f,    	// Lower Left  | 1
 								  0.5f, _baseHeight, 0.0f,    	// Lower Right | 2
 								  0.5f, 1.0f, 		 0.0f  };	// Upper Right | 3
 		
-		for(int i = 0; i < ChroBarStaticData._2D_VERTEX_COMPONENTS; i++)
+		for(int i = 0; i < ChroData._2D_VERTEX_COMPONENTS; i++)
 			vertices[i] = verts_2D[i];
 	}
 
@@ -99,7 +99,7 @@ public class ChroBar2D extends ChroBar {
 	 */
 	@Override
 	protected int getBarDrawSequenceBufferLength() {
-		return ChroBarStaticData._bar_vertexDrawSequence_2D.length;
+		return ChroData._bar_vertexDrawSequence_2D.length;
 	}
 
 	/**
@@ -108,6 +108,6 @@ public class ChroBar2D extends ChroBar {
 	@Override
 	protected int getEdgeDrawSequenceBufferLength() {
 		// TODO Auto-generated method stub
-		return ChroBarStaticData._edges_vertexDrawSequence_2D.length;
+		return ChroData._edges_vertexDrawSequence_2D.length;
 	}
 }

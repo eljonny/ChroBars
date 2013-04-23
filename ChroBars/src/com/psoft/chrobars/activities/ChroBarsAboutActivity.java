@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.psoft.chrobars.R;
 import com.psoft.chrobars.threading.ChroAboutTimerTask;
 import com.psoft.chrobars.util.ChroBarsCredits;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class ChroBarsAboutActivity extends Activity{
 			TextView versionTView = (TextView) findViewById(R.id.lblAboutVersion);
 			versionTView.setText(versionTView.getText() + " " + versionName);
 		}
-		catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
 		construct();
 		startCreditsRoll();

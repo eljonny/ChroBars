@@ -44,8 +44,7 @@ public class ColorPickerDialog extends Dialog {
     /**
      * 
      * @author Google
-     * @author jon
-     *
+     * @author Jonathan Hyry
      */
     private static class ColorPickerView extends View {
 
@@ -115,6 +114,7 @@ public class ColorPickerDialog extends Dialog {
             
             mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mCenterPaint.setColor(color);
+            mCenterPaint.setAlpha(0xFF);
             mCenterPaint.setStrokeWidth(5);
 
             rectStrokeWidth = mPaint.getStrokeWidth()*0.5f;
@@ -194,8 +194,8 @@ public class ColorPickerDialog extends Dialog {
                 mCenterPaint.setStyle(Paint.Style.FILL);
                 mCenterPaint.setColor(c);
             }
-            
-            System.out.println("Lightness angles | Min: " + minLightness_Angle + "Max: " + maxLightness_Angle);
+//          DEBUG
+//          System.out.println("Lightness angles | Min: " + minLightness_Angle + "Max: " + maxLightness_Angle);
         }
         
         /**
@@ -466,7 +466,9 @@ public class ColorPickerDialog extends Dialog {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	
         super.onCreate(savedInstanceState);
+        
         OnColorChangedListener l = new OnColorChangedListener() {
             public void colorChanged(int alpha, int color) {
                 mListener.colorChanged(alpha, color);

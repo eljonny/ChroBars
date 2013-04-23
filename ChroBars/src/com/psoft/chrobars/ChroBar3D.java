@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 import android.content.Context;
 
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.Vec3D;
 
 /**
@@ -54,21 +54,21 @@ public class ChroBar3D extends ChroBar {
 		alClassVec3D = new ArrayList<ArrayList<Vec3D>>();
 		
 		//Set 3D vertex arrays
-		barVertexColors = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
-		edgeVertexColors = new float[ChroBarStaticData._3D_VERTICES*ChroBarStaticData._RGBA_COMPONENTS];
-		vertices = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
-		normals = new float[ChroBarStaticData._3D_VERTEX_COMPONENTS];
+		barVertexColors = new float[ChroData._3D_VERTICES*ChroData._RGBA_COMPONENTS];
+		edgeVertexColors = new float[ChroData._3D_VERTICES*ChroData._RGBA_COMPONENTS];
+		vertices = new float[ChroData._3D_VERTEX_COMPONENTS];
+		normals = new float[ChroData._3D_VERTEX_COMPONENTS];
 		
 		//Allocate the vertex buffer
-		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
+		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
 		//Allocate the color buffer
-		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
+		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
 		//Allocate the vertex draw sequence buffer
-		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._bar_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._bar_vertexDrawSequence_3D).position(0);
+		barDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroData._bar_vertexDrawSequence_3D.length*ChroData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroData._bar_vertexDrawSequence_3D).position(0);
 		//Allocate the edges color buffer
-		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(edgeVertexColors.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
+		edgesColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(edgeVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(edgeVertexColors).position(0);
 		//Allocate the vertex edge draw sequence buffer
-		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroBarStaticData._edges_vertexDrawSequence_3D.length*ChroBarStaticData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroBarStaticData._edges_vertexDrawSequence_3D).position(0);
+		edgeDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroData._edges_vertexDrawSequence_3D.length*ChroData._BYTES_IN_SHORT).order(order_native).asShortBuffer().put(ChroData._edges_vertexDrawSequence_3D).position(0);
 		
 		System.out.println("Intializing vertices in " + this + "...");
 		//Initialize the vertex array with default values
@@ -82,7 +82,7 @@ public class ChroBar3D extends ChroBar {
 		System.gc();
 	
 		//Set up the buffer of vertex normal vectors
-		normalsBuffer = (FloatBuffer) ByteBuffer.allocateDirect(normals.length*ChroBarStaticData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(normals).position(0);
+		normalsBuffer = (FloatBuffer) ByteBuffer.allocateDirect(normals.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(normals).position(0);
 	}
 
 	/**
@@ -90,8 +90,8 @@ public class ChroBar3D extends ChroBar {
 	 */
 	protected void initVertices() {
 		
-		float _baseHeight = ChroBarStaticData._baseHeight,
-					_baseDepth = ChroBarStaticData._baseDepth;
+		float _baseHeight = ChroData._baseHeight,
+					_baseDepth = ChroData._baseDepth;
 		
 		float[] verts_3D = {	 -0.3f,  1.0f,		  0.0f,    		  // Upper Left Front  | 0
 					  		  	 -0.3f,  _baseHeight, 0.0f,    		  // Lower Left Front  | 1 | Base height is -1.8
@@ -102,7 +102,7 @@ public class ChroBar3D extends ChroBar {
 								  0.4f,  _baseHeight, _baseDepth,     // Lower Right Rear  | 6
 								  0.4f,  1.0f,		  _baseDepth  };  // Upper Right Rear  | 7
 		
-		for(int i = 0; i < ChroBarStaticData._3D_VERTEX_COMPONENTS; i++)
+		for(int i = 0; i < ChroData._3D_VERTEX_COMPONENTS; i++)
 			vertices[i] = verts_3D[i];
 	}
 
@@ -118,7 +118,7 @@ public class ChroBar3D extends ChroBar {
 		
 //		System.out.println("Separating vertices...");
 		
-		ArrayList<Short>[] drawSequences = (ArrayList<Short>[]) Array.newInstance(alClassShort.getClass(), ChroBarStaticData._bar_vertexDrawSequence_3D.length/3);
+		ArrayList<Short>[] drawSequences = (ArrayList<Short>[]) Array.newInstance(alClassShort.getClass(), ChroData._bar_vertexDrawSequence_3D.length/3);
 		ArrayList<Float>[] vertexTriples = (ArrayList<Float>[]) Array.newInstance(alClassFloat.getClass(), vertices.length/3);
 		
 		int i, j;
@@ -130,7 +130,7 @@ public class ChroBar3D extends ChroBar {
 			ArrayList<Short> drawSequence = new ArrayList<Short>();
 			for(j = 0; j < 3; j++) {
 				vertex.add(vertices[i*3 + j]);
-				drawSequence.add(ChroBarStaticData._bar_vertexDrawSequence_3D[i*3 + j]);
+				drawSequence.add(ChroData._bar_vertexDrawSequence_3D[i*3 + j]);
 			}
 			drawSequences[i] = drawSequence;
 			vertexTriples[i] = vertex;
@@ -142,7 +142,7 @@ public class ChroBar3D extends ChroBar {
 		for(; i < drawSequences.length; i++) {
 			ArrayList<Short> drawSequence = new ArrayList<Short>();
 			for(j = 0; j < 3; j++) {
-				drawSequence.add(ChroBarStaticData._bar_vertexDrawSequence_3D[i*3 + j]);
+				drawSequence.add(ChroData._bar_vertexDrawSequence_3D[i*3 + j]);
 			}
 			drawSequences[i] = drawSequence;
 		}
@@ -158,9 +158,9 @@ public class ChroBar3D extends ChroBar {
 //		System.out.println("Done.\nGrouping sequences...");
 		
 		//Sort the vertex draw sequences into buckets
-		ArrayList<ArrayList<Short>>[] buckets = (ArrayList<ArrayList<Short>>[]) Array.newInstance(bucketClass.getClass(), ChroBarStaticData._3D_VERTICES);
+		ArrayList<ArrayList<Short>>[] buckets = (ArrayList<ArrayList<Short>>[]) Array.newInstance(bucketClass.getClass(), ChroData._3D_VERTICES);
 		//Initialize the buckets
-		for(i = 0; i < ChroBarStaticData._3D_VERTICES; i++)
+		for(i = 0; i < ChroData._3D_VERTICES; i++)
 			buckets[i] = new ArrayList<ArrayList<Short>>();
 		//Sort the sequences
 		for(i = 0; i < drawSequences.length; i++) {
@@ -183,7 +183,7 @@ public class ChroBar3D extends ChroBar {
 		
 		//For every bucket, examine the draw sequence and drop the vertices into a Vec3D object
 		// even though they are not necessarily vectors yet.
-		ArrayList<ArrayList<Vec3D>>[] faceVertices = (ArrayList<ArrayList<Vec3D>>[]) Array.newInstance(alClassVec3D.getClass(), ChroBarStaticData._3D_VERTICES);
+		ArrayList<ArrayList<Vec3D>>[] faceVertices = (ArrayList<ArrayList<Vec3D>>[]) Array.newInstance(alClassVec3D.getClass(), ChroData._3D_VERTICES);
 		//Initialize the list containers
 		for(i = 0; i < faceVertices.length; i++)
 			faceVertices[i] = new ArrayList<ArrayList<Vec3D>>();
@@ -208,7 +208,7 @@ public class ChroBar3D extends ChroBar {
 //		System.out.println("Done. Finding face normals...");
 		
 		//Calculate normal vectors for all faces connected to each vertex, then average to get a vertex normal.
-		ArrayList<Vec3D>[] faceNormals = (ArrayList<Vec3D>[]) Array.newInstance(vectorClass.getClass(), ChroBarStaticData._3D_VERTICES);
+		ArrayList<Vec3D>[] faceNormals = (ArrayList<Vec3D>[]) Array.newInstance(vectorClass.getClass(), ChroData._3D_VERTICES);
 		//Initialize the vector lists for holding all face normals
 		for(i = 0; i < faceNormals.length; i++)
 			faceNormals[i] = new ArrayList<Vec3D>();
@@ -282,7 +282,7 @@ public class ChroBar3D extends ChroBar {
 	 */
 	@Override
 	protected int getBarDrawSequenceBufferLength() {
-		return ChroBarStaticData._bar_vertexDrawSequence_3D.length;
+		return ChroData._bar_vertexDrawSequence_3D.length;
 	}
 	
 	/**
@@ -290,6 +290,6 @@ public class ChroBar3D extends ChroBar {
 	 */
 	@Override
 	protected int getEdgeDrawSequenceBufferLength() {
-		return ChroBarStaticData._edges_vertexDrawSequence_3D.length;
+		return ChroData._edges_vertexDrawSequence_3D.length;
 	}
 }

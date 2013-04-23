@@ -13,7 +13,7 @@ import com.psoft.chrobars.ChroBar;
  * @author jhyry
  *
  */
-public final class ChroUtils {
+public final class ChroUtilities {
 	
 	private static ArrayList<Integer> colorPickerHistory = new ArrayList<Integer>();
 	

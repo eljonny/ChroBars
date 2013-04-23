@@ -11,24 +11,23 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.view.WindowManager;
 
 import com.psoft.chrobars.activities.ChroBarsActivity;
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
-import com.psoft.chrobars.util.ChroUtils;
+import com.psoft.chrobars.util.ChroPrint;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * 
  * @author jhyry
- *
  */
 public abstract class ChroBar {
 
 	/* Static fields */
 	
-	protected static ChroBarStaticData barsData = null;
+	protected static ChroData barsData = null;
 	protected static BarsRenderer renderer;
 	protected static GL10 surface = null;
 	//Used in determining bar height
@@ -42,6 +41,8 @@ public abstract class ChroBar {
 	protected int barColor, edgeColor;
 	//Whether this bar should be drawn
 	protected boolean drawBar, drawNumber;
+	//Whether this bar has edge colors that should not be operated on.
+	protected boolean[] noColorOp = new boolean[3];
 	protected float[] barVertexColors, vertices;
 	protected float[] edgeVertexColors, normals;
 	//OpenGL Surface and drawing buffers
@@ -55,34 +56,6 @@ public abstract class ChroBar {
 	protected ChroType barType;
 	
 	/* End instance variables */
-	
-	/**
-	 * 
-	 * @param t
-	 * @param color
-	 * @param activityContext
-	 */
-	public ChroBar(ChroType t, Integer color, Context activityContext) {
-		
-		//If the data object is null, make one. Otherwise do nothing.
-		if(barsData == null)
-			barsData = ChroBarStaticData.getNewDataInstance();
-		
-		renderer = ChroSurface.getRenderer();
-		
-		//Set the data class object refs.
-		synchronized(barsData) {
-			if(barsData.getInt("barsCreated") < 1) {
-				barsData.setObjectReference("renderer", ChroSurface.getRenderer());
-			}
-			barsData.modifyIntegerField("barsCreated", 1);
-		}
-		
-		barType = t;
-		
-		//Do the actual buffer allocation.
-		barGLAllocate(ByteOrder.nativeOrder());
-	}
 	
 	/* Begin subclass Interface. */
 	
@@ -130,6 +103,34 @@ public abstract class ChroBar {
 	protected abstract int getEdgeDrawSequenceBufferLength();
 	
 	/* End subclass Interface, Begin partial implementation. */
+
+	/**
+	 * 
+	 * @param t
+	 * @param color
+	 * @param activityContext
+	 */
+	public ChroBar(ChroType t, Integer color, Context activityContext) {
+		
+		//If the data object is null, make one. Otherwise do nothing.
+		if(barsData == null)
+			barsData = ChroData.getNewDataInstance();
+		
+		renderer = ChroSurface.getRenderer();
+		
+		//Set the data class object refs.
+		synchronized(barsData) {
+			if(barsData.getInt("barsCreated") < 1) {
+				barsData.setObjectReference("renderer", ChroSurface.getRenderer());
+			}
+			barsData.modifyIntegerField("barsCreated", 1);
+		}
+		
+		barType = t;
+		
+		//Do the actual buffer allocation.
+		barGLAllocate(ByteOrder.nativeOrder());
+	}
 	
 	/**
 	 * 
@@ -195,10 +196,10 @@ public abstract class ChroBar {
 		
 		if(barType.is3D())
 			barTypeCode -= 4f;
-		barTypeCode -= (ChroBarStaticData._MAX_BARS_TO_DRAW - numberOfBars);
+		barTypeCode -= (ChroData._MAX_BARS_TO_DRAW - numberOfBars);
 		
 		for(int i = barType.getType() + (barType.is3D() ? (-3) : 1);
-							i < ChroBarStaticData._MAX_BARS_TO_DRAW; i++) {
+							i < ChroData._MAX_BARS_TO_DRAW; i++) {
 //			DEBUG
 //			System.out.println("Current bar check index: " + i);
 			if(!visible[i].isDrawn())
@@ -211,7 +212,7 @@ public abstract class ChroBar {
 //		DEBUG
 //		System.out.println("Bar type code: " + barTypeCode + "\nBar type: " + barType);
 					
-		float leftX = ChroBarStaticData._left_screen_edge + edgeMargin + (barWidth * barTypeCode) + (barMargin * barTypeCode);
+		float leftX = ChroData._left_screen_edge + edgeMargin + (barWidth * barTypeCode) + (barMargin * barTypeCode);
 		float rightX = leftX + barWidth;
 		
 		//Set the width of this bar object
@@ -223,13 +224,11 @@ public abstract class ChroBar {
 	 */
 	protected void calculateBarHeight() {
 		
-		calculateBarWidth();
-		
 		currentTime = Calendar.getInstance(TimeZone.getDefault(), Locale.US);
 		
 		//This seems to do the trick. Fun with magic numbers!
 		float scalingFactor = 3.65f;
-		float barTopHeight = ChroBarStaticData._baseHeight + 0.01f;
+		float barTopHeight = ChroData._baseHeight + 0.01f;
 		
 		barTopHeight += (getRatio()*scalingFactor);
 		
@@ -241,7 +240,7 @@ public abstract class ChroBar {
 		//If we're using dynamic lighting with a 3D bar, rebuild the vertex normals for the new bar height.
 		if(barType.is3D() && renderer.usesDynamicLighting()) {
 			try { initNormals(); }
-			catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+			catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 			((FloatBuffer) normalsBuffer.clear()).put(normals).position(0);
 		}
 	}
@@ -266,23 +265,23 @@ public abstract class ChroBar {
 		
 		int precision = (int) renderer.getPrecision();
 		
-		float hoursInDay = renderer.usesTwelveHourTime() ? ChroBarStaticData._HOURS_IN_DAY >> 1 : ChroBarStaticData._HOURS_IN_DAY;
-		float msInDay = renderer.usesTwelveHourTime() ? ChroBarStaticData._msInDay >> 1 : ChroBarStaticData._msInDay;
+		float hoursInDay = renderer.usesTwelveHourTime() ? ChroData._HOURS_IN_DAY >> 1 : ChroData._HOURS_IN_DAY;
+		float msInDay = renderer.usesTwelveHourTime() ? ChroData._msInDay >> 1 : ChroData._msInDay;
 		
 		if(precision > 0) {
 			
-			currentMSInMinute = (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
-			currentMSInHour = (currentMinute*ChroBarStaticData._msInMinute) +
-					 (currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
-			currentMSInDay = (currentHour*ChroBarStaticData._msInHour) +
-					(currentMinute*ChroBarStaticData._msInMinute) +
-					(currentSecond*ChroBarStaticData._MILLIS_IN_SECOND) + currentMillisecond;
+			currentMSInMinute = (currentSecond*ChroData._MILLIS_IN_SECOND) + currentMillisecond;
+			currentMSInHour = (currentMinute*ChroData._msInMinute) +
+					 (currentSecond*ChroData._MILLIS_IN_SECOND) + currentMillisecond;
+			currentMSInDay = (currentHour*ChroData._msInHour) +
+					(currentMinute*ChroData._msInMinute) +
+					(currentSecond*ChroData._MILLIS_IN_SECOND) + currentMillisecond;
 		}
 		
 //		DEBUG
 //		System.out.println("Current time:\n" + currentHour + "/" + currentMSInDay + "\n" + currentMinute + "/" + currentMSInHour + "\n" + currentSecond + "/" + currentMSInMinute + "\n" + currentMillisecond);
 		
-		float precisionRatio = renderer.getPrecision()/ChroBarStaticData._max_precision;
+		float precisionRatio = renderer.getPrecision()/ChroData._max_precision;
 		
 //		DEBUG
 //		System.out.println("Precision ratio: " + precisionRatio);
@@ -292,14 +291,14 @@ public abstract class ChroBar {
 		case 0:
 			return ( currentHour + (precisionRatio * currentMSInDay) ) / ( hoursInDay + (precisionRatio * msInDay)	);
 		case 1:
-			return ( currentMinute + (precisionRatio * currentMSInHour) ) / ( (float)ChroBarStaticData._MINUTES_IN_HOUR + (precisionRatio * ChroBarStaticData._msInHour) );
+			return ( currentMinute + (precisionRatio * currentMSInHour) ) / ( (float)ChroData._MINUTES_IN_HOUR + (precisionRatio * ChroData._msInHour) );
 		case 2:
-			return ( currentSecond + (precisionRatio * currentMSInMinute) ) / ( (float)ChroBarStaticData._SECONDS_IN_MINUTE + (precisionRatio * ChroBarStaticData._msInMinute));
+			return ( currentSecond + (precisionRatio * currentMSInMinute) ) / ( (float)ChroData._SECONDS_IN_MINUTE + (precisionRatio * ChroData._msInMinute));
 		case 3:
-			return currentMillisecond / (float)ChroBarStaticData._MILLIS_IN_SECOND;
+			return currentMillisecond / (float)ChroData._MILLIS_IN_SECOND;
 			
 		default:
-			System.err.print("Invalid type!");
+			System.err.println("Invalid type!");
 			return 0;
 		}
 	}
@@ -344,18 +343,18 @@ public abstract class ChroBar {
 				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
 				
 				//load the buffer of normals into the OpenGL draw object.
-				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroBarStaticData._VERTEX_STRIDE, normalsBuffer);
+				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
 			}
 			
 			//Tell openGL where the vertex data is and how to use it
 			//System.out.println("Calling glVertexPointer");
-			drawSurface.glVertexPointer(ChroBarStaticData._DIMENSIONS, GL10.GL_FLOAT,
-										ChroBarStaticData._VERTEX_STRIDE, verticesBuffer);
+			drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
+										ChroData._VERTEX_STRIDE, verticesBuffer);
 			
 			//Color buffer for the bars.
 			//System.out.println("Calling glColorPointer for bars");
-	        drawSurface.glColorPointer(ChroBarStaticData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-	        							ChroBarStaticData._VERTEX_STRIDE, barsColorBuffer);
+	        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+	        							ChroData._VERTEX_STRIDE, barsColorBuffer);
 	        
 			//Draw the bar
 	        //System.out.println("Calling glDrawElements for bars");
@@ -366,8 +365,8 @@ public abstract class ChroBar {
 					
 				//Color buffer for the edges.
 				//System.out.println("Calling glColorPointer for edges");
-		        drawSurface.glColorPointer(ChroBarStaticData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-		        							ChroBarStaticData._VERTEX_STRIDE, edgesColorBuffer);
+		        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+		        							ChroData._VERTEX_STRIDE, edgesColorBuffer);
 				
 				//Draw the accented bar edges
 				//System.out.println("Calling glDrawElements for edges");
@@ -395,6 +394,7 @@ public abstract class ChroBar {
 				surface = drawSurface;
 		    
 			//Recalculate the bar dimensions in preparation for a redraw
+			calculateBarWidth();
 			calculateBarHeight();
 		}
 	}
@@ -431,9 +431,6 @@ public abstract class ChroBar {
 	public void changeChroBarColor(String colorstring) {
 		
 		changeChroBarColor(Color.parseColor(colorstring));
-
-		if(surface != null)
-			draw(surface);
 	}
 	
 	/**
@@ -443,50 +440,33 @@ public abstract class ChroBar {
 	 */
 	public void changeChroBarColor(int colorInt) {
 		
-		byte edgeColorDiff;
 		int colorArrayLength = barVertexColors.length;
 		barColor = colorInt;
 		
-		//If we change the color of the bar,
-		// we also need to change the edge color accordingly.
-		switch(renderer.getBarEdgeSetting()) {
-		//If the edges are supposed to be the same color
-		case 0:
-			edgeColor = barColor;
-			break;
-		//If the edges are supposed to be lighter than the bar
-		case 1:
-			edgeColorDiff = ChroBarStaticData._lighter_edgeColorDifference;
-			edgeColor = Color.argb( Color.alpha(barColor),
-								    Color.red(barColor) 	+ edgeColorDiff,
-								    Color.green(barColor) 	+ edgeColorDiff,
-								    Color.blue(barColor) 	+ edgeColorDiff   );
-			break;
-		//If the edges are supposed to be darker than the bar
-		case 2:
-			edgeColorDiff = ChroBarStaticData._darker_edgeColorDifference;
-			edgeColor = Color.argb( Color.alpha(barColor),
-								    Color.red(barColor) 	- edgeColorDiff,
-								    Color.green(barColor) 	- edgeColorDiff,
-								    Color.blue(barColor) 	- edgeColorDiff   );
-			break;
-		//We'll just set it to the bar color if it's an unknown edge color option to be safe.
-		default:
-			edgeColor = barColor;
-		}
+		int red = ((barColor >> 16) & 0xFF);
+		int green = ((barColor >>  8) & 0xFF);
+		int blue = (barColor & 0xFF);
 		
+		setEdgeColor(red, green, blue);
+		
+		int edgeRed 	= ((edgeColor >> 16) & 0xFF);
+		int edgeGreen 	= ((edgeColor >>  8) & 0xFF);
+		int edgeBlue 	= 		  (edgeColor & 0xFF);
+
+		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " +
+						  edgeGreen + " Blue: " + edgeBlue, System.out);
 		
 		for(int i = 0; i < colorArrayLength; i += 4) {
-			barVertexColors[i] = (float)Color.red(barColor)/255.0f;
-			edgeVertexColors[i] = (float)Color.red(edgeColor)/255.0f;
+			barVertexColors[i] = (float)red/255.0f;
+			edgeVertexColors[i] = (float)edgeRed/255.0f;
 		}
 		for(int i = 1; i < colorArrayLength; i += 4) {
-			barVertexColors[i] = (float)Color.green(barColor)/255.0f;
-			edgeVertexColors[i] = (float)Color.green(edgeColor)/255.0f;
+			barVertexColors[i] = (float)green/255.0f;
+			edgeVertexColors[i] = (float)edgeGreen/255.0f;
 		}
 		for(int i = 2; i < colorArrayLength; i += 4) {
-			barVertexColors[i] = (float)Color.blue(barColor)/255.0f;
-			edgeVertexColors[i] = (float)Color.blue(edgeColor)/255.0f;
+			barVertexColors[i] = (float)blue/255.0f;
+			edgeVertexColors[i] = (float)edgeBlue/255.0f;
 		}
 		for(int i = 3; i < colorArrayLength; i += 4) {
 			barVertexColors[i] = (float)Color.alpha(barColor)/255.0f;
@@ -502,45 +482,142 @@ public abstract class ChroBar {
 	 */
 	public void updateEdgeColor(int edgeType) {
 		
-		byte edgeColorDiff;
+		int red = ((barColor >> 16) & 0xFF);
+		int green = ((barColor >>  8) & 0xFF);
+		int blue = (barColor & 0xFF);
+
 		int colorArrayLength = edgeVertexColors.length;
 		
-		switch(edgeType) {
+		setEdgeColor(red, green, blue);
+		
+		int edgeRed 	= ((edgeColor >> 16) & 0xFF);
+		int edgeGreen 	= ((edgeColor >>  8) & 0xFF);
+		int edgeBlue 	= 		  (edgeColor & 0xFF);
+
+		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " +
+						  edgeGreen + " Blue: " + edgeBlue, System.out);
+		
+		for(int i = 0; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)edgeRed/255.0f;
+		for(int i = 1; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)edgeGreen/255.0f;
+		for(int i = 2; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)edgeBlue/255.0f;
+		for(int i = 3; i < colorArrayLength; i += 4)
+			edgeVertexColors[i] = (float)Color.alpha(edgeColor)/255.0f;
+		
+		((FloatBuffer) edgesColorBuffer.clear()).put(edgeVertexColors).position(0);
+	}
+
+	/**
+	 * This section checks for color overflow, and corrects it
+	 *  if it exists.
+	 * @param edgeColorDiff
+	 * @return
+	 */
+	private int checkColorOverflow(int r, int g, int b) {
+
+		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, System.out);
+		
+		int maxColorValue = (short) Math.max(r,	Math.max(g, b));
+		
+		if(maxColorValue == 255) {
+			
+			boolean redMax = noColorOp[0] = r == 255,
+					greenMax = noColorOp[1] = g == 255,
+					blueMax = noColorOp[2] = b == 255;
+			
+			if((redMax && greenMax) ||
+			   (redMax && blueMax)  ||
+			   (greenMax && blueMax)	)
+				maxColorValue = redMax && greenMax ? b : redMax && blueMax ? g : r;
+			else
+				maxColorValue = Math.max(redMax ? 0 : r, Math.max(
+											greenMax ? 0 : g, blueMax ? 0 : b));
+		}
+//		DEBUG
+		ChroPrint.println("Maximum color value is " + maxColorValue, System.out);
+		int maxColorValueDiff = 255 - maxColorValue;
+		if(maxColorValueDiff < ChroData._lighter_edgeColorDifference)
+			return maxColorValueDiff;
+		else
+			return ChroData._lighter_edgeColorDifference;
+	}
+
+	/**
+	 * This section checks for color underflow, and corrects it
+	 *  if it exists.
+	 * @param edgeColorDiff
+	 * @return
+	 */
+	private int checkColorUnderflow(int r, int g, int b) {
+		
+		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, System.out);
+		
+		int minColorValue = Math.min(r,	Math.min(g, b));
+		
+		if(minColorValue == 0) {
+			boolean redZero = r == 0, greenZero = g == 0, blueZero = b == 0;
+			noColorOp[0] = redZero; noColorOp[1] = greenZero; noColorOp[2] = blueZero;
+			if((redZero && greenZero) ||
+			   (redZero && blueZero)  ||
+			   (greenZero && blueZero)	)
+				minColorValue = redZero && greenZero ? b : redZero && blueZero ? g : r;
+			else 
+				minColorValue = Math.min(redZero ? 256 : r, Math.min(
+											greenZero ? 256 : g, blueZero ? 256 : b));
+			
+		}
+//		DEBUG
+		ChroPrint.println("Minimum color value is " + minColorValue, System.out);
+		if(minColorValue < ChroData._darker_edgeColorDifference)
+			return minColorValue;
+		else
+			return ChroData._darker_edgeColorDifference;
+	}
+
+	/**
+	 * @param red
+	 * @param green
+	 * @param blue
+	 */
+	private void setEdgeColor(int red, int green, int blue) {
+		
+		int edgeColorDiff;
+		
+		//Assume that all colors will be operated on.
+		for(int i = 0; i < noColorOp.length; i++)
+			noColorOp[i] = false;
+		
+		//If we change the color of the bar,
+		// we also need to change the edge color accordingly.
+		switch(renderer.getBarEdgeSetting()) {
 		//If the edges are supposed to be the same color
 		case 0:
 			edgeColor = barColor;
 			break;
 		//If the edges are supposed to be lighter than the bar
 		case 1:
-			edgeColorDiff = ChroBarStaticData._lighter_edgeColorDifference;
+			edgeColorDiff = checkColorOverflow(red, green, blue);
+			
 			edgeColor = Color.argb( Color.alpha(barColor),
-								    Color.red(barColor) 	+ edgeColorDiff,
-								    Color.green(barColor) 	+ edgeColorDiff,
-								    Color.blue(barColor) 	+ edgeColorDiff   );
+								    red 	+ (noColorOp[0] ? 0 : edgeColorDiff),
+								    green 	+ (noColorOp[1] ? 0 : edgeColorDiff),
+								    blue 	+ (noColorOp[2] ? 0 : edgeColorDiff) );
 			break;
 		//If the edges are supposed to be darker than the bar
 		case 2:
-			edgeColorDiff = ChroBarStaticData._darker_edgeColorDifference;
+			edgeColorDiff = checkColorUnderflow(red, green, blue);
+			
 			edgeColor = Color.argb( Color.alpha(barColor),
-								    Color.red(barColor) 	- edgeColorDiff,
-								    Color.green(barColor) 	- edgeColorDiff,
-								    Color.blue(barColor) 	- edgeColorDiff   );
+								    red		- (noColorOp[0] ? 0 : edgeColorDiff),
+								    green 	- (noColorOp[1] ? 0 : edgeColorDiff),
+								    blue 	- (noColorOp[2] ? 0 : edgeColorDiff) );
 			break;
 		//We'll just set it to the bar color if it's an unknown edge color option to be safe.
 		default:
 			edgeColor = barColor;
 		}
-		
-		for(int i = 0; i < colorArrayLength; i += 4)
-			edgeVertexColors[i] = (float)Color.red(edgeColor)/255.0f;
-		for(int i = 1; i < colorArrayLength; i += 4)
-			edgeVertexColors[i] = (float)Color.green(edgeColor)/255.0f;
-		for(int i = 2; i < colorArrayLength; i += 4)
-			edgeVertexColors[i] = (float)Color.blue(edgeColor)/255.0f;
-		for(int i = 3; i < colorArrayLength; i += 4)
-			edgeVertexColors[i] = (float)Color.alpha(edgeColor)/255.0f;
-		
-		((FloatBuffer) edgesColorBuffer.clear()).put(edgeVertexColors).position(0);
 	}
 
 	/**
@@ -580,7 +657,6 @@ public abstract class ChroBar {
 	/**
 	 * 
 	 * @param ct
-	 * @param object
 	 * @param activityContext
 	 * @return
 	 */

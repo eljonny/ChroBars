@@ -16,7 +16,7 @@ import android.graphics.Color;
 
 import com.psoft.chrobars.ChroType;
 import com.psoft.chrobars.R;
-import com.psoft.chrobars.data.ChroBarStaticData;
+import com.psoft.chrobars.data.ChroData;
 
 /**
  * This class manages settings for the ChroBars application.
@@ -47,7 +47,7 @@ public final class ChroBarsSettings {
 				  userDefault_millisecondBarColor;
 	
 	//Preferences objects
-	private static final int visSize = ChroBarStaticData._MAX_BARS_TO_DRAW*2;
+	private static final int visSize = ChroData._MAX_BARS_TO_DRAW*2;
 	
 	private static SharedPreferences chroPrefs;
 	private static ArrayList<Field> memberFields = new ArrayList<Field>();
@@ -178,7 +178,7 @@ public final class ChroBarsSettings {
 							continue;
 						visMap.put(ChroType.valueByNumber(Integer.parseInt(parsed[parsed.length - 1])), (Boolean) prefsMap.get(tempKey));
 					}
-					catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+					catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 				}
 			}
 			
@@ -197,7 +197,7 @@ public final class ChroBarsSettings {
 					}
 					catch (Exception unknownEx) {
 						System.err.println("Exception processing field " + pref.getName());
-						ChroUtils.printExDetails(unknownEx);
+						ChroUtilities.printExDetails(unknownEx);
 					}
 					break;
 				}
@@ -221,7 +221,7 @@ public final class ChroBarsSettings {
 							break;
 						}
 				}
-				catch (Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+				catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 			}
 	}
 
@@ -245,8 +245,8 @@ public final class ChroBarsSettings {
 		System.out.println("Setting visibilities to default values...");
 		
 		for(int visIndex = 0; visIndex < visSize; visIndex++) {
-			barsVisibility.put(ChroType.valueByNumber(visIndex), ChroBarStaticData.visibleBars[visIndex < 4 ? visIndex : visIndex - 4]);
-			numbersVisibility.put(ChroType.valueByNumber(visIndex), ChroBarStaticData.visibleNumbers[visIndex < 4 ? visIndex : visIndex - 4]);
+			barsVisibility.put(ChroType.valueByNumber(visIndex), ChroData.visibleBars[visIndex < 4 ? visIndex : visIndex - 4]);
+			numbersVisibility.put(ChroType.valueByNumber(visIndex), ChroData.visibleNumbers[visIndex < 4 ? visIndex : visIndex - 4]);
 		}
 	}
 
@@ -257,13 +257,13 @@ public final class ChroBarsSettings {
 		
 		System.out.println("Setting general defaults...");
 		settingsActivityLayout = R.layout.chrobars_settings;
-		precision = ChroBarStaticData.precision;
-		barEdgeSetting = ChroBarStaticData.barEdgeSetting;
-		barMargin = ChroBarStaticData.barMargin;
-		edgeMargin = ChroBarStaticData.edgeMargin;
-		threeD = ChroBarStaticData.threeD;
-		dynamicLighting = ChroBarStaticData.dynamicLighting;
-		twelveHourTime = ChroBarStaticData.twelveHourTime;
+		precision = ChroData.precision;
+		barEdgeSetting = ChroData.barEdgeSetting;
+		barMargin = ChroData.barMargin;
+		edgeMargin = ChroData.edgeMargin;
+		threeD = ChroData.threeD;
+		dynamicLighting = ChroData.dynamicLighting;
+		twelveHourTime = ChroData.twelveHourTime;
 	}
 
 	/**
@@ -273,7 +273,7 @@ public final class ChroBarsSettings {
 		
 		System.out.println("Setting color defaults...");
 		
-		HashMap<String, Integer> defaultColors = ChroBarStaticData.getColorDefaults();
+		HashMap<String, Integer> defaultColors = ChroData.getColorDefaults();
 		
 		for(Field member : memberFields)
 			if(member.getName().endsWith(colorFieldSuffix) &&
@@ -291,7 +291,7 @@ public final class ChroBarsSettings {
 									break;
 								}
 						}
-						catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+						catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 						
 						break;
 					}
@@ -304,19 +304,19 @@ public final class ChroBarsSettings {
 	 */
 	private void setPreferenceToDefault(Field pref) {
 		try {
-			pref.set(this, ChroBarStaticData.getDataInstance().getObject(pref.getName()));
+			pref.set(this, ChroData.getDataInstance().getObject(pref.getName()));
 			try { putPreference(pref.getName(), false); }
 			catch(Exception unknownEx) {
 				try {
 					putPreference(pref.getName(), true);
 				}
 				catch(Exception ex) {
-					ChroUtils.printExDetails(unknownEx);
-					ChroUtils.printExDetails(ex);
+					ChroUtilities.printExDetails(unknownEx);
+					ChroUtilities.printExDetails(ex);
 				}
 			}
 		}
-		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 	}
 
 	/**
@@ -340,7 +340,7 @@ public final class ChroBarsSettings {
 			putVisibilityPreference("numbersVisibility_" + barVis, numbersVisibility.get(ChroType.valueByNumber(barVis)));
 		}
 		
-		HashMap<String, Integer> defaultColors = ChroBarStaticData.getColorDefaults();
+		HashMap<String, Integer> defaultColors = ChroData.getColorDefaults();
 		
 		for(String key : defaultColors.keySet()) {
 			putPreference(key, true);
@@ -358,7 +358,7 @@ public final class ChroBarsSettings {
 		Object setting = null;
 		
 		try { setting = findField(prefName).get(this); }
-		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
 		SharedPreferences.Editor chroPrefsEditor = chroPrefs.edit();
 		
@@ -545,7 +545,7 @@ public final class ChroBarsSettings {
 		else {
 			System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 			try { findField(pref).setBoolean(this, value); }
-			catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+			catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		}
 		
 		putPreference(pref, false);
@@ -560,7 +560,7 @@ public final class ChroBarsSettings {
 
 		System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 		try { findField(pref).setInt(this, value); }
-		catch(Exception unknownEx) { ChroUtils.printExDetails(unknownEx); }
+		catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
 		putPreference(pref, true );
 	}
