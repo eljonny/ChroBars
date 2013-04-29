@@ -157,8 +157,8 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
     	super.draw(loading);
     	
     	int progress = mainActivity.getProgress();
-    	float progPercent = (float)progress/100f;
-    	int		alpha = (int) (255*progPercent);
+    	float progPercent = (float)progress/(float)ChroData._max_prog;
+    	int	alpha = (int) (255*progPercent);
     	
 //      DEBUG
 //      System.out.println("Drawing loading screen...");
@@ -170,9 +170,8 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 								logoLocation.bottom + 10f, textDraw);
 		loading.drawRect(loadingBarFrame, loadingBarFramePaint);
     	float startX = loadingBarFrame.left + 5f,
-    		  startY = loadingBarFrame.top + ((float)ChroData._LOADING_BAR_HEIGHT/2f),
-    		  stopX = startX + (loadingBarFrame.right -
-    				  	loadingBarFrame.left - 10f) * progPercent;
+    		   startY = loadingBarFrame.top + ((float)ChroData._LOADING_BAR_HEIGHT/2f),
+    		   stopX = startX + ((loadingBarFrame.right - loadingBarFrame.left - 10f) * progPercent); //Account for the margin
     	
     	loading.drawLine(startX, startY, stopX, startY, loadingBarPaint);
     	

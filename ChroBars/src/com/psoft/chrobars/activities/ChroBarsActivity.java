@@ -13,9 +13,11 @@ import android.widget.ViewSwitcher;
 
 import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroConstructionParams;
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.threading.ChroConstructionThread;
+import com.psoft.chrobars.threading.ChroPostStartLoad;
 import com.psoft.chrobars.util.ChroBarsSettings;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -61,12 +63,14 @@ public class ChroBarsActivity extends Activity {
 	 * This is the GLSurfaceView that runs the 
 	 *  Stopwatch application mode.
 	 */
+	@SuppressWarnings("unused")
 	private static ChroSurface archimedes;
 	
 	/**
 	 * This is the GLSurfaceView that runs the 
 	 *  timer application mode.
 	 */
+	@SuppressWarnings("unused")
 	private static ChroSurface perseus;
 	
 	/**
@@ -189,7 +193,7 @@ public class ChroBarsActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		ChroBarsSettings.clean();
+		housekeeping();
 		finish();
 	}
 	
@@ -199,7 +203,17 @@ public class ChroBarsActivity extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		housekeeping();
+	}
+
+	/**
+	 * Perform standard exit cleaning routines.
+	 */
+	private void housekeeping() {
 		ChroBarsSettings.clean();
+		//This being left in memory is very common between
+		// application runs, so set it back to default.
+		ChroData._max_prog = ChroData._BASE_MAX_PROGRESS;
 	}
 
 	/**
@@ -260,7 +274,7 @@ public class ChroBarsActivity extends Activity {
 		
 		//When the application loading is done,
 		// we need to do these things.
-		if(progress == 100) {
+		if(progress == ChroData._max_prog.shortValue()) {
 //			DEBUG
 //			System.out.println("Retrieving built objects...");
 			settings = params.getSettings();
@@ -290,10 +304,14 @@ public class ChroBarsActivity extends Activity {
 	 *  the loading screen to the bars view.
 	 */
 	private void switchToBars() {
-		System.out.println("Adding GLSurfaceView...");
+//		DEBUG
+//		System.out.println("Adding GLSurfaceView...");
 		loadToGL.addView(kronos, 1);
-		System.out.println("Showing bars...");
+//		DEBUG
+//		System.out.println("Showing bars...");
 		loadToGL.showNext();
+		//Load textures we don't need yet in the background.
+		new ChroPostStartLoad(params.getTextures(), ChroSurface.getRenderer()).start();
 	}
 	
 	/**

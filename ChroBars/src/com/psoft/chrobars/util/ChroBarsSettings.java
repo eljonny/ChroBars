@@ -120,7 +120,8 @@ public final class ChroBarsSettings {
 
 		instanceActivityContext = activityContext;
 		chroPrefs = activityContext.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
-		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
+//		DEBUG
+//		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
 	}
 	
 	/**
@@ -153,8 +154,8 @@ public final class ChroBarsSettings {
 		loadUserDefaults(preferenceKeys, prefsMap);
 		
 		for(Field pref : memberFields) {
-			
-			System.out.println("Loading preference " + pref.getName());
+//			DEBUG
+//			System.out.println("Loading preference " + pref.getName());
 			
 			//We already dealt with the user defaults, so continue.
 			if(pref.getName().startsWith(userDef))
@@ -170,7 +171,8 @@ public final class ChroBarsSettings {
 					
 					//If we have a visibility preference key,
 					// parse the key and set the value.
-					System.out.println("Parsing saved item " + tempKey);
+//					DEBUG
+//					System.out.println("Parsing saved item " + tempKey);
 					String[] parsed = tempKey.split("_");
 					try {
 						LinkedHashMap<ChroType, Boolean> visMap = tempKey.startsWith(visList) ? barsVisibility : (tempKey.startsWith(visListNum) ? numbersVisibility : null);
@@ -391,8 +393,10 @@ public final class ChroBarsSettings {
 	private void commitPreferenceChange(String prefName, Object value,
 										  SharedPreferences.Editor chroPrefsEditor) {
 
-		if(chroPrefsEditor.commit())
-			System.out.println("Successfully saved " + prefName + " as " + value);
+		if(chroPrefsEditor.commit()) {
+//			DEBUG
+//			System.out.println("Successfully saved " + prefName + " as " + value);
+		}
 		else
 			throw new RuntimeException("The values were not successfully committed to the preferences object " + chroPrefs + ".");
 	}
@@ -543,7 +547,8 @@ public final class ChroBarsSettings {
 		if(pref.startsWith("instance"))
 			throw new RuntimeException(new IllegalArgumentException("Illegal modification request."));
 		else {
-			System.out.println("Trying to set the setting " + pref + " to " + value + "...");
+//			DEBUG
+//			System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 			try { findField(pref).setBoolean(this, value); }
 			catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		}
@@ -557,8 +562,8 @@ public final class ChroBarsSettings {
 	 * @param value
 	 */
 	public final void setPrefValue(String pref, int value) {
-
-		System.out.println("Trying to set the setting " + pref + " to " + value + "...");
+//		DEBUG
+//		System.out.println("Trying to set the setting " + pref + " to " + value + "...");
 		try { findField(pref).setInt(this, value); }
 		catch(Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 		
@@ -571,8 +576,8 @@ public final class ChroBarsSettings {
 	 * @param visibility
 	 */
 	public final void setVisibilityPrefValue(ChroType t, boolean textDraw, boolean visibility) {
-
-		System.out.println("Setting Visibility for bar type " + t + " to " + visibility + ". Number? " + textDraw);
+//		DEBUG
+//		System.out.println("Setting Visibility for bar type " + t + " to " + visibility + ". Number? " + textDraw);
 		(textDraw ? numbersVisibility : barsVisibility).put(t, visibility);
 		putVisibilityPreference((textDraw ? "numbersVisibility_" : "barsVisibility_") + t.getType(), visibility);
 	}
@@ -582,11 +587,12 @@ public final class ChroBarsSettings {
 	 * @param pref
 	 */
 	private Field findField(String pref) throws NullPointerException {
-
-		System.out.println("Trying to find " + pref + "...");
+//		DEBUG
+//		System.out.println("Trying to find " + pref + "...");
 		for(Field setting : memberFields) {
 			if(setting.getName().equals(pref)) {
-				System.out.println("Setting field for " + pref + " retrieved!");
+//				DEBUG
+//				System.out.println("Setting field for " + pref + " retrieved!");
 				return setting;
 			}
 			else if(setting.getName().startsWith(visList) &&

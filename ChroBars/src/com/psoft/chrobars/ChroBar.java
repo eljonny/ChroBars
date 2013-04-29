@@ -3,7 +3,9 @@ package com.psoft.chrobars;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -16,12 +18,13 @@ import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
+import com.psoft.chrobars.opengl.ChroTexture;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * 
- * @author jhyry
+ * @author Jonathan Hyry
  */
 public abstract class ChroBar {
 
@@ -32,6 +35,8 @@ public abstract class ChroBar {
 	protected static GL10 surface = null;
 	//Used in determining bar height
 	protected static Calendar currentTime;
+	//Map of ChroType/Textures for all bars
+	protected static HashMap<ChroType, ArrayList<ChroTexture>> textures;
 	
 	/* End static fields */
 	
@@ -110,7 +115,7 @@ public abstract class ChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar(ChroType t, Integer color, Context activityContext) {
+	public ChroBar(ChroType t, Context activityContext) {
 		
 		//If the data object is null, make one. Otherwise do nothing.
 		if(barsData == null)
@@ -171,7 +176,7 @@ public abstract class ChroBar {
 
 		//Gather required information
 		float screenWidth = ChroBarsActivity.getDisplayMetrics().widthPixels;
-		//System.out.println("Screen width: " + screenWidth);
+		//ChroPrint.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMarginBase");
 		float edgeMargin = barsData.getFloat("edgeMarginBase");
@@ -188,7 +193,7 @@ public abstract class ChroBar {
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
-		//System.out.println("We are drawing " + numberOfBars + " bars.");
+		//ChroPrint.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth *= 2f;
 		barWidth -= ((edgeMargin*2f)/(float)numberOfBars);
@@ -201,7 +206,7 @@ public abstract class ChroBar {
 		for(int i = barType.getType() + (barType.is3D() ? (-3) : 1);
 							i < ChroData._MAX_BARS_TO_DRAW; i++) {
 //			DEBUG
-//			System.out.println("Current bar check index: " + i);
+//			ChroPrint.println("Current bar check index: " + i);
 			if(!visible[i].isDrawn())
 				++barTypeCode;
 		}
@@ -210,7 +215,7 @@ public abstract class ChroBar {
 			barTypeCode = 0;
 		
 //		DEBUG
-//		System.out.println("Bar type code: " + barTypeCode + "\nBar type: " + barType);
+//		ChroPrint.println("Bar type code: " + barTypeCode + "\nBar type: " + barType);
 					
 		float leftX = ChroData._left_screen_edge + edgeMargin + (barWidth * barTypeCode) + (barMargin * barTypeCode);
 		float rightX = leftX + barWidth;
@@ -279,12 +284,12 @@ public abstract class ChroBar {
 		}
 		
 //		DEBUG
-//		System.out.println("Current time:\n" + currentHour + "/" + currentMSInDay + "\n" + currentMinute + "/" + currentMSInHour + "\n" + currentSecond + "/" + currentMSInMinute + "\n" + currentMillisecond);
+//		ChroPrint.println("Current time:\n" + currentHour + "/" + currentMSInDay + "\n" + currentMinute + "/" + currentMSInHour + "\n" + currentSecond + "/" + currentMSInMinute + "\n" + currentMillisecond);
 		
 		float precisionRatio = renderer.getPrecision()/ChroData._max_precision;
 		
 //		DEBUG
-//		System.out.println("Precision ratio: " + precisionRatio);
+//		ChroPrint.println("Precision ratio: " + precisionRatio);
 		
 		switch(t > 3 ? t - 4 : t) {
 		
@@ -298,7 +303,7 @@ public abstract class ChroBar {
 			return currentMillisecond / (float)ChroData._MILLIS_IN_SECOND;
 			
 		default:
-			System.err.println("Invalid type!");
+			ChroPrint.println("Invalid type!", System.err);
 			return 0;
 		}
 	}
@@ -315,22 +320,22 @@ public abstract class ChroBar {
 		if(drawBar) {
 		
 			//Set up face culling
-			//System.out.println("Calling glFrontFace");
+			//ChroPrint.println("Calling glFrontFace", System.out);
 		    drawSurface.glFrontFace(GL10.GL_CCW);
-		    //System.out.println("Calling glEnable");
+		    //ChroPrint.println("Calling glEnable", System.out);
 		    drawSurface.glEnable(GL10.GL_CULL_FACE);
-		    //System.out.println("Calling glCullFace");
+		    //ChroPrint.println("Calling glCullFace", System.out);
 		    drawSurface.glCullFace(GL10.GL_BACK);
 			
 		    //Enable the OpenGL vertex array buffer space
-		    //System.out.println("Calling glEnableClientState for vertex array");
+		    //ChroPrint.println("Calling glEnableClientState for vertex array", System.out);
 			drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-			//System.out.println("Calling glEnableClientState for color array");
+			//ChroPrint.println("Calling glEnableClientState for color array", System.out);
 			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 			
 			if(barType.is3D()) {
 				
-				//System.out.println("Calling glEnableClientState for normals array");
+				//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
 				drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 				
 				//Set general lighting buffers
@@ -346,47 +351,53 @@ public abstract class ChroBar {
 				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
 			}
 			
+			/* Draw the bar */
+			
 			//Tell openGL where the vertex data is and how to use it
-			//System.out.println("Calling glVertexPointer");
+			//ChroPrint.println("Calling glVertexPointer", System.out);
 			drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
 										ChroData._VERTEX_STRIDE, verticesBuffer);
 			
 			//Color buffer for the bars.
-			//System.out.println("Calling glColorPointer for bars");
+			//ChroPrint.println("Calling glColorPointer for bars", System.out);
 	        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
 	        							ChroData._VERTEX_STRIDE, barsColorBuffer);
 	        
 			//Draw the bar
-	        //System.out.println("Calling glDrawElements for bars");
+	        //ChroPrint.println("Calling glDrawElements for bars", System.out);
 			drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
 										GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+			
+			/* End bar drawing */
+			
+			
 			
 			if(renderer.getBarEdgeSetting() != 0) {
 					
 				//Color buffer for the edges.
-				//System.out.println("Calling glColorPointer for edges");
+				//ChroPrint.println("Calling glColorPointer for edges", System.out);
 		        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
 		        							ChroData._VERTEX_STRIDE, edgesColorBuffer);
 				
 				//Draw the accented bar edges
-				//System.out.println("Calling glDrawElements for edges");
+				//ChroPrint.println("Calling glDrawElements for edges", System.out);
 				drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
 											GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
 			}
 			
 			//Clear the buffer space
-			//System.out.println("Calling glDisableClientState for vertex array");
+			//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
 			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			//System.out.println("Calling glDisableClientState for color array");
+			//ChroPrint.println("Calling glDisableClientState for color array", System.out);
 			drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 			
 			if(barType.is3D()) {
-				//System.out.println("Calling glDisableClientState for normals array");
+				//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
 				drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 			}
 			
 			//Disable face culling.
-			//System.out.println("Calling glDisable");
+			//ChroPrint.println("Calling glDisable", System.out);
 			drawSurface.glDisable(GL10.GL_CULL_FACE);
 		    
 			//Cache the surface
@@ -452,9 +463,8 @@ public abstract class ChroBar {
 		int edgeRed 	= ((edgeColor >> 16) & 0xFF);
 		int edgeGreen 	= ((edgeColor >>  8) & 0xFF);
 		int edgeBlue 	= 		  (edgeColor & 0xFF);
-
-		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " +
-						  edgeGreen + " Blue: " + edgeBlue, System.out);
+//		DEBUG
+//		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " + edgeGreen + " Blue: " + edgeBlue, ChroPrint);
 		
 		for(int i = 0; i < colorArrayLength; i += 4) {
 			barVertexColors[i] = (float)red/255.0f;
@@ -493,9 +503,8 @@ public abstract class ChroBar {
 		int edgeRed 	= ((edgeColor >> 16) & 0xFF);
 		int edgeGreen 	= ((edgeColor >>  8) & 0xFF);
 		int edgeBlue 	= 		  (edgeColor & 0xFF);
-
-		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " +
-						  edgeGreen + " Blue: " + edgeBlue, System.out);
+//		DEBUG
+//		ChroPrint.println("\nEdges:\nRed: " + edgeRed + " Green: " + edgeGreen + " Blue: " + edgeBlue, ChroPrint);
 		
 		for(int i = 0; i < colorArrayLength; i += 4)
 			edgeVertexColors[i] = (float)edgeRed/255.0f;
@@ -516,8 +525,8 @@ public abstract class ChroBar {
 	 * @return
 	 */
 	private int checkColorOverflow(int r, int g, int b) {
-
-		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, System.out);
+//		DEBUG
+//		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, ChroPrint);
 		
 		int maxColorValue = (short) Math.max(r,	Math.max(g, b));
 		
@@ -536,7 +545,7 @@ public abstract class ChroBar {
 											greenMax ? 0 : g, blueMax ? 0 : b));
 		}
 //		DEBUG
-		ChroPrint.println("Maximum color value is " + maxColorValue, System.out);
+//		ChroPrint.println("Maximum color value is " + maxColorValue, ChroPrint);
 		int maxColorValueDiff = 255 - maxColorValue;
 		if(maxColorValueDiff < ChroData._lighter_edgeColorDifference)
 			return maxColorValueDiff;
@@ -551,8 +560,8 @@ public abstract class ChroBar {
 	 * @return
 	 */
 	private int checkColorUnderflow(int r, int g, int b) {
-		
-		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, System.out);
+//		DEBUG
+//		ChroPrint.println("Red: " + r + " Green: " + g + " Blue: " + b, ChroPrint);
 		
 		int minColorValue = Math.min(r,	Math.min(g, b));
 		
@@ -569,7 +578,7 @@ public abstract class ChroBar {
 			
 		}
 //		DEBUG
-		ChroPrint.println("Minimum color value is " + minColorValue, System.out);
+//		ChroPrint.println("Minimum color value is " + minColorValue, ChroPrint);
 		if(minColorValue < ChroData._darker_edgeColorDifference)
 			return minColorValue;
 		else
@@ -619,6 +628,35 @@ public abstract class ChroBar {
 			edgeColor = barColor;
 		}
 	}
+	
+	/**
+	 * 
+	 * @param tex
+	 */
+	public static void putNumberTextures(ArrayList<ChroTexture> tex) {
+		
+		//Get all possible ChroTypes.
+		ChroType[] chrotypes = ChroType.values();
+		//Initialize the hashmap so we can add some arraylists to hold our textures.
+		textures = new HashMap<ChroType, ArrayList<ChroTexture>>(chrotypes.length);
+		//Initialize the mapped arraylists.
+		for(ChroType t : chrotypes)
+			textures.put(t, new ArrayList<ChroTexture>(chrotypes.length));
+		//Populate the arraylists with the appropriate textures.
+		for(ChroTexture texture : tex)
+			for(ChroType t : texture.getBarTypes())
+				textures.get(t).add(texture);
+	}
+	
+	/**
+	 * 
+	 * @param texture
+	 * @param types
+	 */
+	public synchronized static void putNumberTexture(ChroTexture texture, ChroType[] types) {
+		for(ChroType t : types)
+			textures.get(t).add(texture);
+	}
 
 	/**
 	 * 
@@ -651,7 +689,7 @@ public abstract class ChroBar {
 	public String toString() {
 		
 		return "ChroBar Object " + this.hashCode() +
-				"\nType: " + barType + "\nColor: " + barColor;
+				" Type: " + barType + " Color: " + barColor;
 	}
 
 	/**
@@ -663,8 +701,8 @@ public abstract class ChroBar {
 	public static ChroBar getInstance(ChroType ct, Context activityContext) {
 		
 		if(ct.is3D())
-			return new ChroBar3D(ct, null, activityContext);
+			return new ChroBar3D(ct, activityContext);
 		else
-			return new ChroBar2D(ct, null, activityContext);
+			return new ChroBar2D(ct, activityContext);
 	}
 }

@@ -16,6 +16,7 @@ import com.psoft.chrobars.ChroBar;
 import com.psoft.chrobars.ChroType;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
 import android.content.Context;
@@ -45,7 +46,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		
+
+		ChroTextures.loadTextures(gl, ChroData._TEX_SIZE);
 		refreshVisibleBars();
 		
 		ByteOrder order_native = ByteOrder.nativeOrder();
@@ -60,6 +62,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		// - Background color of the OpenGL surface to white
 		// - Smooth GL shader model
 		// - Clear the depth buffer for usage
+		// - Enable texture mapping
 		// - Enable the OpenGL depth testing
 		// - Set the OpenGL depth testing function to be used
 		// - Use NICEST perspective correction.
@@ -70,6 +73,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		gl.glShadeModel(GL10.GL_SMOOTH);
 		gl.glClearDepthf(1.0f);
+//		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL10.GL_LEQUAL);
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
@@ -301,34 +305,43 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		//Set settings object reference
 		BarsRenderer.settings = settings;
 		
-		System.out.println("Constructing bars...");
+		ChroPrint.println("Constructing bars...", System.out);
 		//Then populate the HashMap so we can load settings
 		for(ChroType ct : ChroType.values())
 			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
 		
-		System.out.println("Loading settings...");
+		ChroPrint.println("Loading settings...", System.out);
 		//Then load all the relevant settings into the renderer.
 		loadSettings();
+		ChroPrint.println("Done.", System.out);
 	}
 	
 	/**
 	 * Loads the stored settings into the OpenGL renderer.
 	 */
 	private void loadSettings() {
-		
+//		DEBUG
+//		ChroPrint.println("Setting visibility lists...", System.out);
 		ArrayList<Boolean> barVis = settings.getBarsVisibility();
 		ArrayList<Boolean> numVis = settings.getNumbersVisibility();
-		
+//		DEBUG
+//		ChroPrint.println("Setting background color...", System.out);
 		setBackgroundColor(settings.getBackgroundColor(false));
-		
+//		DEBUG
+//		ChroPrint.println("Load bar settings...", System.out);
 		//Loads the appropriate settings for each bar.
 		for(ChroType t : ChroType.values()) {
 			
 			ChroBar current = chroBars.get(t);
-			
+//			DEBUG
+			ChroPrint.println("Current bar: " + current, System.out);
+			ChroPrint.println("Setting bar visibility...", System.out);
 			current.setDrawBar(barVis.get(t.getType()));
+//			DEBUG
+			ChroPrint.println("Setting number visibility...", System.out);
 			current.setDrawNumber(numVis.get(t.getType()));
-			
+//			DEBUG
+			ChroPrint.println("Setting bar color...", System.out);
 			ChroUtilities.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
 	}
@@ -340,6 +353,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 *   need this to reload the settings from the settings object.
 	 */
 	public void reloadSettings() {
+//		DEBUG
+//		ChroPrint.println("Reloading settings...", System.out);
 		loadSettings();
 	}
 

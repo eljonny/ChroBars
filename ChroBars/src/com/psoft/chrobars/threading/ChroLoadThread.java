@@ -3,6 +3,7 @@ package com.psoft.chrobars.threading;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
+import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -72,7 +73,7 @@ public class ChroLoadThread extends Thread {
                     loadSurfaceHolder.unlockCanvasAndPost(loadCanvas);
             }
             
-            if(progress == 100)
+            if(progress == ChroData._max_prog)
             	break;
             
         } while (true);

@@ -34,9 +34,9 @@ public class ChroBar3D extends ChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar3D(ChroType t, Integer color, Context activityContext) {
+	public ChroBar3D(ChroType t, Context activityContext) {
 		//Make sure to pass params to the super constructor, where they are actually used.
-		super(t, color, activityContext);
+		super(t, activityContext);
 	}
 
 	/**

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.util.SparseArray;
 import android.view.View;
 
 import com.psoft.chrobars.ChroBar;
@@ -11,7 +13,6 @@ import com.psoft.chrobars.ChroBar;
 /**
  * 
  * @author jhyry
- *
  */
 public final class ChroUtilities {
 	
@@ -35,7 +36,10 @@ public final class ChroUtilities {
 	 * @param colorInt
 	 */
 	public static void changeChroBarColor(ChroBar toChange, Integer colorInt) {
+//		DEBUG
+//		ChroPrint.println("Changing " + toChange + " bar color to " + colorInt, System.out);
 		toChange.changeChroBarColor(colorInt);
+//		ChroPrint.println("Color changed.", System.out);
 	}
 	
 	/**
@@ -109,7 +113,11 @@ public final class ChroUtilities {
 				return colorPickerHistory.get(historyItemIndex);
 	}
 	
-	
+	/**
+	 * 
+	 * @param activity
+	 * @param color
+	 */
 	public static void setViewBackground(Activity activity, int color) {
 	    
 		View activityView1 = activity.getWindow().getDecorView();
@@ -117,8 +125,9 @@ public final class ChroUtilities {
 	}
 	
 	/**
+	 * Prints a detailed exception report.
 	 * 
-	 * @param ex
+	 * @param ex The exception for which to print a report.
 	 */
 	public static void printExDetails(Exception ex) {
 		
@@ -138,5 +147,18 @@ public final class ChroUtilities {
 		
 		final String postFix = "BarColor";
 		return bar.getBarType().getTypeString() + postFix;
+	}
+
+	/**
+	 * Goes through the sparse array and plucks out the keys.
+	 * 
+	 * @param loadThese A SparseArray that you want to gather only keys from.
+	 * @return The keys are returned as an integer array.
+	 */
+	public static int[] getSparseArrayKeyset(SparseArray<Bitmap> loadThese) {
+		int[] keys = new int[loadThese.size()];
+		for(int i = 0; i < loadThese.size(); i++)
+			keys[i] = loadThese.keyAt(i);
+		return keys;
 	}
 }

@@ -22,9 +22,9 @@ public class ChroBar2D extends ChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar2D(ChroType t, Integer color, Context activityContext) {
+	public ChroBar2D(ChroType t, Context activityContext) {
 		//Make sure to pass params to the super constructor, where they are actually used.
-		super(t, color, activityContext);
+		super(t, activityContext);
 	}
 
 	/**

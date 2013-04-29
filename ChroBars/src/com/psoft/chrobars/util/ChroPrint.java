@@ -8,7 +8,8 @@ import android.util.Printer;
  * A printer. Pretty simple.
  * Directs any calls to this printer to stdout.
  * 
- * Static methods are also included for customized std printing.
+ * Static methods are also included for customized stdout/err printing.
+ * 
  * 
  * @author Jonathan Hyry
  */
@@ -44,8 +45,8 @@ public class ChroPrint implements Printer {
 	 * @param stream The stream to which you would like to print.
 	 */
 	public static void println(String message, String prefix,
-							   String postfix, Character delimiter,
-												 PrintStream stream) {
+							   	 String postfix, Character delimiter,
+												 	PrintStream stream) {
 		if(prefix == null) {
 			if(postfix == null)
 				stream.println(message);

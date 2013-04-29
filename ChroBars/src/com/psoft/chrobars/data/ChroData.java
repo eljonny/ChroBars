@@ -35,6 +35,8 @@ public final class ChroData {
 	public static final byte _MAX_BARS_TO_DRAW = 4;
 	public static final byte _LOGO_TEXT_HEIGHT = 56;
 	public static final byte _LOADING_BAR_HEIGHT = 35;
+	public static final short _TEX_SIZE = 128;
+	public static final Short _BASE_MAX_PROGRESS = 100;
 	
 	//Application default settings, immutable
 	public static final byte precision = 0; //No precision. Tick-Tock style.
@@ -117,6 +119,18 @@ public final class ChroData {
 	 */
 	@SuppressWarnings("unused")
 	private static int barsCreated = 0;
+	
+	/**
+	 * Default max progress. This is modified
+	 * at runtime to account for texture loading.
+	 * 
+	 * If you modify this without using the proper 
+	 *  method below, make sure you lock it as to 
+	 *  not have two threads modifying it at the same time.
+	 *  
+	 * @see #modifyIntegerField(String, int)
+	 */
+	public static Short _max_prog = ChroData._BASE_MAX_PROGRESS.shortValue();
 	
 	/** 
 	  * Bar pixel margin and visibility array,
@@ -202,8 +216,8 @@ public final class ChroData {
 	private ChroData() {
 		updateNonFinalFields();
 		_instance = true;
-		
-		System.out.println("Non-Final Static fields consist of: " + _nonFinalStatic);
+//		DEBUG
+//		System.out.println("Non-Final Static fields consist of: " + _nonFinalStatic);
 	}
 	
 	/**
@@ -296,7 +310,6 @@ public final class ChroData {
 		for(Field f : _nonFinalStatic) {
 			if(f.getClass().isPrimitive()) {
 				if(f.getName().equals(intName)) {
-					
 					try {
 						synchronized(f) {
 							f.setInt(null, f.getInt(null) + modBy);
@@ -319,7 +332,8 @@ public final class ChroData {
 			if(f.getName().equals(objFieldName)) {
 				try {
 					synchronized(f) {
-						System.out.println("Setting field " + objFieldName + " to " + ref);
+//						DEBUG
+//						System.out.println("Setting field " + objFieldName + " to " + ref);
 						f.set(null, ref);
 					}
 				}
