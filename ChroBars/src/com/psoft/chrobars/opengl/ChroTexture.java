@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import android.graphics.Bitmap;
 
 import com.psoft.chrobars.ChroType;
+//import com.psoft.chrobars.util.ChroPrint;
 
 /**
  * This stores a texture buffer object and all 
@@ -42,14 +43,13 @@ public class ChroTexture {
 		 */
 		public ChroTexture(int res, String resN,
 							boolean cacheLater,
-							Bitmap texBmp,
-							ChroType... bars	 ) {
+							Bitmap texBmp		 ) {
 			setResId(res); setResName(resN);
 			setTexId(-1); setTexBuffer(null);
-			if(cacheLater)
-				setBmpTex(texBmp);
+			setCacheLater(cacheLater); setBmpTex(texBmp);
 			barsForTex = new ArrayList<ChroType>(4);
-			addBars(bars);
+//			DEBUG
+//			ChroPrint.println("Set bitmap to " + bmpTex + " from " + texBmp, System.out);
 		}
 		
 		/**
@@ -103,8 +103,9 @@ public class ChroTexture {
 		/**
 		 * @param texBuffer the texBuffer to set
 		 */
-		public void setTexBuffer(ByteBuffer texBuffer) {
+		public ChroTexture setTexBuffer(ByteBuffer texBuffer) {
 			this.texBuffer = texBuffer;
+			return this;
 		}
 
 		/**

@@ -1,7 +1,6 @@
 package com.psoft.chrobars.threading;
 
 import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -38,7 +37,7 @@ import com.psoft.chrobars.util.ChroUtilities;
 public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 														 Integer,
 														 ChroConstructionParams>
-									 implements IChroLoadThread {
+									  implements IChroLoadThread {
 
 	/**
 	 * For holding the parameter/data return object.
@@ -89,7 +88,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 */
 	private void wmAttachWait() {
 		synchronized(this) {
-			try { Thread.sleep(350); }
+			try { Thread.sleep(650); }
 			catch(InterruptedException intEx) { ChroUtilities.printExDetails(intEx); }
 		}
 	}
@@ -145,7 +144,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	private void cacheTextures() {
 		
 		ArrayList<Field> imgResIds = findImgResIds();
-		ArrayList<ByteBuffer> cache = ChroTextures.cache();
+		ArrayList<ChroTexture> cache = ChroTextures.cache();
 		
 		if(checkMemoryForCache(imgResIds, cache))
 			return;
@@ -155,8 +154,8 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 		final BitmapFactory.Options bmpLoadOptions = setBitmapOptions();
 		
 //		DEBUG
-		ChroPrint.println("New max progress: " + ChroData._max_prog, System.out);
-		ChroPrint.println("Textures to cache: " + imgResIds.size(), System.out);
+//		ChroPrint.println("New max progress: " + ChroData._max_prog, System.out);
+//		ChroPrint.println("Textures to cache: " + imgResIds.size(), System.out);
 		
 		cacheGraphics(imgResIds, cachingThreads, bmpLoadOptions);
 		
@@ -186,20 +185,23 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 			cacheTextureOrContinue(cachingThreads, image, tex, resids);
 		}
 		
-		updateProgressMaximum((ChroData._max_prog - ((imgResIds.size() - resids.size()) * 3)));
+		updateProgressMaximum((ChroData._max_prog - ((imgResIds.size() - resids.size()) * 2)));
 		cacheJobsWait(cachingThreads);
 	}
 
 	/**
-	 * @param imgResIds
-	 * @param resids
+	 * @param changeTo The 
 	 */
-	private void updateProgressMaximum(int changeBy) {
+	private void updateProgressMaximum(int changeTo) {
+		
 		//Change the progress maximum based on the
 		// number of textures we are loading.
 		synchronized(ChroData._max_prog) {
-			ChroData._max_prog = (short) changeBy;
+			ChroData._max_prog = (short) changeTo;
 		}
+		
+//		DEBUG
+//		ChroPrint.println("New maximum: " + ChroData._max_prog, System.out);
 	}
 
 	/**
@@ -290,27 +292,34 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 		//Modify the bar type based on the visibility
 		// of either 3D or 2D initial bars.
 		int visMod = settings.isThreeD() ? 4 : 0;
-		//The type of bar applicable to the
-		// resource we are dealing with.
-		int barType;
 		
 		//Try to decode the png via its drawable resid
 		try {
+			
 			//Here we get the resource ID and resource name from the Field object.
 			resId = image.getInt(null);
 			resName = image.getName();
+//			DEBUG
+//			ChroPrint.println("Will try to decode  resource " + resName + " with resource ID " + resId + " from resources object " + chroRes, System.out);
 			//We then attempt to decode the PNG texture.
 			Bitmap texture = BitmapFactory.decodeResource(chroRes, resId, bmpLoadOptions);
+//			DEBUG
+//			ChroPrint.println("Decoded png into bitmap object " + texture, System.out);
 			//Figure out which bar this texture applies to and create the texture object.
-			String bar = resName.split("_")[resName.length()-1];
+			String[] texName = resName.split("_");
+			String bar = texName[texName.length - 1];
+//			DEBUG
+//			ChroPrint.println("Found bar " + bar + " in texture " + resName, System.out);
+			boolean loadNow = false;
+			
 			if(bar.length() > 1) {
 				char[] types = bar.toCharArray();
 				//Check if we need to load this texture now.
-				boolean loadNow = false;
 				for(int i = 0; i < types.length; i++)
-					loadNow |= numbersVis.get(Integer.parseInt("" + types[i]) + visMod);
+					loadNow |= numbersVis.get(Integer.parseInt("" + types[i]) + visMod) |
+							   numbersVis.get(Integer.parseInt("" + types[i]) + visMod + (visMod == 0 ? 4 : -4));
 //				DEBUG
-				ChroPrint.println("Loading " + texture + " with resid " + resId + "later.", System.out);
+				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
 				tex = new ChroTexture(resId, resName, !loadNow, texture);
 				
 				for(char b : types)
@@ -320,19 +329,19 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 				textures.add(tex);
 			}
 			else {
-				 barType = Integer.parseInt(bar) + visMod;
-				if(!numbersVis.get(barType + visMod)) {
-//					DEBUG
-					ChroPrint.println("Loading " + texture + " with resid " + resId + "later.", System.out);
-					tex = new ChroTexture(resId, resName, true, texture);
-					tex.addBarTypes(ChroType.valueByNumber(barType + visMod));
-					textures.add(tex);
-				}
-				else{
-					tex = new ChroTexture(resId, resName, false, texture);
-					tex.addBarTypes(ChroType.valueByNumber(barType + visMod));
-					textures.add(tex);
-				}
+				//The type of bar applicable to the
+				// resource we are dealing with.
+				int barType = Integer.parseInt(bar) + visMod;
+				//Check if we need to load texture now.
+				loadNow |= numbersVis.get(barType) | numbersVis.get(barType + (visMod == 0 ? 4 : -4));
+//				DEBUG
+				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
+				tex = new ChroTexture(resId, resName, !loadNow, texture);
+				tex.addBarTypes(ChroType.valueByNumber(barType),
+								ChroType.valueByNumber(barType + (visMod == 0 ? 4 : -4)));
+//				DEBUG
+//				ChroPrint.println("Current bar types in texture object " + tex + ": " + tex.getBarTypes().length, System.out);
+				textures.add(tex);
 			}
 		}
 		catch(Exception ex) { ChroUtilities.printExDetails(ex); }
@@ -356,7 +365,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 * @return
 	 */
 	private LinkedList<Thread> initCache(ArrayList<Field> imgResIds,
-										  ArrayList<ByteBuffer> cache) {
+										  ArrayList<ChroTexture> cache) {
 		
 		ChroPrint.println("Initializing caching mechanisms...", System.out);
 		LinkedList<Thread> cachingThreads = new LinkedList<Thread>();
@@ -401,7 +410,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 * @param imgResIds
 	 * @return
 	 */
-	private boolean checkMemoryForCache(ArrayList<Field> imgResIds, ArrayList<ByteBuffer> cache) {
+	private boolean checkMemoryForCache(ArrayList<Field> imgResIds, ArrayList<ChroTexture> cache) {
 		
 		ChroPrint.println("Checking for cache in memory...", System.out);
 		

@@ -19,6 +19,7 @@ import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.threading.ChroConstructionThread;
 import com.psoft.chrobars.threading.ChroPostStartLoad;
 import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
 /**
@@ -279,6 +280,8 @@ public class ChroBarsActivity extends Activity {
 //			System.out.println("Retrieving built objects...");
 			settings = params.getSettings();
 			kronos = params.getRenderSurface();
+//			DEBUg
+//			ChroPrint.println("Recieved textures " + params.getTextures() + "\nSize " + params.getTextures().size(), System.out);
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
@@ -286,7 +289,17 @@ public class ChroBarsActivity extends Activity {
 				e.printStackTrace();
 			}
 			switchToBars();
+			cacheAndLoadLateTextures();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void cacheAndLoadLateTextures() {
+		//Load textures we don't need yet in the background.
+		ChroPrint.println("Starting background texture loading thread...", System.out);
+		(new ChroPostStartLoad(params.getTextures(), ChroSurface.getRenderer())).start();
 	}
 	
 	/**
@@ -310,8 +323,6 @@ public class ChroBarsActivity extends Activity {
 //		DEBUG
 //		System.out.println("Showing bars...");
 		loadToGL.showNext();
-		//Load textures we don't need yet in the background.
-		new ChroPostStartLoad(params.getTextures(), ChroSurface.getRenderer()).start();
 	}
 	
 	/**

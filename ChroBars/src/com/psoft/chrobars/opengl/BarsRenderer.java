@@ -1,8 +1,5 @@
 package com.psoft.chrobars.opengl;
 
-//import java.nio.ByteBuffer;
-//import java.nio.ByteOrder;
-//import java.nio.FloatBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -47,6 +44,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
+		gl10 = gl;
 		ChroTextures.loadTextures(gl, ChroData._TEX_SIZE);
 		refreshVisibleBars();
 		
@@ -196,6 +194,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		
+		gl10 = gl;
+		
 		gl.glPushMatrix(); {
 		
 			gl.glLoadIdentity();
@@ -275,6 +275,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		
+		gl10 = gl;
+		
 		//Readjusts the surface to match the current conditions
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
@@ -334,16 +336,24 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 			
 			ChroBar current = chroBars.get(t);
 //			DEBUG
-			ChroPrint.println("Current bar: " + current, System.out);
-			ChroPrint.println("Setting bar visibility...", System.out);
+//			ChroPrint.println("Current bar: " + current, System.out);
+//			ChroPrint.println("Setting bar visibility...", System.out);
 			current.setDrawBar(barVis.get(t.getType()));
 //			DEBUG
-			ChroPrint.println("Setting number visibility...", System.out);
+//			ChroPrint.println("Setting number visibility...", System.out);
 			current.setDrawNumber(numVis.get(t.getType()));
 //			DEBUG
-			ChroPrint.println("Setting bar color...", System.out);
+//			ChroPrint.println("Setting bar color...", System.out);
 			ChroUtilities.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param loadThese
+	 */
+	public void loadLateCache(ArrayList<ChroTexture> loadThese) {
+		ChroTextures.loadTextures(gl10, loadThese, ChroData._TEX_SIZE);
 	}
 	
 	/**
@@ -524,6 +534,9 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	
 	//For setting the background color
 	private static float[] backgroundColor = new float[ChroData._RGBA_COMPONENTS];
+	
+	//For loading extra cached textures after surface creation.
+	private static GL10 gl10;
 
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(8);

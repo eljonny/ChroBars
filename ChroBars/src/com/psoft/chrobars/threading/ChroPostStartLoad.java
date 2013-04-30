@@ -21,27 +21,29 @@ public class ChroPostStartLoad extends Thread
 
 	private static int progress;
 	private static int maxProgress;
-	//Cache a map of resids to strings/buffers
+	//Texture cache
 	private static ArrayList<ChroTexture> textures;
-//	private static BarsRenderer barsRenderer;
+	private static BarsRenderer barsRenderer;
 	
 	public ChroPostStartLoad(ArrayList<ChroTexture> toLoad, BarsRenderer rend) {
 		textures = toLoad;
-//		barsRenderer = rend;
+		barsRenderer = rend;
 		progress = 0;
 	}
 	
 	public void run() {
 		
 		ArrayList<ChroTexture> loadThese = findCacheLaters();
+//		DEBUG
+//		ChroPrint.println("We are now going to load these: " + loadThese, System.out);
 		
-		maxProgress = loadThese.size();
-		
-		LinkedList<Thread> cachingThreads = startCacheJobs(loadThese);
+		maxProgress = loadThese.size()*2;
 
-		cacheJobWaitFinish(cachingThreads);
+		cacheJobWaitFinish(startCacheJobs(loadThese));
 		
-		ChroPrint.println("Done caching late-load textures.", System.out);
+		ChroPrint.println("Done caching late-load textures.\nLoading into renderer...", System.out);
+		
+		barsRenderer.loadLateCache(loadThese);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class ChroPostStartLoad extends Thread
 		
 		for(ChroTexture tex : loadThese) {
 //			DEBUG
-//			ChroPrint.println(tex, "Chaching:|", loadThese.size(), '-', System.out);
+//			ChroPrint.println(tex.toString(), "Chaching:|", loadThese.size()+"", '-', System.out);
 			ChroTexCacheThread cachingThread = new ChroTexCacheThread(tex, this);
 			cachingThread.start();
 			cachingThreads.add(cachingThread);
@@ -88,6 +90,8 @@ public class ChroPostStartLoad extends Thread
 	 */
 	private ArrayList<ChroTexture> findCacheLaters() {
 		ArrayList<ChroTexture> loadThese = new ArrayList<ChroTexture>();
+//		DEBUG
+//		ChroPrint.println("Searching for textures to cache later in " + textures, System.out);
 		for(ChroTexture tex : textures)
 			if(tex.isCacheLater())
 				loadThese.add(tex);
