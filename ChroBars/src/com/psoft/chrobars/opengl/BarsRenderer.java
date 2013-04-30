@@ -12,7 +12,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.psoft.chrobars.ChroBar;
 import com.psoft.chrobars.ChroType;
 import com.psoft.chrobars.data.ChroData;
-import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.settings.ChroBarsSettings;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -44,7 +44,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-		gl10 = gl;
 		ChroTextures.loadTextures(gl, ChroData._TEX_SIZE);
 		refreshVisibleBars();
 		
@@ -194,7 +193,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		
-		gl10 = gl;
+		if(loadLateTextures) {
+			loadLateTextures = false;
+			ChroTextures.loadTextures(gl, lates, ChroData._TEX_SIZE);
+		}
 		
 		gl.glPushMatrix(); {
 		
@@ -275,8 +277,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		
-		gl10 = gl;
-		
 		//Readjusts the surface to match the current conditions
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
@@ -353,7 +353,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 * @param loadThese
 	 */
 	public void loadLateCache(ArrayList<ChroTexture> loadThese) {
-		ChroTextures.loadTextures(gl10, loadThese, ChroData._TEX_SIZE);
+		lates = loadThese;
+		loadLateTextures = true;
 	}
 	
 	/**
@@ -534,9 +535,6 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	
 	//For setting the background color
 	private static float[] backgroundColor = new float[ChroData._RGBA_COMPONENTS];
-	
-	//For loading extra cached textures after surface creation.
-	private static GL10 gl10;
 
 	//Data structure for holding ChroBars
 	private static HashMap<ChroType, ChroBar> chroBars = new HashMap<ChroType, ChroBar>(8);
@@ -554,4 +552,8 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	private Context activityContext;
 	//Settings object reference.
 	private static ChroBarsSettings settings;
+	//Whether or not late cache textures are ready to load.
+	private boolean loadLateTextures = false;
+	//Late cache textures to load.
+	private ArrayList<ChroTexture> lates;
 }

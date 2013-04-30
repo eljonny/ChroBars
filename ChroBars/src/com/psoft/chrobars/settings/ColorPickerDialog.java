@@ -17,7 +17,7 @@
  * android app project.
  */
 
-package com.psoft.chrobars.util;
+package com.psoft.chrobars.settings;
 
 import android.app.Dialog;
 import android.content.Context;

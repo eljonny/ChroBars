@@ -42,7 +42,7 @@ public class ChroBar3D extends ChroBar {
 	/**
 	 * 
 	 */
-	protected void barGLAllocate(ByteOrder order_native) {
+	public void barGLAllocate(ByteOrder order_native) {
 		
 		//Instantiate empty arraylists to reduce the number of allocations when
 		// users turn on dynamic lighting. Will use slightly more memory throughout
@@ -88,7 +88,7 @@ public class ChroBar3D extends ChroBar {
 	/**
 	 * 
 	 */
-	protected void initVertices() {
+	public void initVertices() {
 		
 		float _baseHeight = ChroData._baseHeight,
 					_baseDepth = ChroData._baseDepth;
@@ -111,7 +111,7 @@ public class ChroBar3D extends ChroBar {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	protected void initNormals() {
+	public void initNormals() {
 		
 //		DEBUG
 //		System.out.println("Current memory usage:\nTotal allocated heap: " + Runtime.getRuntime().totalMemory() + " Total free: " + Runtime.getRuntime().freeMemory());
@@ -254,7 +254,7 @@ public class ChroBar3D extends ChroBar {
 	/**
 	 * 
 	 */
-	protected void setBarWidth(float leftXCoord, float rightXCoord) {
+	public void setBarWidth(float leftXCoord, float rightXCoord) {
 		
 		float leftXCoordinate_3D_rear  = leftXCoord + barsData.getFloat("bar_3D_offset");
 		float rightXCoordinate_3D_rear  = rightXCoord + barsData.getFloat("bar_3D_offset");
@@ -273,7 +273,7 @@ public class ChroBar3D extends ChroBar {
 	/**
 	 * 
 	 */
-	protected void setBarHeight(float barTopHeight) {
+	public void setBarHeight(float barTopHeight) {
 		vertices[1] = vertices[10] = vertices[13] = vertices[22] = barTopHeight;
 	}
 
@@ -281,7 +281,7 @@ public class ChroBar3D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected int getBarDrawSequenceBufferLength() {
+	public int getBarDrawSequenceBufferLength() {
 		return ChroData._bar_vertexDrawSequence_3D.length;
 	}
 	
@@ -289,7 +289,7 @@ public class ChroBar3D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected int getEdgeDrawSequenceBufferLength() {
+	public int getEdgeDrawSequenceBufferLength() {
 		return ChroData._edges_vertexDrawSequence_3D.length;
 	}
 }

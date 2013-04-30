@@ -31,10 +31,10 @@ import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
-import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.settings.ChroBarsSettings;
+import com.psoft.chrobars.settings.ColorPickerDialog;
+import com.psoft.chrobars.settings.ColorPickerDialog.OnColorChangedListener;
 import com.psoft.chrobars.util.ChroUtilities;
-import com.psoft.chrobars.util.ColorPickerDialog;
-import com.psoft.chrobars.util.ColorPickerDialog.OnColorChangedListener;
 
 /**
  * 

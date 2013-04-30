@@ -1,4 +1,4 @@
-package com.psoft.chrobars.util;
+package com.psoft.chrobars.settings;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -17,6 +17,7 @@ import android.graphics.Color;
 import com.psoft.chrobars.ChroType;
 import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroData;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * This class manages settings for the ChroBars application.

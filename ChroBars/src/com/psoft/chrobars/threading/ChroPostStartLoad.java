@@ -23,11 +23,12 @@ public class ChroPostStartLoad extends Thread
 	private static int maxProgress;
 	//Texture cache
 	private static ArrayList<ChroTexture> textures;
-	private static BarsRenderer barsRenderer;
+	private static BarsRenderer callback;
 	
-	public ChroPostStartLoad(ArrayList<ChroTexture> toLoad, BarsRenderer rend) {
+	public ChroPostStartLoad(ArrayList<ChroTexture> toLoad,
+							  BarsRenderer rend) {
 		textures = toLoad;
-		barsRenderer = rend;
+		callback = rend;
 		progress = 0;
 	}
 	
@@ -41,9 +42,9 @@ public class ChroPostStartLoad extends Thread
 
 		cacheJobWaitFinish(startCacheJobs(loadThese));
 		
-		ChroPrint.println("Done caching late-load textures.\nLoading into renderer...", System.out);
+		ChroPrint.println("Done caching late-load textures.", System.out);
 		
-		barsRenderer.loadLateCache(loadThese);
+		callback.loadLateCache(loadThese);
 	}
 
 	/**

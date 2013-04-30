@@ -18,7 +18,7 @@ import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.opengl.ChroTexture;
 import com.psoft.chrobars.opengl.ChroTextures;
-import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.settings.ChroBarsSettings;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 

@@ -1,4 +1,4 @@
-package com.psoft.chrobars.util;
+package com.psoft.chrobars.data;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import android.content.Context;
 
 import com.psoft.chrobars.R;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * 

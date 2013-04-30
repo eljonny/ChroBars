@@ -31,7 +31,7 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected void barGLAllocate(ByteOrder order_native) {
+	public void barGLAllocate(ByteOrder order_native) {
 
 		//Set 2D vertex arrays
 		barVertexColors = new float[ChroData._2D_VERTICES*ChroData._RGBA_COMPONENTS];
@@ -58,7 +58,7 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected void initVertices() {
+	public void initVertices() {
 		
 		float _baseHeight = ChroData._baseHeight;
 		
@@ -75,14 +75,14 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected void initNormals() throws Exception {
+	public void initNormals() throws Exception {
 		throw new Exception("Method not implemented in 2D");
 	}
 	
 	/**
 	 * 
 	 */
-	protected void setBarWidth(float leftX, float rightX) {
+	public void setBarWidth(float leftX, float rightX) {
 		vertices[0] = vertices[3] = leftX;
 		vertices[6] = vertices[9] = rightX;
 	}
@@ -90,7 +90,7 @@ public class ChroBar2D extends ChroBar {
 	/**
 	 * 
 	 */
-	protected void setBarHeight(float barTopHeight) {
+	public void setBarHeight(float barTopHeight) {
 		vertices[1] = vertices[10] = barTopHeight;
 	}
 
@@ -98,7 +98,7 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected int getBarDrawSequenceBufferLength() {
+	public int getBarDrawSequenceBufferLength() {
 		return ChroData._bar_vertexDrawSequence_2D.length;
 	}
 
@@ -106,7 +106,7 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	@Override
-	protected int getEdgeDrawSequenceBufferLength() {
+	public int getEdgeDrawSequenceBufferLength() {
 		// TODO Auto-generated method stub
 		return ChroData._edges_vertexDrawSequence_2D.length;
 	}

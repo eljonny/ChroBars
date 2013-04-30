@@ -26,9 +26,9 @@ import com.psoft.chrobars.util.ChroUtilities;
  * 
  * @author Jonathan Hyry
  */
-public abstract class ChroBar {
+public abstract class ChroBar implements IChroBar {
 
-	/* Static fields */
+	/* Begin static fields */
 	
 	protected static ChroData barsData = null;
 	protected static BarsRenderer renderer;
@@ -38,9 +38,7 @@ public abstract class ChroBar {
 	//Map of ChroType/Textures for all bars
 	protected static HashMap<ChroType, ArrayList<ChroTexture>> textures;
 	
-	/* End static fields */
-	
-	/* Instance Variables */
+	/* End static fields, Begin instance variables */
 	
 	//The bar and edge color is stored as a packed color int
 	protected int barColor, edgeColor;
@@ -61,53 +59,6 @@ public abstract class ChroBar {
 	protected ChroType barType;
 	
 	/* End instance variables */
-	
-	/* Begin subclass Interface. */
-	
-	/**
-	 * 
-	 * @param order
-	 */
-	protected abstract void barGLAllocate(ByteOrder order);
-
-	/**
-	 * 
-	 */
-	protected abstract void initVertices();
-	
-	/**
-	 * @throws Exception 
-	 * 
-	 */
-	protected abstract void initNormals() throws Exception;
-	
-	/**
-	 * 
-	 * @param leftXCoord
-	 * @param rightXCoord
-	 */
-	protected abstract void setBarWidth(float leftXCoord, float rightXCoord);
-
-	/**
-	 * 
-	 * @param height
-	 */
-	protected abstract void setBarHeight(float height);
-	
-	/**
-	 * Accessor for the length of the
-	 *  bar-specific draw vertices sequence buffer to be used.
-	 * @return An integer representation of the length of the draw sequence buffer.
-	 */
-	protected abstract int getBarDrawSequenceBufferLength();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	protected abstract int getEdgeDrawSequenceBufferLength();
-	
-	/* End subclass Interface, Begin partial implementation. */
 
 	/**
 	 * 

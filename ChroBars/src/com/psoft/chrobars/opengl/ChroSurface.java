@@ -3,7 +3,7 @@ package com.psoft.chrobars.opengl;
 
 import java.util.Locale;
 
-import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.settings.ChroBarsSettings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

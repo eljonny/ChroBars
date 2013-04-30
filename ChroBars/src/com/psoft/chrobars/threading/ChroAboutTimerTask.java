@@ -2,7 +2,7 @@ package com.psoft.chrobars.threading;
 
 import java.util.TimerTask;
 
-import com.psoft.chrobars.util.ChroBarsCredits;
+import com.psoft.chrobars.data.ChroBarsCredits;
 
 import android.widget.TextSwitcher;
 

@@ -11,8 +11,8 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.psoft.chrobars.R;
+import com.psoft.chrobars.data.ChroBarsCredits;
 import com.psoft.chrobars.threading.ChroAboutTimerTask;
-import com.psoft.chrobars.util.ChroBarsCredits;
 import com.psoft.chrobars.util.ChroUtilities;
 
 /**

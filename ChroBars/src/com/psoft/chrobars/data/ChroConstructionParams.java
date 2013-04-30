@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.opengl.ChroTexture;
-import com.psoft.chrobars.util.ChroBarsSettings;
+import com.psoft.chrobars.settings.ChroBarsSettings;
 
 /**
  * Parameter object for use with class ChroConstructionThread.
