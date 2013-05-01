@@ -1,23 +1,26 @@
 package com.psoft.chrobars.opengl;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.opengl.GLUtils;
 
 import com.psoft.chrobars.ChroBar;
 import com.psoft.chrobars.ChroType;
-import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.threading.construction.ChroBarsLateTexLoadThread;
 import com.psoft.chrobars.util.ChroPrint;
+
 //DEBUG
 //import com.psoft.chrobars.util.ChroUtilities;
+
+//Imports for raw buffer caching.
+//import java.nio.ByteOrder;
+//import android.graphics.Color;
+//import com.psoft.chrobars.data.ChroData;
 
 /**
  * When an instance of this class is created, it caches

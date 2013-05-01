@@ -1,7 +1,5 @@
 package com.psoft.chrobars.threading.construction;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -315,6 +313,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 //			ChroPrint.println("Will try to decode  resource " + resName + " with resource ID " + resId + " from resources object " + chroRes, System.out);
 			//We then attempt to decode the PNG texture.
 			Bitmap texture = BitmapFactory.decodeResource(chroRes, resId, bmpLoadOptions);
+			
 			//Alternate Method for decoding PNG
 //			Bitmap texture = null;
 //            InputStream is = chroRes.openRawResource(resId);
