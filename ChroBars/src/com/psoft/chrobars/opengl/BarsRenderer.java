@@ -195,7 +195,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		
 		if(loadLateTextures) {
 			loadLateTextures = false;
-			ChroTextures.loadTextures(gl, lates, ChroData._TEX_SIZE);
+			ChroTextures.loadTextures(gl, lates, ChroData._TEX_SIZE, chroBars);
 		}
 		
 		gl.glPushMatrix(); {
@@ -310,7 +310,7 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		ChroPrint.println("Constructing bars...", System.out);
 		//Then populate the HashMap so we can load settings
 		for(ChroType ct : ChroType.values())
-			chroBars.put(ct, ChroBar.getInstance(ct, activityContext));
+			chroBars.put(ct, ChroBar.getInstance(ct, getTextures(ct), activityContext));
 		
 		ChroPrint.println("Loading settings...", System.out);
 		//Then load all the relevant settings into the renderer.
@@ -318,6 +318,15 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 		ChroPrint.println("Done.", System.out);
 	}
 	
+	/**
+	 * 
+	 * @param ct
+	 * @return
+	 */
+	private final ArrayList<ChroTexture> getTextures(ChroType ct) {
+		return ChroTextures.getTexturesForBarType(ct);
+	}
+
 	/**
 	 * Loads the stored settings into the OpenGL renderer.
 	 */

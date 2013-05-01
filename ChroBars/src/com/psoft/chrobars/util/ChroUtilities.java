@@ -150,7 +150,7 @@ public final class ChroUtilities {
 	}
 
 	/**
-	 * Goes through the sparse array and plucks out the keys.
+	 * Goes through a sparse array and plucks out the keys.
 	 * 
 	 * @param loadThese A SparseArray that you want to gather only keys from.
 	 * @return The keys are returned as an integer array.
@@ -160,5 +160,45 @@ public final class ChroUtilities {
 		for(int i = 0; i < loadThese.size(); i++)
 			keys[i] = loadThese.keyAt(i);
 		return keys;
+	}
+
+	/**
+	 * Prints the elements in the given array as a comma-delimited list.
+	 * 
+	 * @param array The array of which to print all elements.
+	 * 
+	 * @return The elements as a comma-delimited string.
+	 */
+	public static <T> String buildArrayString(T[] array) {
+		
+		String arrayElements = "[";
+		
+		for(T element : array)
+			arrayElements += element + ", ";
+		arrayElements += "]";
+		
+		arrayElements = arrayElements.replace(", ]", "]");
+		
+		return arrayElements;
+	}
+
+	/**
+	 * 
+	 * @param array
+	 * @param delimiter
+	 * 
+	 * @return
+	 */
+	public static <T> String buildArrayString(T[] array,
+										  String delimiter) {
+		String arrayElements = "[";
+		
+		for(T element : array)
+			arrayElements += element + delimiter + " ";
+		arrayElements += "]";
+		
+		arrayElements = arrayElements.replace(delimiter + " ]", "]");
+		
+		return arrayElements;
 	}
 }

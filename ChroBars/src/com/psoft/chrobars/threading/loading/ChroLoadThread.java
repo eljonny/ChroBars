@@ -1,4 +1,4 @@
-package com.psoft.chrobars.threading;
+package com.psoft.chrobars.threading.loading;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;

@@ -1,13 +1,14 @@
 /**
  * 
  */
-package com.psoft.chrobars.threading;
+package com.psoft.chrobars.threading.construction;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroTexture;
+import com.psoft.chrobars.threading.IChroLoadThread;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -16,7 +17,7 @@ import com.psoft.chrobars.util.ChroUtilities;
  * 
  * @author jhyry
  */
-public class ChroPostStartLoad extends Thread
+public class ChroPostStartLoadThread extends Thread
 								 implements IChroLoadThread{
 
 	private static int progress;
@@ -25,7 +26,7 @@ public class ChroPostStartLoad extends Thread
 	private static ArrayList<ChroTexture> textures;
 	private static BarsRenderer callback;
 	
-	public ChroPostStartLoad(ArrayList<ChroTexture> toLoad,
+	public ChroPostStartLoadThread(ArrayList<ChroTexture> toLoad,
 							  BarsRenderer rend) {
 		textures = toLoad;
 		callback = rend;
@@ -33,6 +34,8 @@ public class ChroPostStartLoad extends Thread
 	}
 	
 	public void run() {
+		
+		bindWait();
 		
 		ArrayList<ChroTexture> loadThese = findCacheLaters();
 //		DEBUG
@@ -45,6 +48,15 @@ public class ChroPostStartLoad extends Thread
 		ChroPrint.println("Done caching late-load textures.", System.out);
 		
 		callback.loadLateCache(loadThese);
+	}
+
+	/**
+	 * 
+	 */
+	private void bindWait() {
+		//Wait for the main textures to bind to the surface.
+		try { Thread.sleep(1000); }
+		catch (InterruptedException e) { ChroUtilities.printExDetails(e); }
 	}
 
 	/**
@@ -67,6 +79,15 @@ public class ChroPostStartLoad extends Thread
 			}
 			incProgress(1);
 		}
+		//When we are done with all caching, recycle the loaded bitmaps.
+		recycleBitmaps();
+	}
+
+	/**
+	 * 
+	 */
+	private void recycleBitmaps() {
+		(new ChroBitmapRecycleThread()).start();
 	}
 
 	/**

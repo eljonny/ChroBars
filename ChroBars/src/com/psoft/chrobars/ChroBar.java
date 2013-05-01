@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -13,6 +12,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.SparseArray;
 
 import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroData;
@@ -35,8 +35,6 @@ public abstract class ChroBar implements IChroBar {
 	protected static GL10 surface = null;
 	//Used in determining bar height
 	protected static Calendar currentTime;
-	//Map of ChroType/Textures for all bars
-	protected static HashMap<ChroType, ArrayList<ChroTexture>> textures;
 	
 	/* End static fields, Begin instance variables */
 	
@@ -46,17 +44,21 @@ public abstract class ChroBar implements IChroBar {
 	protected boolean drawBar, drawNumber;
 	//Whether this bar has edge colors that should not be operated on.
 	protected boolean[] noColorOp = new boolean[3];
-	protected float[] barVertexColors, vertices;
+	protected float[] barVertexColors, barVertices;
 	protected float[] edgeVertexColors, normals;
+	protected float[] textureVertices;
 	//OpenGL Surface and drawing buffers
-	protected ShortBuffer barDrawSequenceBuffer;
-	protected ShortBuffer edgeDrawSequenceBuffer;
-	protected FloatBuffer verticesBuffer;
-	protected FloatBuffer barsColorBuffer;
-	protected FloatBuffer edgesColorBuffer;
-	protected FloatBuffer normalsBuffer;
+	protected ShortBuffer barDrawSequenceBuffer, edgeDrawSequenceBuffer;
+	protected FloatBuffer barVerticesBuffer, barsColorBuffer;
+	protected FloatBuffer edgesColorBuffer, normalsBuffer;
+	protected FloatBuffer textureVerticesBuffer;
 	//Type of data this represents
 	protected ChroType barType;
+	//The current number to draw for this bar.
+	protected ChroTexture number;
+	protected int textureId;
+	//The numbers that are applicable to this bar type.
+	protected SparseArray<ChroTexture> textures;
 	
 	/* End instance variables */
 
@@ -66,7 +68,7 @@ public abstract class ChroBar implements IChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar(ChroType t, Context activityContext) {
+	public ChroBar(ChroType t, ArrayList<ChroTexture> texs, Context activityContext) {
 		
 		//If the data object is null, make one. Otherwise do nothing.
 		if(barsData == null)
@@ -83,6 +85,10 @@ public abstract class ChroBar implements IChroBar {
 		}
 		
 		barType = t;
+		
+		putNumberTextures(texs);
+//		DEBUG
+//		ChroPrint.println("Added " + textures.size() + " to " + barType + "'s texture cache.", System.out);
 		
 		//Do the actual buffer allocation.
 		barGLAllocate(ByteOrder.nativeOrder());
@@ -127,7 +133,8 @@ public abstract class ChroBar implements IChroBar {
 
 		//Gather required information
 		float screenWidth = ChroBarsActivity.getDisplayMetrics().widthPixels;
-		//ChroPrint.println("Screen width: " + screenWidth);
+//		DEBUG
+//		ChroPrint.println("Screen width: " + screenWidth);
 		float barTypeCode = (float)barType.getType();
 		float barMargin = barsData.getFloat("barMarginBase");
 		float edgeMargin = barsData.getFloat("edgeMarginBase");
@@ -144,7 +151,8 @@ public abstract class ChroBar implements IChroBar {
 		
 		//Perform bar width calculations
 		int numberOfBars = renderer.numberOfBarsToDraw();
-		//ChroPrint.println("We are drawing " + numberOfBars + " bars.");
+//		DEBUG
+//		ChroPrint.println("We are drawing " + numberOfBars + " bars.");
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth *= 2f;
 		barWidth -= ((edgeMargin*2f)/(float)numberOfBars);
@@ -191,7 +199,7 @@ public abstract class ChroBar implements IChroBar {
 		setBarHeight(barTopHeight);
 		
 		//Reset the OpenGL vertices buffer with updated coordinates
-		((FloatBuffer) verticesBuffer.clear()).put(vertices).position(0);
+		((FloatBuffer) barVerticesBuffer.clear()).put(barVertices).position(0);
 		
 		//If we're using dynamic lighting with a 3D bar, rebuild the vertex normals for the new bar height.
 		if(barType.is3D() && renderer.usesDynamicLighting()) {
@@ -266,101 +274,240 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	public void draw(GL10 drawSurface) {
 
+		surface = drawSurface;
+		
 		//If this bar should not be drawn, exit
 		//The method
 		if(drawBar) {
 		
-			//Set up face culling
-			//ChroPrint.println("Calling glFrontFace", System.out);
-		    drawSurface.glFrontFace(GL10.GL_CCW);
-		    //ChroPrint.println("Calling glEnable", System.out);
-		    drawSurface.glEnable(GL10.GL_CULL_FACE);
-		    //ChroPrint.println("Calling glCullFace", System.out);
-		    drawSurface.glCullFace(GL10.GL_BACK);
-			
-		    //Enable the OpenGL vertex array buffer space
-		    //ChroPrint.println("Calling glEnableClientState for vertex array", System.out);
-			drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-			//ChroPrint.println("Calling glEnableClientState for color array", System.out);
-			drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+			setUpCulling_EnableStates(drawSurface);
 			
 			if(barType.is3D()) {
-				
-				//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
-				drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-				
-				//Set general lighting buffers
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
-				
-				//Set the color material to the appropriate colors.
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
-				drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
-				
-				//load the buffer of normals into the OpenGL draw object.
-				drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
+				setColorMaterials(drawSurface);
+				setLightBuffers(drawSurface);
+				setNormalPointer(drawSurface);
 			}
 			
-			/* Draw the bar */
+			drawBar(drawSurface);
 			
-			//Tell openGL where the vertex data is and how to use it
-			//ChroPrint.println("Calling glVertexPointer", System.out);
-			drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
-										ChroData._VERTEX_STRIDE, verticesBuffer);
+			if(renderer.getBarEdgeSetting() != 0)
+				drawBarEdges(drawSurface);
 			
-			//Color buffer for the bars.
-			//ChroPrint.println("Calling glColorPointer for bars", System.out);
-	        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-	        							ChroData._VERTEX_STRIDE, barsColorBuffer);
-	        
-			//Draw the bar
-	        //ChroPrint.println("Calling glDrawElements for bars", System.out);
-			drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
-										GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+			if(drawNumber)
+				drawTexture(drawSurface);
 			
-			/* End bar drawing */
+			disableStates(drawSurface);
 			
-			
-			
-			if(renderer.getBarEdgeSetting() != 0) {
-					
-				//Color buffer for the edges.
-				//ChroPrint.println("Calling glColorPointer for edges", System.out);
-		        drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-		        							ChroData._VERTEX_STRIDE, edgesColorBuffer);
-				
-				//Draw the accented bar edges
-				//ChroPrint.println("Calling glDrawElements for edges", System.out);
-				drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
-											GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
-			}
-			
-			//Clear the buffer space
-			//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
-			drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-			//ChroPrint.println("Calling glDisableClientState for color array", System.out);
-			drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
-			
-			if(barType.is3D()) {
-				//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
-				drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-			}
-			
-			//Disable face culling.
-			//ChroPrint.println("Calling glDisable", System.out);
-			drawSurface.glDisable(GL10.GL_CULL_FACE);
-		    
-			//Cache the surface
-		    if(surface == null)
-				surface = drawSurface;
-		    
-			//Recalculate the bar dimensions in preparation for a redraw
-			calculateBarWidth();
-			calculateBarHeight();
+			recalculateBarDimensions();
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private void recalculateBarDimensions() {
+		//Recalculate the bar dimensions in preparation for a redraw
+		calculateBarWidth();
+		calculateBarHeight();
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void disableStates(GL10 drawSurface) {
+		//Clear the buffer space
+		//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
+		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
+		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		
+		if(barType.is3D()) {
+			//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
+			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+		}
+		
+		//Disable face culling.
+		//ChroPrint.println("Calling glDisable", System.out);
+		drawSurface.glDisable(GL10.GL_CULL_FACE);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setUpCulling_EnableStates(GL10 drawSurface) {
+		//Set up face culling
+		//ChroPrint.println("Calling glFrontFace", System.out);
+		drawSurface.glFrontFace(GL10.GL_CCW);
+		//ChroPrint.println("Calling glEnable", System.out);
+		drawSurface.glEnable(GL10.GL_CULL_FACE);
+		//ChroPrint.println("Calling glCullFace", System.out);
+		drawSurface.glCullFace(GL10.GL_BACK);
+		
+		//Enable the OpenGL vertex array buffer space
+		//ChroPrint.println("Calling glEnableClientState for vertex array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setNormalPointer(GL10 drawSurface) {
+		//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+		//load the buffer of normals into the OpenGL draw object.
+		drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setLightBuffers(GL10 drawSurface) {
+		//Set the color material to the appropriate colors.
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setColorMaterials(GL10 drawSurface) {
+		//Set general lighting buffers
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void drawBar(GL10 drawSurface) {
+		//Tell openGL where the vertex data is and how to use it
+		//ChroPrint.println("Calling glVertexPointer", System.out);
+		drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, barVerticesBuffer);
+		
+		//Color buffer for the bars.
+		//ChroPrint.println("Calling glColorPointer for bars", System.out);
+		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, barsColorBuffer);
+		
+		//Draw the bar
+		//ChroPrint.println("Calling glDrawElements for bars", System.out);
+		drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
+									GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void drawBarEdges(GL10 drawSurface) {
+		//Color buffer for the edges.
+		//ChroPrint.println("Calling glColorPointer for edges", System.out);
+		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, edgesColorBuffer);
+		
+		//Draw the accented bar edges
+		//ChroPrint.println("Calling glDrawElements for edges", System.out);
+		drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
+									GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void drawTexture(GL10 drawSurface) {
+		
+		if(!shouldDrawTexture())
+			return;
+		
+		drawSurface.glEnable(GL10.GL_TEXTURE_2D);
+		drawSurface.glEnable(GL10.GL_TEXTURE_COORD_ARRAY);
+		drawSurface.glEnable(GL10.GL_TEXTURE0);
+		
+		drawSurface.glActiveTexture(GL10.GL_TEXTURE0);
+//		DEBUG
+//		ChroPrint.println("Trying to bind number " + this.number + " with texture ID " + textureId, System.out);
+		drawSurface.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
+		
+		
+		//Draw the number texture
+//		DEBUG
+//		ChroPrint.println("Calling glDrawElements for textures", System.out);
+		drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
+									GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+		
+		drawSurface.glDisable(GL10.GL_TEXTURE0);
+		drawSurface.glDisable(GL10.GL_TEXTURE_COORD_ARRAY);
+		drawSurface.glDisable(GL10.GL_TEXTURE_2D);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean shouldDrawTexture() {
+		
+		ChroTexture number = getNumberTexture();
+		int textureId = 0;
+		
+		//There is no texture for this time
+		if(number == null)
+			return false;
+		//Otherwise, proceed as usual.
+		else {
+			this.number = number;
+			textureId = number.getTexId();
+		}
+		//There is a problem with the texture if this is true.
+		if(textureId == 0)
+			return false;
+		else
+			this.textureId = textureId;
+		//Or if for some reason the instance number texture object is still null
+		if(this.number == null)
+			return false;
+		else if(this.textureId == 0)
+			return false;
+		
+		return true;
+	}
 	
+	/**
+	 * Returns a time-based texture to display for this bar.
+	 * 
+	 * @return The texture to display at the appropriate position.
+	 */
+	private ChroTexture getNumberTexture() {
+		return textures.get(getCurrentBarTime());
+	}
+
+	/**
+	 * This returns the current bar time as an integer, which allows
+	 * @return
+	 */
+	private int getCurrentBarTime() {
+		switch(barType) {
+		case HOUR:
+		case HOUR3D:
+			if(renderer.usesTwelveHourTime())
+				return Calendar.HOUR;
+			else
+				return Calendar.HOUR_OF_DAY;
+		case MINUTE:
+		case MINUTE3D:
+			return Calendar.MINUTE;
+		case SECOND:
+		case SECOND3D:
+			return Calendar.SECOND;
+		case MILLIS:
+		case MILLIS3D:
+			return Calendar.MILLISECOND;
+		default:
+			return 0;
+		}
+	}
+
 	/**
 	 * Changes the color of this bar using ARGB parameters.
 	 * <br><br>
@@ -582,31 +729,30 @@ public abstract class ChroBar implements IChroBar {
 	
 	/**
 	 * 
-	 * @param tex
+	 * @param texs
 	 */
-	public static void putNumberTextures(ArrayList<ChroTexture> tex) {
-		
-		//Get all possible ChroTypes.
-		ChroType[] chrotypes = ChroType.values();
-		//Initialize the hashmap so we can add some arraylists to hold our textures.
-		textures = new HashMap<ChroType, ArrayList<ChroTexture>>(chrotypes.length);
-		//Initialize the mapped arraylists.
-		for(ChroType t : chrotypes)
-			textures.put(t, new ArrayList<ChroTexture>(chrotypes.length));
-		//Populate the arraylists with the appropriate textures.
-		for(ChroTexture texture : tex)
-			for(ChroType t : texture.getBarTypes())
-				textures.get(t).add(texture);
+	public void putNumberTextures(ArrayList<ChroTexture> texs) {
+		textures = new SparseArray<ChroTexture>();
+		for(ChroTexture tex : texs) {
+			for(ChroType t : tex.getBarTypes()) {
+				if(t == barType) {
+					textures.append(tex.getOrderIndex(), tex);
+					break;
+				}
+			}
+		}
 	}
 	
 	/**
 	 * 
 	 * @param texture
-	 * @param types
 	 */
-	public synchronized static void putNumberTexture(ChroTexture texture, ChroType[] types) {
-		for(ChroType t : types)
-			textures.get(t).add(texture);
+	public synchronized void putNumberTexture(ChroTexture texture) {
+		for(ChroType t : texture.getBarTypes()) {
+			if(t == barType) {
+				textures.append(texture.getOrderIndex(), texture);
+			}
+		}
 	}
 
 	/**
@@ -649,11 +795,12 @@ public abstract class ChroBar implements IChroBar {
 	 * @param activityContext
 	 * @return
 	 */
-	public static ChroBar getInstance(ChroType ct, Context activityContext) {
-		
+	public static ChroBar getInstance(ChroType ct,
+										ArrayList<ChroTexture> texs,
+										Context activityContext) {
 		if(ct.is3D())
-			return new ChroBar3D(ct, activityContext);
+			return new ChroBar3D(ct, texs, activityContext);
 		else
-			return new ChroBar2D(ct, activityContext);
+			return new ChroBar2D(ct, texs, activityContext);
 	}
 }

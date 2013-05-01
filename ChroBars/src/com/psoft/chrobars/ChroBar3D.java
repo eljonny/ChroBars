@@ -11,6 +11,7 @@ import java.util.Iterator;
 import android.content.Context;
 
 import com.psoft.chrobars.data.ChroData;
+import com.psoft.chrobars.opengl.ChroTexture;
 import com.psoft.chrobars.opengl.Vec3D;
 
 /**
@@ -34,9 +35,9 @@ public class ChroBar3D extends ChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar3D(ChroType t, Context activityContext) {
+	public ChroBar3D(ChroType t, ArrayList<ChroTexture> texs, Context activityContext) {
 		//Make sure to pass params to the super constructor, where they are actually used.
-		super(t, activityContext);
+		super(t, texs, activityContext);
 	}
 
 	/**
@@ -56,11 +57,11 @@ public class ChroBar3D extends ChroBar {
 		//Set 3D vertex arrays
 		barVertexColors = new float[ChroData._3D_VERTICES*ChroData._RGBA_COMPONENTS];
 		edgeVertexColors = new float[ChroData._3D_VERTICES*ChroData._RGBA_COMPONENTS];
-		vertices = new float[ChroData._3D_VERTEX_COMPONENTS];
+		barVertices = new float[ChroData._3D_VERTEX_COMPONENTS];
 		normals = new float[ChroData._3D_VERTEX_COMPONENTS];
 		
 		//Allocate the vertex buffer
-		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
+		barVerticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertices).position(0);
 		//Allocate the color buffer
 		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
 		//Allocate the vertex draw sequence buffer
@@ -103,7 +104,7 @@ public class ChroBar3D extends ChroBar {
 								  0.4f,  1.0f,		  _baseDepth  };  // Upper Right Rear  | 7
 		
 		for(int i = 0; i < ChroData._3D_VERTEX_COMPONENTS; i++)
-			vertices[i] = verts_3D[i];
+			barVertices[i] = verts_3D[i];
 	}
 
 	/**
@@ -119,17 +120,17 @@ public class ChroBar3D extends ChroBar {
 //		System.out.println("Separating vertices...");
 		
 		ArrayList<Short>[] drawSequences = (ArrayList<Short>[]) Array.newInstance(alClassShort.getClass(), ChroData._bar_vertexDrawSequence_3D.length/3);
-		ArrayList<Float>[] vertexTriples = (ArrayList<Float>[]) Array.newInstance(alClassFloat.getClass(), vertices.length/3);
+		ArrayList<Float>[] vertexTriples = (ArrayList<Float>[]) Array.newInstance(alClassFloat.getClass(), barVertices.length/3);
 		
 		int i, j;
 		
 		//break the vertices up into their respective triples
 		//At the same time we can take care of breaking up some draw sequence triples as well.
-		for(i = 0; i < vertices.length/3; i++) {
+		for(i = 0; i < barVertices.length/3; i++) {
 			ArrayList<Float> vertex = new ArrayList<Float>();
 			ArrayList<Short> drawSequence = new ArrayList<Short>();
 			for(j = 0; j < 3; j++) {
-				vertex.add(vertices[i*3 + j]);
+				vertex.add(barVertices[i*3 + j]);
 				drawSequence.add(ChroData._bar_vertexDrawSequence_3D[i*3 + j]);
 			}
 			drawSequences[i] = drawSequence;
@@ -264,17 +265,17 @@ public class ChroBar3D extends ChroBar {
 //							leftXCoordinate_3D_rear + ", " + rightXCoord +
 //							", " + rightXCoordinate_3D_rear);
 		
-		vertices[0]  = vertices[3]  = leftXCoord;
-		vertices[6]  = vertices[9]  = rightXCoord;
-		vertices[12] = vertices[15] = leftXCoordinate_3D_rear;
-		vertices[18] = vertices[21] = rightXCoordinate_3D_rear;
+		barVertices[0]  = barVertices[3]  = leftXCoord;
+		barVertices[6]  = barVertices[9]  = rightXCoord;
+		barVertices[12] = barVertices[15] = leftXCoordinate_3D_rear;
+		barVertices[18] = barVertices[21] = rightXCoordinate_3D_rear;
 	}
 	
 	/**
 	 * 
 	 */
 	public void setBarHeight(float barTopHeight) {
-		vertices[1] = vertices[10] = vertices[13] = vertices[22] = barTopHeight;
+		barVertices[1] = barVertices[10] = barVertices[13] = barVertices[22] = barTopHeight;
 	}
 
 	/**

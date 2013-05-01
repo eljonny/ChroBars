@@ -432,7 +432,6 @@ public final class ChroBarsSettings {
 	 * @return the barsVisibility
 	 */
 	public final ArrayList<Boolean> getBarsVisibility() {
-		System.gc();
 		return new ArrayList<Boolean>(barsVisibility.values());
 	}
 	
@@ -440,7 +439,6 @@ public final class ChroBarsSettings {
 	 * @return the numbersVisibility
 	 */
 	public final ArrayList<Boolean> getNumbersVisibility() {
-		System.gc();
 		return new ArrayList<Boolean>(numbersVisibility.values());
 	}
 

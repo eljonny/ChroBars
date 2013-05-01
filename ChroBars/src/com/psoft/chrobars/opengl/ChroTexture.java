@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import android.graphics.Bitmap;
 
 import com.psoft.chrobars.ChroType;
+//DEBUG
 //import com.psoft.chrobars.util.ChroPrint;
 
 /**
@@ -19,9 +20,9 @@ import com.psoft.chrobars.ChroType;
  */
 public class ChroTexture {
 
-	private byte orderIndex;
-	private int resId, texId;
 	private boolean cacheLater;
+	private short orderIndex;
+	private int resId, texId;
 	private Bitmap bmpTex;
 	private String resName;
 	private ByteBuffer texBuffer;
@@ -50,8 +51,9 @@ public class ChroTexture {
 		setCacheLater(cacheLater); setBmpTex(texBmp);
 		barsForTex = new ArrayList<ChroType>(4);
 		determineOrder();
-//			DEBUG
-//			ChroPrint.println("Set bitmap to " + bmpTex + " from " + texBmp, System.out);
+//		DEBUG
+//		ChroPrint.println("Set bitmap to " + bmpTex + " from " + texBmp, System.out);
+//		ChroPrint.println("OrderIndex for " + this + "-" + resName + ": " + orderIndex, System.out)	;
 	}
 
 	/**
@@ -72,8 +74,11 @@ public class ChroTexture {
 		addBars(bars);
 	}
 	
+	/**
+	 * Simple means of determining where/when this texture should be drawn.
+	 */
 	private void determineOrder() {
-		
+		orderIndex = Short.parseShort(resName.split("_")[1]);
 	}
 
 	/**
@@ -189,7 +194,7 @@ public class ChroTexture {
 	/**
 	 * @return the orderIndex
 	 */
-	public byte getOrderIndex() {
+	public short getOrderIndex() {
 		return orderIndex;
 	}
 

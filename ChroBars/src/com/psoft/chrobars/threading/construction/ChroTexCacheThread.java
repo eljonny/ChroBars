@@ -1,7 +1,9 @@
-package com.psoft.chrobars.threading;
+package com.psoft.chrobars.threading.construction;
 
 import com.psoft.chrobars.opengl.ChroTexture;
 import com.psoft.chrobars.opengl.ChroTextures;
+import com.psoft.chrobars.threading.IChroLoadThread;
+//DEBUG
 //import com.psoft.chrobars.util.ChroPrint;
 
 /**
@@ -42,7 +44,7 @@ public class ChroTexCacheThread extends Thread {
 	public void run() {
 //		DEBUG
 //		ChroTexture cached;
-		(/*cached = */ChroTextures.cacheTexture(toCache)).getBmpTex().recycle();
+		/*cached = */ChroTextures.cacheTexture(toCache);
 //		DEBUG
 //		ChroPrint.println(this + " cached " + cached, System.out);
 		callbackThread.incProgress(1);

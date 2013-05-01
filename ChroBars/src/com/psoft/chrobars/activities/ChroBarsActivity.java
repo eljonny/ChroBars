@@ -17,8 +17,8 @@ import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.settings.ChroBarsSettings;
-import com.psoft.chrobars.threading.ChroConstructionThread;
-import com.psoft.chrobars.threading.ChroPostStartLoad;
+import com.psoft.chrobars.threading.construction.ChroConstructionThread;
+import com.psoft.chrobars.threading.construction.ChroPostStartLoadThread;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -299,7 +299,7 @@ public class ChroBarsActivity extends Activity {
 	private void cacheAndLoadLateTextures() {
 		//Load textures we don't need yet in the background.
 		ChroPrint.println("Starting background texture loading thread...", System.out);
-		(new ChroPostStartLoad(params.getTextures(), ChroSurface.getRenderer())).start();
+		(new ChroPostStartLoadThread(params.getTextures(), ChroSurface.getRenderer())).start();
 	}
 	
 	/**

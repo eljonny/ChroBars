@@ -1,4 +1,4 @@
-package com.psoft.chrobars.threading;
+package com.psoft.chrobars.threading.construction;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.opengl.ChroTexture;
 import com.psoft.chrobars.opengl.ChroTextures;
 import com.psoft.chrobars.settings.ChroBarsSettings;
+import com.psoft.chrobars.threading.IChroLoadThread;
 import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
 
@@ -109,6 +110,13 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	private void construct() {
 		incProgress(2);
 		getSettingsInstance();
+		//For debugging purposes, give a return value to ensure that
+		// the settings object is created before we continue.
+		//Most of the time I am pretty sure this is not an issue.
+//		if(getSettingsInstance()) {
+////			DEBUG
+//			ChroPrint.println("Loaded settings successfully.", System.out);
+//		}
 		incProgress(2);
 		cacheTextures();
 		incProgress(5);
@@ -173,15 +181,13 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 		
 		//Get the application's resources object reference.
 		Resources chroRes = UIThread.getResources();
-		//Get the initial numbersVisibility from the settings object.
-		ArrayList<Boolean> numbersVis = settings.getNumbersVisibility();
 		ArrayList<Field> resids = new ArrayList<Field>();
 		
 		ChroPrint.println("Caching graphics...", System.out);
 		
 		//Pore through the fields, load the corresponding images.
 		for(Field image : imgResIds) {
-			ChroTexture tex = decodeAndProcessResource(bmpLoadOptions, chroRes, numbersVis, image);
+			ChroTexture tex = decodeAndProcessResource(bmpLoadOptions, chroRes, image);
 			cacheTextureOrContinue(cachingThreads, image, tex, resids);
 		}
 		
@@ -281,9 +287,10 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 */
 	private ChroTexture decodeAndProcessResource(final BitmapFactory.Options bmpLoadOptions,
 												  Resources chroRes,
-												  ArrayList<Boolean> numbersVis,
 												  Field image) {
-		
+		//Get the numbersVisibility and barsVisibility from the settings object.
+		ArrayList<Boolean> numbersVis = settings.getNumbersVisibility(),
+						   barsVis = settings.getBarsVisibility();
 		//Temporary texture variables for this resource ID
 		ChroTexture tex = null;
 		//Storage for the resource ID and name
@@ -292,6 +299,9 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 		//Modify the bar type based on the visibility
 		// of either 3D or 2D initial bars.
 		int visMod = settings.isThreeD() ? 4 : 0;
+		
+//		DEBUG
+//		ChroPrint.println("Working with numbers visibility list " + numbersVis, System.out);
 		
 		//Try to decode the png via its drawable resid
 		try {
@@ -311,34 +321,39 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 //			DEBUG
 //			ChroPrint.println("Found bar " + bar + " in texture " + resName, System.out);
 			boolean loadNow = false;
+			int typeMain, typeAlt;
 			
 			if(bar.length() > 1) {
 				char[] types = bar.toCharArray();
 				//Check if we need to load this texture now.
-				for(int i = 0; i < types.length; i++)
-					loadNow |= numbersVis.get(Integer.parseInt("" + types[i]) + visMod) |
-							   numbersVis.get(Integer.parseInt("" + types[i]) + visMod + (visMod == 0 ? 4 : -4));
+				for(int i = 0; i < types.length; i++) {
+					typeMain = Integer.parseInt("" + types[i]) + visMod;
+					typeAlt = typeMain + (visMod == 0 ? 4 : -4);
+					loadNow |= ((numbersVis.get(typeMain) && barsVis.get(typeMain)) | (numbersVis.get(typeAlt) && barsVis.get(typeAlt)));
+				}
 //				DEBUG
-				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
+//				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
 				tex = new ChroTexture(resId, resName, !loadNow, texture);
 				
-				for(char b : types)
-					tex.addBarTypes(ChroType.valueByNumber(Integer.parseInt("" + b) + visMod),
-									ChroType.valueByNumber(Integer.parseInt("" + b) + visMod + (visMod == 0 ? 4 : -4)));
+				for(char b : types) {
+					typeMain = Integer.parseInt("" + b) + visMod;
+					typeAlt = typeMain + (visMod == 0 ? 4 : -4);
+					tex.addBarTypes(ChroType.valueByNumber(typeMain), ChroType.valueByNumber(typeAlt));
+				}
 				
 				textures.add(tex);
 			}
 			else {
 				//The type of bar applicable to the
 				// resource we are dealing with.
-				int barType = Integer.parseInt(bar) + visMod;
+				typeMain = Integer.parseInt(bar) + visMod;
+				typeAlt = typeMain + (visMod == 0 ? 4 : -4);
 				//Check if we need to load texture now.
-				loadNow |= numbersVis.get(barType) | numbersVis.get(barType + (visMod == 0 ? 4 : -4));
+				loadNow |= ((numbersVis.get(typeMain) && barsVis.get(typeMain)) | (numbersVis.get(typeAlt) && barsVis.get(typeAlt)));
 //				DEBUG
-				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
+//				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
 				tex = new ChroTexture(resId, resName, !loadNow, texture);
-				tex.addBarTypes(ChroType.valueByNumber(barType),
-								ChroType.valueByNumber(barType + (visMod == 0 ? 4 : -4)));
+				tex.addBarTypes(ChroType.valueByNumber(typeMain), ChroType.valueByNumber(typeAlt));
 //				DEBUG
 //				ChroPrint.println("Current bar types in texture object " + tex + ": " + tex.getBarTypes().length, System.out);
 				textures.add(tex);
@@ -410,7 +425,8 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 * @param imgResIds
 	 * @return
 	 */
-	private boolean checkMemoryForCache(ArrayList<Field> imgResIds, ArrayList<ChroTexture> cache) {
+	private boolean checkMemoryForCache(ArrayList<Field> imgResIds,
+										  ArrayList<ChroTexture> cache) {
 		
 		ChroPrint.println("Checking for cache in memory...", System.out);
 		
@@ -480,6 +496,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 //			System.out.println("Getting new settings instance...");
 			settings = ChroBarsSettings.getNewSettingsInstance(UIThread);
 			incProgress(10);
+//			return true;
 		}
 		catch(Exception unknownEx) {
 			//Something went wrong that can possibly be corrected by attempting
@@ -493,6 +510,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 //				DEBUG
 //				ChroPrint.println("Existing settings instance retrieved.", System.out);
 				incProgress(5);
+//				return true;
 			}
 			//If this happens, we have no access to the program settings,
 			// thus we cannot continue past this point.

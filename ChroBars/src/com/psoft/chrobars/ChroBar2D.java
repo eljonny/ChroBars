@@ -4,10 +4,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 
 import android.content.Context;
 
 import com.psoft.chrobars.data.ChroData;
+import com.psoft.chrobars.opengl.ChroTexture;
 
 /**
  * 
@@ -22,9 +24,9 @@ public class ChroBar2D extends ChroBar {
 	 * @param color
 	 * @param activityContext
 	 */
-	public ChroBar2D(ChroType t, Context activityContext) {
+	public ChroBar2D(ChroType t, ArrayList<ChroTexture> texs, Context activityContext) {
 		//Make sure to pass params to the super constructor, where they are actually used.
-		super(t, activityContext);
+		super(t, texs, activityContext);
 	}
 
 	/**
@@ -36,10 +38,10 @@ public class ChroBar2D extends ChroBar {
 		//Set 2D vertex arrays
 		barVertexColors = new float[ChroData._2D_VERTICES*ChroData._RGBA_COMPONENTS];
 		edgeVertexColors = new float[ChroData._2D_VERTICES*ChroData._RGBA_COMPONENTS];
-		vertices = new float[ChroData._2D_VERTEX_COMPONENTS];
+		barVertices = new float[ChroData._2D_VERTEX_COMPONENTS];
 		
 		//Allocate the vertex buffer
-		verticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(vertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(vertices).position(0);
+		barVerticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertices.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertices).position(0);
 		//Allocate the bar's color buffer
 		barsColorBuffer = (FloatBuffer) ByteBuffer.allocateDirect(barVertexColors.length*ChroData._BYTES_IN_FLOAT).order(order_native).asFloatBuffer().put(barVertexColors).position(0);
 		//Allocate the vertex bar draw sequence buffer
@@ -68,7 +70,7 @@ public class ChroBar2D extends ChroBar {
 								  0.5f, 1.0f, 		 0.0f  };	// Upper Right | 3
 		
 		for(int i = 0; i < ChroData._2D_VERTEX_COMPONENTS; i++)
-			vertices[i] = verts_2D[i];
+			barVertices[i] = verts_2D[i];
 	}
 
 	/**
@@ -83,15 +85,15 @@ public class ChroBar2D extends ChroBar {
 	 * 
 	 */
 	public void setBarWidth(float leftX, float rightX) {
-		vertices[0] = vertices[3] = leftX;
-		vertices[6] = vertices[9] = rightX;
+		barVertices[0] = barVertices[3] = leftX;
+		barVertices[6] = barVertices[9] = rightX;
 	}
 
 	/**
 	 * 
 	 */
 	public void setBarHeight(float barTopHeight) {
-		vertices[1] = vertices[10] = barTopHeight;
+		barVertices[1] = barVertices[10] = barTopHeight;
 	}
 
 	/**

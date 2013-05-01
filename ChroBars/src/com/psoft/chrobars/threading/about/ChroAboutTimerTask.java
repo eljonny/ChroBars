@@ -1,4 +1,4 @@
-package com.psoft.chrobars.threading;
+package com.psoft.chrobars.threading.about;
 
 import java.util.TimerTask;
 
