@@ -32,12 +32,14 @@ public class ChroSurface extends GLSurfaceView {
 		//Set the pixel format
 		if((Build.MANUFACTURER.toLowerCase(Locale.US)).contains("samsung") ||
 		   (Build.MANUFACTURER.toLowerCase(Locale.US)).contains("moto"))
-			getHolder().setFormat(PixelFormat.RGB_565);
+			getHolder().setFormat(PixelFormat.RGBA_8888);
 		else
 			getHolder().setFormat(PixelFormat.TRANSLUCENT);
 		
+		setEGLConfigChooser(8,8,8,8,0,0);
+		
 		//Uncomment if you're having trouble
-	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
+//	    setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
 		
 		rend = new BarsRenderer();
 		rend.setActivityContext(context);

@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.opengl.GLUtils;
 
 import com.psoft.chrobars.ChroBar;
 import com.psoft.chrobars.ChroType;
@@ -123,6 +124,7 @@ public class ChroTextures {
 		number.setTexId(numTexture[0]);
 		
 		ChroPrint.println("Loading texture" + number + "...", System.out);
+		
 		gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, number.getBmpTex().getWidth(),
 						number.getBmpTex().getHeight(), 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, numBuffer);
 		return numTexture[0];
@@ -138,26 +140,26 @@ public class ChroTextures {
 	 */
 	public static ChroTexture cacheTexture(ChroTexture number) {
 
-		Bitmap numBmp = number.getBmpTex();
-		ByteBuffer tex = ByteBuffer.allocateDirect(numBmp.getHeight() * numBmp.getWidth() * ChroData._RGBA_COMPONENTS).order(ByteOrder.nativeOrder());
-		byte pixelBuffer[] = new byte[ChroData._RGBA_COMPONENTS];
-		for(int i = 0; i < numBmp.getHeight(); i++) {
-			for(int j = 0; j < numBmp.getWidth(); j++) {
-				int color = numBmp.getPixel(j, i);
-				pixelBuffer[0] = (byte)Color.red(color);
-				pixelBuffer[1] = (byte)Color.green(color);
-				pixelBuffer[2] = (byte)Color.blue(color);
-				pixelBuffer[3] = (byte)Color.alpha(color);
-				tex.put(pixelBuffer);
-			}
-		}
+//		Bitmap numBmp = number.getBmpTex();
+//		ByteBuffer tex = ByteBuffer.allocateDirect(numBmp.getHeight() * numBmp.getWidth() * ChroData._RGBA_COMPONENTS).order(ByteOrder.nativeOrder());
+//		byte pixelBuffer[] = new byte[ChroData._RGBA_COMPONENTS];
+//		for(int i = 0; i < numBmp.getHeight(); i++) {
+//			for(int j = 0; j < numBmp.getWidth(); j++) {
+//				int color = numBmp.getPixel(j, i);
+//				pixelBuffer[0] = (byte)Color.red(color);
+//				pixelBuffer[1] = (byte)Color.green(color);
+//				pixelBuffer[2] = (byte)Color.blue(color);
+//				pixelBuffer[3] = (byte)Color.alpha(color);
+//				tex.put(pixelBuffer);
+//			}
+//		}
 		
 //		DEBUG
 //		ChroPrint.println("Adding " + number + " with types " + ChroUtilities.buildArrayString(number.getBarTypes()) + " to the texture cache...", System.out);
 		synchronized(texCache) {
 			synchronized(uniqueTextures) {
 				for(ChroType t : number.getBarTypes())
-					texCache.get(t).add(number.setTexBuffer((ByteBuffer) tex.position(0)));
+					texCache.get(t).add(number/*.setTexBuffer((ByteBuffer) tex.position(0))*/);
 				uniqueTextures.add(number);
 			}
 		}
@@ -173,6 +175,9 @@ public class ChroTextures {
 	 * @return The array of texture names assigned by OpenGL.
 	 */
 	public static int[] loadTextures(GL10 gl, int texSize) {
+		
+		gl.glEnable(GL10.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		
 		int[] textures = new int[uniqueTextures.size()];
 		
@@ -191,16 +196,29 @@ public class ChroTextures {
 //				DEBUG
 //				ChroPrint.println("Binding texture " + texture + ":" + textures[texture] + "...", System.out);
 				number.setTexId(textures[texture]);
-				gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[texture++]);
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[texture]);
+
+		    	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,GL10.GL_CLAMP_TO_EDGE);
+		    	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,GL10.GL_CLAMP_TO_EDGE);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 				
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
 //				DEBUG
-//				ChroPrint.println("Loading texture " + (texture - 1) + "...", System.out);
-				gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texSize,
-								texSize, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//				ChroPrint.println("Loading texture " + texture + "...", System.out);
+//				gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texSize,
+//								texSize, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//				gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_LUMINANCE, texSize,
+//				texSize, 0, GL10.GL_LUMINANCE, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//				gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_LUMINANCE_ALPHA, texSize,
+//				texSize, 0, GL10.GL_LUMINANCE_ALPHA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+				GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, number.getBmpTex(), 0);
+				texture++;
+				glCheckError(gl);
 			}
 		}
+
+		gl.glDisable(GL10.GL_BLEND);
+		
 		ChroPrint.println("Loaded " + textures.length + " textures into OpenGL.", System.out);
 		
 		return textures;
@@ -217,6 +235,10 @@ public class ChroTextures {
 	 */
 	public static int[] loadTextures(GL10 gl, ArrayList<ChroTexture> givenTexs,
 									   int texSize, HashMap<ChroType, ChroBar> chroBars) {
+		
+		gl.glEnable(GL10.GL_BLEND);
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+		
 		int[] textures = new int[givenTexs.size()];
 		
 		ChroPrint.println("Loading " + givenTexs.size() + " textures into bars...", System.out);
@@ -235,19 +257,41 @@ public class ChroTextures {
 //			DEBUG
 //			ChroPrint.println("Binding texture " + texture + ":" + textures[texture] + "...", System.out);
 			number.setTexId(textures[texture]);
-			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[texture++]);
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[texture]);
+
+	    	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,GL10.GL_CLAMP_TO_EDGE);
+	    	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,GL10.GL_CLAMP_TO_EDGE);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 			
-			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
 //			DEBUG
-//			ChroPrint.println("Loading texture " + (texture - 1) + "...", System.out);
-			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texSize,
-							texSize, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//			ChroPrint.println("Loading texture " + texture + "...", System.out);
+//			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, texSize,
+//							texSize, 0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_LUMINANCE, texSize,
+//					texSize, 0, GL10.GL_LUMINANCE, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+//			gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_LUMINANCE_ALPHA, texSize,
+//					texSize, 0, GL10.GL_LUMINANCE_ALPHA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, number.getBmpTex(), 0);
+			texture++;
+			glCheckError(gl);
 		}
+
+		gl.glDisable(GL10.GL_BLEND);
 		
 		ChroPrint.println("Loaded " + textures.length + " textures into OpenGL.", System.out);
 		
 		return textures;
+	}
+
+	/**
+	 * @param gl
+	 */
+	private static void glCheckError(GL10 gl) {
+		int error = gl.glGetError();
+		if (error != GL10.GL_NO_ERROR) { 
+		    ChroPrint.println("GL Texture Load Error: " + error, System.err);
+		}
 	}
 
 	/**

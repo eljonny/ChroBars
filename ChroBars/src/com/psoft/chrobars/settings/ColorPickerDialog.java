@@ -367,9 +367,11 @@ public class ColorPickerDialog extends Dialog {
                         }
                     } else {
                         float angle = (float)java.lang.Math.atan2(y, x);
-                        System.out.println("Angle: " + angle);
+//                      DEBUG
+//                      System.out.println("Angle: " + angle);
                         // need to turn angle [-PI ... PI] into unit [0....1]
                         float unit = angle/(2*PI);
+//                      DEBUG
                         System.out.println("Unit: " + unit);
                         
                         if (unit < 0) {

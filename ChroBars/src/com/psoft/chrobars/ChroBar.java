@@ -1,5 +1,6 @@
 package com.psoft.chrobars;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
@@ -37,11 +38,14 @@ public abstract class ChroBar implements IChroBar {
 	protected static Calendar currentTime;
 	
 	/* End static fields, Begin instance variables */
-	
-	//The bar and edge color is stored as a packed color int
-	protected int barColor, edgeColor;
+
 	//Whether this bar should be drawn
 	protected boolean drawBar, drawNumber;
+	//The bar and edge color is stored as a packed color int
+	protected int barColor, edgeColor;
+	//Bar width instance variable, updated at every recalculation.
+	//This is the actual width of the bar on screen and does not include margins.
+	protected float barWidth;
 	//Whether this bar has edge colors that should not be operated on.
 	protected boolean[] noColorOp = new boolean[3];
 	protected float[] barVertexColors, barVertices;
@@ -49,9 +53,10 @@ public abstract class ChroBar implements IChroBar {
 	protected float[] textureVertices;
 	//OpenGL Surface and drawing buffers
 	protected ShortBuffer barDrawSequenceBuffer, edgeDrawSequenceBuffer;
+	protected ShortBuffer textureDrawSequenceBuffer;
 	protected FloatBuffer barVerticesBuffer, barsColorBuffer;
 	protected FloatBuffer edgesColorBuffer, normalsBuffer;
-	protected FloatBuffer textureVerticesBuffer;
+	protected FloatBuffer textureVerticesBuffer, textureCoordinatesBuffer;
 	//Type of data this represents
 	protected ChroType barType;
 	//The current number to draw for this bar.
@@ -70,9 +75,29 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	public ChroBar(ChroType t, ArrayList<ChroTexture> texs, Context activityContext) {
 		
+		setBarsDataInit();
+		setRendererInit();
+		setBarType(t);
+		
+		prepareTextures(texs);
+		
+		//Do the actual buffer allocation.
+		barGLAllocate(ByteOrder.nativeOrder());
+	}
+
+	/**
+	 * 
+	 */
+	private void setBarsDataInit() {
 		//If the data object is null, make one. Otherwise do nothing.
 		if(barsData == null)
 			barsData = ChroData.getNewDataInstance();
+	}
+
+	/**
+	 * 
+	 */
+	private void setRendererInit() {
 		
 		renderer = ChroSurface.getRenderer();
 		
@@ -83,17 +108,49 @@ public abstract class ChroBar implements IChroBar {
 			}
 			barsData.modifyIntegerField("barsCreated", 1);
 		}
+	}
+
+	/**
+	 * @param texs
+	 */
+	private void prepareTextures(ArrayList<ChroTexture> texs) {
 		
-		barType = t;
-		
+		//Add the current textures to this bar.
 		putNumberTextures(texs);
+		//Allocate space for the texture coordinate float array to be put into a FloatBuffer.
+		textureCoordinatesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(ChroData._textureCoordinates.length*ChroData._BYTES_IN_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer().put(ChroData._textureCoordinates).position(0);
+		//Allocate space for the texture draw sequence float array to be put into a FloatBuffer.
+		textureDrawSequenceBuffer = (ShortBuffer) ByteBuffer.allocateDirect(ChroData._texture_vertexDrawSequence.length*ChroData._BYTES_IN_SHORT).order(ByteOrder.nativeOrder()).asShortBuffer().put(ChroData._texture_vertexDrawSequence).position(0);
+		
+		ChroPrint.println("Initializing texture vertices...", System.out);
+		initTextureVertices();
+		
 //		DEBUG
 //		ChroPrint.println("Added " + textures.size() + " to " + barType + "'s texture cache.", System.out);
-		
-		//Do the actual buffer allocation.
-		barGLAllocate(ByteOrder.nativeOrder());
 	}
-	
+
+	/**
+	 * 
+	 */
+	private void initTextureVertices() {
+		
+		textureVertices = new float[ChroData._2D_VERTEX_COMPONENTS];
+		
+		//Allocate a FloatBuffer for the texture vertices.
+		textureVerticesBuffer = (FloatBuffer) ByteBuffer.allocateDirect(textureVertices.length*ChroData._BYTES_IN_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer().put(textureVertices).position(0);
+		
+		float _baseHeight = ChroData._baseHeight;
+		
+		//Place the texture plane right in front of the bars.
+		float[] texVerts = { 	 -0.5f, _baseHeight, 0.01f,    	// Lower Left  | 0
+								  0.5f, _baseHeight, 0.01f,    	// Lower Right | 1
+								 -0.5f, 1.0f, 		 0.01f,    	// Upper Left  | 2
+								  0.5f, 1.0f, 		 0.01f  };	// Upper Right | 3
+		
+		for(int i = 0; i < ChroData._2D_VERTEX_COMPONENTS; i++)
+			textureVertices[i] = texVerts[i];
+	}
+
 	/**
 	 * 
 	 * @param toDraw
@@ -156,7 +213,7 @@ public abstract class ChroBar implements IChroBar {
 		float barWidth = (screenWidth/(float)numberOfBars)/screenWidth;
 		barWidth *= 2f;
 		barWidth -= ((edgeMargin*2f)/(float)numberOfBars);
-		barWidth -= ((barMargin*((float)numberOfBars-1f))/(float)numberOfBars);
+		this.barWidth = barWidth -= ((barMargin*((float)numberOfBars-1f))/(float)numberOfBars);
 		
 		if(barType.is3D())
 			barTypeCode -= 4f;
@@ -299,6 +356,7 @@ public abstract class ChroBar implements IChroBar {
 			disableStates(drawSurface);
 			
 			recalculateBarDimensions();
+			calculateTextureDimensions();
 		}
 	}
 
@@ -318,14 +376,11 @@ public abstract class ChroBar implements IChroBar {
 		//Clear the buffer space
 		//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
 		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
-		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		
 		if(barType.is3D()) {
 			//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
 			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 		}
-		
 		//Disable face culling.
 		//ChroPrint.println("Calling glDisable", System.out);
 		drawSurface.glDisable(GL10.GL_CULL_FACE);
@@ -418,57 +473,81 @@ public abstract class ChroBar implements IChroBar {
 	 * @param drawSurface
 	 */
 	private void drawTexture(GL10 drawSurface) {
+
+		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
+		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		
-		if(!shouldDrawTexture())
-			return;
+		shouldDrawTexture();
+		
+		drawSurface.glEnable(GL10.GL_BLEND);
+		drawSurface.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		
 		drawSurface.glEnable(GL10.GL_TEXTURE_2D);
-		drawSurface.glEnable(GL10.GL_TEXTURE_COORD_ARRAY);
-		drawSurface.glEnable(GL10.GL_TEXTURE0);
 		
-		drawSurface.glActiveTexture(GL10.GL_TEXTURE0);
 //		DEBUG
-//		ChroPrint.println("Trying to bind number " + this.number + " with texture ID " + textureId, System.out);
-		drawSurface.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
+//		ChroPrint.println("Trying to bind number " + this.number + " with texture ID " + this.textureId, System.out);
+		drawSurface.glBindTexture(GL10.GL_TEXTURE_2D, this.textureId);
+		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		drawSurface.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+		drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, textureVerticesBuffer);
+		drawSurface.glTexCoordPointer(ChroData._DIMENSIONS - 1, GL10.GL_FLOAT,
+									  ChroData._VERTEX_STRIDE, textureCoordinatesBuffer);
 		
-		
-		//Draw the number texture
 //		DEBUG
 //		ChroPrint.println("Calling glDrawElements for textures", System.out);
-		drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
-									GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+		//Uses the same draw sequence as the 2D bars, to preserve polygon winding.
+		//Draw the number texture
+		drawSurface.glDrawElements(GL10.GL_TRIANGLES, ChroData._texture_vertexDrawSequence.length,
+									GL10.GL_UNSIGNED_SHORT, textureDrawSequenceBuffer);
+//		drawSurface.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, textureVertices.length / 3);
 		
-		drawSurface.glDisable(GL10.GL_TEXTURE0);
-		drawSurface.glDisable(GL10.GL_TEXTURE_COORD_ARRAY);
+		drawSurface.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		drawSurface.glDisable(GL10.GL_TEXTURE_2D);
+		drawSurface.glDisable(GL10.GL_BLEND);
+		
+//		ChroUtilities.glCheckError(drawSurface);
+	}
+
+	private void calculateTextureDimensions() {
+		//Set the left-side position of the texture plane to the edge of the bar.
+		textureVertices[0] = textureVertices[6] = barVertices[0];
+		//Set the right-side vertices: The texture should be the width of the bar.
+		textureVertices[3] = textureVertices[9] = textureVertices[0] + barWidth;
+		//The texture should have the same height as it is width.
+		textureVertices[7] = textureVertices[10] = textureVertices[1] + barWidth;
+		//Refill the textureverticesbuffer with the new coordinates.
+		((FloatBuffer) textureVerticesBuffer.clear()).put(textureVertices).position(0);
 	}
 
 	/**
 	 * @return
 	 */
 	private boolean shouldDrawTexture() {
-		
+//		DEBUG
+//		ChroPrint.println("Looking for a texture for " + barType, System.out);
 		ChroTexture number = getNumberTexture();
 		int textureId = 0;
 		
 		//There is no texture for this time
 		if(number == null)
 			return false;
-		//Otherwise, proceed as usual.
-		else {
-			this.number = number;
-			textureId = number.getTexId();
-		}
+		//Otherwise, proceed.
+		this.number = number;
+		textureId = number.getTexId();
 		//There is a problem with the texture if this is true.
 		if(textureId == 0)
 			return false;
-		else
-			this.textureId = textureId;
+		this.textureId = textureId;
 		//Or if for some reason the instance number texture object is still null
 		if(this.number == null)
 			return false;
 		else if(this.textureId == 0)
 			return false;
+//		DEBUG
+//		ChroPrint.println("Texture: " + number + "\nTexture ID: " + textureId, System.out);
 		
 		return true;
 	}
@@ -479,7 +558,13 @@ public abstract class ChroBar implements IChroBar {
 	 * @return The texture to display at the appropriate position.
 	 */
 	private ChroTexture getNumberTexture() {
-		return textures.get(getCurrentBarTime());
+		int time = getCurrentBarTime();
+//		DEBUG
+//		ChroPrint.println("Get time for " + barType + ": " + time, System.out);
+		ChroTexture tex = textures.get(time);
+//		DEBUG
+//		ChroPrint.println("Current texture: " + tex, System.out);
+		return tex;
 	}
 
 	/**
@@ -487,22 +572,25 @@ public abstract class ChroBar implements IChroBar {
 	 * @return
 	 */
 	private int getCurrentBarTime() {
+		currentTime = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+//		DEBUG
+//		ChroPrint.println("Getting current time for bar: " + barType, System.out);
 		switch(barType) {
 		case HOUR:
 		case HOUR3D:
 			if(renderer.usesTwelveHourTime())
-				return Calendar.HOUR;
+				return currentTime.get(Calendar.HOUR);
 			else
-				return Calendar.HOUR_OF_DAY;
+				return currentTime.get(Calendar.HOUR_OF_DAY);
 		case MINUTE:
 		case MINUTE3D:
-			return Calendar.MINUTE;
+			return currentTime.get(Calendar.MINUTE);
 		case SECOND:
 		case SECOND3D:
-			return Calendar.SECOND;
+			return currentTime.get(Calendar.SECOND);
 		case MILLIS:
 		case MILLIS3D:
-			return Calendar.MILLISECOND;
+			return currentTime.get(Calendar.MILLISECOND);
 		default:
 			return 0;
 		}
@@ -732,15 +820,21 @@ public abstract class ChroBar implements IChroBar {
 	 * @param texs
 	 */
 	public void putNumberTextures(ArrayList<ChroTexture> texs) {
+//		DEBUG
+//		ChroPrint.println("Putting " + texs, System.out);
 		textures = new SparseArray<ChroTexture>();
 		for(ChroTexture tex : texs) {
 			for(ChroType t : tex.getBarTypes()) {
-				if(t == barType) {
+				if(t.equals(barType)) {
+//					DEBUG
+//					ChroPrint.println("Appending " + tex, System.out);
 					textures.append(tex.getOrderIndex(), tex);
 					break;
 				}
 			}
 		}
+//		DEBUG
+//		ChroPrint.println("Current ChroTextures:\n" + textures, System.out);
 	}
 	
 	/**
@@ -769,6 +863,14 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	public ChroType getBarType() {
 		return barType;
+	}
+	
+	/**
+	 * 
+	 * @param t
+	 */
+	private void setBarType(ChroType t) {
+		barType = t;
 	}
 	
 	/**

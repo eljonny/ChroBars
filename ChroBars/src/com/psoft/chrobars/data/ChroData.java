@@ -71,7 +71,7 @@ public final class ChroData {
 										 				_SECONDS_IN_MINUTE * ChroData._MILLIS_IN_SECOND ),
 							   _msInMinute = ( ChroData._SECONDS_IN_MINUTE * ChroData._MILLIS_IN_SECOND );
 	
-	//Vertex draw sequences for 2D and 3D, respectively.
+	//Vertex draw sequences for 2D, 3D, and texture plane, respectively.
 	public static final short[] _bar_vertexDrawSequence_2D = {	0, 1, 2,
 																	0, 2, 3  };
 	
@@ -88,12 +88,19 @@ public final class ChroData {
 															        3, 0, 1,
 															        3, 1, 2  };
 	
+	public static final short[] _texture_vertexDrawSequence = {	0, 1, 2,
+																	2, 1, 3  };
+	//Texels for drawing the numbers.
+	public static final float[] _textureCoordinates =  { 0.0f, 1.0f,
+															1.0f, 1.0f,
+													        0.0f, 0.0f,
+													        1.0f, 0.0f };
+	
 	//Edge draw sequences for 2D and 3D, respectively.
 	public static final short[] _edges_vertexDrawSequence_2D = { 0, 1, 1, 2, 2, 3, 3, 0 };	//2D bar
 	public static final short[] _edges_vertexDrawSequence_3D = { 0, 1, 1, 2, 2, 3, 3, 0,		//Front side
-																	0, 4, 4, 5, 5, 1,			//Left side
 																	2, 6, 6, 7,					//Right side
-																				7, 4, 7, 3 };	//Top side
+																		  7, 4, 4, 0, 7, 3 };	//Top side
 	//GL Light buffer defaults
 	public static final float[] //Parameters for light 0
 								   _light_0_ambient = {0.05f, 0.05f, 0.05f, 1.0f},

@@ -3,6 +3,8 @@ package com.psoft.chrobars.util;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.SparseArray;
@@ -28,6 +30,16 @@ public final class ChroUtilities {
 				Calendar.DAY_OF_MONTH + "{" + Calendar.HOUR +
 				":" + Calendar.MINUTE + ":" + Calendar.SECOND +
 				"." + Calendar.MILLISECOND + "}");
+	}
+
+	/**
+	 * @param gl
+	 */
+	public static void glCheckError(GL10 gl) {
+		int error = gl.glGetError();
+		if (error != GL10.GL_NO_ERROR) { 
+		    ChroPrint.println("GL Error: " + error, System.err);
+		}
 	}
 	
 	/**

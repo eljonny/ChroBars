@@ -21,7 +21,7 @@ import com.psoft.chrobars.ChroType;
 public class ChroTexture {
 
 	private boolean cacheLater;
-	private short orderIndex;
+	private int orderIndex;
 	private int resId, texId;
 	private Bitmap bmpTex;
 	private String resName;
@@ -194,7 +194,7 @@ public class ChroTexture {
 	/**
 	 * @return the orderIndex
 	 */
-	public short getOrderIndex() {
+	public int getOrderIndex() {
 		return orderIndex;
 	}
 
