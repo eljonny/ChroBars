@@ -223,6 +223,13 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 		if(tex.getBmpTex() == null)
 			ChroPrint.println("Error decoding resid field " + image, System.err);
 
+		/*
+		 * The code below allows us to cache textures after the application is finished loading.
+		 * We are going to shy away from this because we know a much more efficient way to load
+		 *  textures from Bitmaps straight into OpenGL that does indeed preserve 8-bit alpha values.
+		 */
+		
+		/*
 		//Then check if it is set for loading post-start
 		if(tex.isCacheLater())
 			return;
@@ -235,6 +242,15 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 			cachingThreads.add(texCacheThread);
 			resids.add(image);
 		}
+		*/
+		
+		/*
+		 * This will load all textures before the OpenGL surface is created.
+		 */
+		ChroTexCacheThread texCacheThread = new ChroTexCacheThread(tex, this);
+		texCacheThread.start();
+		cachingThreads.add(texCacheThread);
+		resids.add(image);
 	}
 
 	/**
@@ -288,9 +304,13 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	private ChroTexture decodeAndProcessResource(final BitmapFactory.Options bmpLoadOptions,
 												  Resources chroRes,
 												  Field image) {
+		/*
+		 * Deprecated fields. Though these are required to enable post-load
+		 *  texture caching to analyze the state of the bars before they load.
+		 */
 		//Get the numbersVisibility and barsVisibility from the settings object.
-		ArrayList<Boolean> numbersVis = settings.getNumbersVisibility(),
-						   barsVis = settings.getBarsVisibility();
+//		ArrayList<Boolean> numbersVis = settings.getNumbersVisibility(),
+//						   barsVis = settings.getBarsVisibility();
 		//Temporary texture variables for this resource ID
 		ChroTexture tex = null;
 		//Storage for the resource ID and name
@@ -311,7 +331,7 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 			resName = image.getName();
 //			DEBUG
 //			ChroPrint.println("Will try to decode  resource " + resName + " with resource ID " + resId + " from resources object " + chroRes, System.out);
-			//We then attempt to decode the PNG texture.
+			//We then attempt to decode the PNG texture. This is the preferred method for image resource decoding.
 			Bitmap texture = BitmapFactory.decodeResource(chroRes, resId, bmpLoadOptions);
 			
 			//Alternate Method for decoding PNG
@@ -330,17 +350,26 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 			String bar = texName[texName.length - 1];
 //			DEBUG
 //			ChroPrint.println("Found bar " + bar + " in texture " + resName, System.out);
-			boolean loadNow = false;
+//			boolean loadNow = false;
+			boolean loadNow = true;
 			int typeMain, typeAlt;
 			
 			if(bar.length() > 1) {
 				char[] types = bar.toCharArray();
+				
+				/*
+				 * We are deprecating post-load texture caching since loading times 
+				 *  have improved significantly.
+				 */
+				/*
 				//Check if we need to load this texture now.
 				for(int i = 0; i < types.length; i++) {
 					typeMain = Integer.parseInt("" + types[i]) + visMod;
 					typeAlt = typeMain + (visMod == 0 ? 4 : -4);
 					loadNow |= ((numbersVis.get(typeMain) && barsVis.get(typeMain)) | (numbersVis.get(typeAlt) && barsVis.get(typeAlt)));
 				}
+				*/
+				
 //				DEBUG
 //				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
 				tex = new ChroTexture(resId, resName, !loadNow, texture);
@@ -358,8 +387,15 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 				// resource we are dealing with.
 				typeMain = Integer.parseInt(bar) + visMod;
 				typeAlt = typeMain + (visMod == 0 ? 4 : -4);
+				
+				/*
+				 * Deprecated.
+				 */
+				/*
 				//Check if we need to load texture now.
 				loadNow |= ((numbersVis.get(typeMain) && barsVis.get(typeMain)) | (numbersVis.get(typeAlt) && barsVis.get(typeAlt)));
+				*/
+				
 //				DEBUG
 //				ChroPrint.println("Loading " + texture + " with resid " + resId + " now: " + loadNow, System.out);
 				tex = new ChroTexture(resId, resName, !loadNow, texture);

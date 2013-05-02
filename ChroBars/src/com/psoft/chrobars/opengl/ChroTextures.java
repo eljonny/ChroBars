@@ -143,19 +143,24 @@ public class ChroTextures {
 	 */
 	public static ChroTexture cacheTexture(ChroTexture number) {
 
-//		Bitmap numBmp = number.getBmpTex();
-//		ByteBuffer tex = ByteBuffer.allocateDirect(numBmp.getHeight() * numBmp.getWidth() * ChroData._RGBA_COMPONENTS).order(ByteOrder.nativeOrder());
-//		byte pixelBuffer[] = new byte[ChroData._RGBA_COMPONENTS];
-//		for(int i = 0; i < numBmp.getHeight(); i++) {
-//			for(int j = 0; j < numBmp.getWidth(); j++) {
-//				int color = numBmp.getPixel(j, i);
-//				pixelBuffer[0] = (byte)Color.red(color);
-//				pixelBuffer[1] = (byte)Color.green(color);
-//				pixelBuffer[2] = (byte)Color.blue(color);
-//				pixelBuffer[3] = (byte)Color.alpha(color);
-//				tex.put(pixelBuffer);
-//			}
-//		}
+		/*
+		 * This has been deprecated in favor of much more efficient texture loading that preserves the alpha channel.
+		 */
+		/*
+		Bitmap numBmp = number.getBmpTex();
+		ByteBuffer tex = ByteBuffer.allocateDirect(numBmp.getHeight() * numBmp.getWidth() * ChroData._RGBA_COMPONENTS).order(ByteOrder.nativeOrder());
+		byte pixelBuffer[] = new byte[ChroData._RGBA_COMPONENTS];
+		for(int i = 0; i < numBmp.getHeight(); i++) {
+			for(int j = 0; j < numBmp.getWidth(); j++) {
+				int color = numBmp.getPixel(j, i);
+				pixelBuffer[0] = (byte)Color.red(color);
+				pixelBuffer[1] = (byte)Color.green(color);
+				pixelBuffer[2] = (byte)Color.blue(color);
+				pixelBuffer[3] = (byte)Color.alpha(color);
+				tex.put(pixelBuffer);
+			}
+		}
+		*/
 		
 //		DEBUG
 //		ChroPrint.println("Adding " + number + " with types " + ChroUtilities.buildArrayString(number.getBarTypes()) + " to the texture cache...", System.out);
@@ -179,6 +184,10 @@ public class ChroTextures {
 	 */
 	public static int[] loadTextures(GL10 gl, int texSize) {
 		
+		/*
+		 * We need to enable this so the loaded textures will have their
+		 *  alpha channel analyzed and properly calibrated for OpenGL display.
+		 */
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		
@@ -214,12 +223,16 @@ public class ChroTextures {
 //				texSize, 0, GL10.GL_LUMINANCE, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
 //				gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_LUMINANCE_ALPHA, texSize,
 //				texSize, 0, GL10.GL_LUMINANCE_ALPHA, GL10.GL_UNSIGNED_BYTE, number.getTexBuffer());
+				/*
+				 * This has proven to be the best, most efficient method for loading textures into OpenGL
+				 */
 				GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, number.getBmpTex(), 0);
 				texture++;
 				glCheckError(gl);
 			}
 		}
 
+		//Make sure to disable it after you are done loading textures.
 		gl.glDisable(GL10.GL_BLEND);
 		
 		ChroPrint.println("Loaded " + textures.length + " textures into OpenGL.", System.out);

@@ -141,11 +141,11 @@ public abstract class ChroBar implements IChroBar {
 		
 		float _baseHeight = ChroData._baseHeight;
 		
-		//Place the texture plane right in front of the bars.
-		float[] texVerts = { 	 -0.5f, _baseHeight, 0.01f,    	// Lower Left  | 0
-								  0.5f, _baseHeight, 0.01f,    	// Lower Right | 1
-								 -0.5f, 1.0f, 		 0.01f,    	// Upper Left  | 2
-								  0.5f, 1.0f, 		 0.01f  };	// Upper Right | 3
+		//Place the texture plane on top of the bar.
+		float[] texVerts = { 	 -0.5f, _baseHeight, -0.375f,    	// Lower Left  | 0
+								  0.5f, _baseHeight, -0.375f,    	// Lower Right | 1
+								 -0.5f, 1.0f, 		 -0.375f,    	// Upper Left  | 2
+								  0.5f, 1.0f, 		 -0.375f  };	// Upper Right | 3
 		
 		for(int i = 0; i < ChroData._2D_VERTEX_COMPONENTS; i++)
 			textureVertices[i] = texVerts[i];
@@ -339,10 +339,13 @@ public abstract class ChroBar implements IChroBar {
 		
 			setUpCulling_EnableStates(drawSurface);
 			
+			if(drawNumber)
+				drawTexture(drawSurface);
+			
 			if(barType.is3D()) {
 				setColorMaterials(drawSurface);
 				setLightBuffers(drawSurface);
-				setNormalPointer(drawSurface);
+				setBarPointers(drawSurface);
 			}
 			
 			drawBar(drawSurface);
@@ -350,40 +353,14 @@ public abstract class ChroBar implements IChroBar {
 			if(renderer.getBarEdgeSetting() != 0)
 				drawBarEdges(drawSurface);
 			
-			if(drawNumber)
-				drawTexture(drawSurface);
-			
 			disableStates(drawSurface);
 			
 			recalculateBarDimensions();
 			calculateTextureDimensions();
+			
+//			DEBUG - Uncomment if you are having draw problems
+//			ChroUtilities.glCheckError(drawSurface);
 		}
-	}
-
-	/**
-	 * 
-	 */
-	private void recalculateBarDimensions() {
-		//Recalculate the bar dimensions in preparation for a redraw
-		calculateBarWidth();
-		calculateBarHeight();
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void disableStates(GL10 drawSurface) {
-		//Clear the buffer space
-		//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
-		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		
-		if(barType.is3D()) {
-			//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
-			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-		}
-		//Disable face culling.
-		//ChroPrint.println("Calling glDisable", System.out);
-		drawSurface.glDisable(GL10.GL_CULL_FACE);
 	}
 
 	/**
@@ -401,72 +378,6 @@ public abstract class ChroBar implements IChroBar {
 		//Enable the OpenGL vertex array buffer space
 		//ChroPrint.println("Calling glEnableClientState for vertex array", System.out);
 		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
-		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void setNormalPointer(GL10 drawSurface) {
-		//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
-		drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-		//load the buffer of normals into the OpenGL draw object.
-		drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void setLightBuffers(GL10 drawSurface) {
-		//Set the color material to the appropriate colors.
-		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
-		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void setColorMaterials(GL10 drawSurface) {
-		//Set general lighting buffers
-		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
-		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
-		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void drawBar(GL10 drawSurface) {
-		//Tell openGL where the vertex data is and how to use it
-		//ChroPrint.println("Calling glVertexPointer", System.out);
-		drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
-									ChroData._VERTEX_STRIDE, barVerticesBuffer);
-		
-		//Color buffer for the bars.
-		//ChroPrint.println("Calling glColorPointer for bars", System.out);
-		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-									ChroData._VERTEX_STRIDE, barsColorBuffer);
-		
-		//Draw the bar
-		//ChroPrint.println("Calling glDrawElements for bars", System.out);
-		drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
-									GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
-	}
-
-	/**
-	 * @param drawSurface
-	 */
-	private void drawBarEdges(GL10 drawSurface) {
-		//Color buffer for the edges.
-		//ChroPrint.println("Calling glColorPointer for edges", System.out);
-		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
-									ChroData._VERTEX_STRIDE, edgesColorBuffer);
-		
-		//Draw the accented bar edges
-		//ChroPrint.println("Calling glDrawElements for edges", System.out);
-		drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
-									GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
 	}
 
 	/**
@@ -507,8 +418,108 @@ public abstract class ChroBar implements IChroBar {
 		drawSurface.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		drawSurface.glDisable(GL10.GL_TEXTURE_2D);
 		drawSurface.glDisable(GL10.GL_BLEND);
+
+		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setColorMaterials(GL10 drawSurface) {
 		
-//		ChroUtilities.glCheckError(drawSurface);
+		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
+		
+		//Set general lighting buffers
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_EMISSION, renderer.getEmissionLightBuffer());
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SHININESS, renderer.getShininessBuffer());
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setLightBuffers(GL10 drawSurface) {
+		//Set the color material to the appropriate colors.
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
+		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void setBarPointers(GL10 drawSurface) {
+		
+		//Flush the vertex pointer since we used it for the texture.
+		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		
+		//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+		//load the buffer of normals into the OpenGL draw object.
+		drawSurface.glNormalPointer(GL10.GL_FLOAT, ChroData._VERTEX_STRIDE, normalsBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void drawBar(GL10 drawSurface) {
+		
+		//Tell openGL where the vertex data is and how to use it
+		//ChroPrint.println("Calling glVertexPointer", System.out);
+		drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, barVerticesBuffer);
+		//Color buffer for the bars.
+		//ChroPrint.println("Calling glColorPointer for bars", System.out);
+		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, barsColorBuffer);
+		//Draw the bar
+		//ChroPrint.println("Calling glDrawElements for bars", System.out);
+		drawSurface.glDrawElements(GL10.GL_TRIANGLES, getBarDrawSequenceBufferLength(),
+									GL10.GL_UNSIGNED_SHORT, barDrawSequenceBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void drawBarEdges(GL10 drawSurface) {
+		//Color buffer for the edges.
+		//ChroPrint.println("Calling glColorPointer for edges", System.out);
+		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, edgesColorBuffer);
+		
+		//Draw the accented bar edges
+		//ChroPrint.println("Calling glDrawElements for edges", System.out);
+		drawSurface.glDrawElements(GL10.GL_LINES, getEdgeDrawSequenceBufferLength(),
+									GL10.GL_UNSIGNED_SHORT, edgeDrawSequenceBuffer);
+	}
+
+	/**
+	 * @param drawSurface
+	 */
+	private void disableStates(GL10 drawSurface) {
+		//Clear the buffer space
+		//ChroPrint.println("Calling glDisableClientState for vertex array", System.out);
+		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		
+		if(barType.is3D()) {
+			//ChroPrint.println("Calling glDisableClientState for normals array", System.out);
+			drawSurface.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+		}
+		//Disable face culling.
+		//ChroPrint.println("Calling glDisable", System.out);
+		drawSurface.glDisable(GL10.GL_CULL_FACE);
+	}
+
+	/**
+	 * 
+	 */
+	private void recalculateBarDimensions() {
+		//Recalculate the bar dimensions in preparation for a redraw
+		calculateBarWidth();
+		calculateBarHeight();
 	}
 
 	private void calculateTextureDimensions() {
@@ -516,6 +527,8 @@ public abstract class ChroBar implements IChroBar {
 		textureVertices[0] = textureVertices[6] = barVertices[0];
 		//Set the right-side vertices: The texture should be the width of the bar.
 		textureVertices[3] = textureVertices[9] = textureVertices[0] + barWidth;
+		//Set the bottom vertices to the top of the bar.
+		textureVertices[1] = textureVertices[4] = barVertices[1];
 		//The texture should have the same height as it is width.
 		textureVertices[7] = textureVertices[10] = textureVertices[1] + barWidth;
 		//Refill the textureverticesbuffer with the new coordinates.

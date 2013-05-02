@@ -289,7 +289,7 @@ public class ChroBarsActivity extends Activity {
 				e.printStackTrace();
 			}
 			switchToBars();
-			cacheAndLoadLateTextures();
+//			cacheAndLoadLateTextures();
 		}
 	}
 

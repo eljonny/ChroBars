@@ -157,7 +157,7 @@ public final class ChroData {
 	 * Pushes the rear x-coordinates left (neg value) or right (pos value).
 	 */
 	@SuppressWarnings("unused")
-	private static float bar_3D_offset = 0.1f;
+	private static float bar_3D_offset = 0.0f;
 	
 	/**
 	 * An object reference to the current surface renderer
