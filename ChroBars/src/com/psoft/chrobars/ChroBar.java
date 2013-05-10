@@ -40,7 +40,7 @@ public abstract class ChroBar implements IChroBar {
 	/* End static fields, Begin instance variables */
 
 	//Whether this bar should be drawn
-	protected boolean drawBar, drawNumber;
+	protected boolean drawBar, drawNumber, wireframe;
 	//The bar and edge color is stored as a packed color int
 	protected int barColor, edgeColor;
 	//Bar width instance variable, updated at every recalculation.
@@ -142,10 +142,10 @@ public abstract class ChroBar implements IChroBar {
 		float _baseHeight = ChroData._baseHeight;
 		
 		//Place the texture plane on top of the bar.
-		float[] texVerts = { 	 -0.5f, _baseHeight, -0.375f,    	// Lower Left  | 0
-								  0.5f, _baseHeight, -0.375f,    	// Lower Right | 1
-								 -0.5f, 1.0f, 		 -0.375f,    	// Upper Left  | 2
-								  0.5f, 1.0f, 		 -0.375f  };	// Upper Right | 3
+		float[] texVerts = { 	 -0.5f, _baseHeight, -0.1f,    	// Lower Left  | 0
+								  0.5f, _baseHeight, -0.1f,    	// Lower Right | 1
+								 -0.5f, 1.0f, 		 -0.1f,    	// Upper Left  | 2
+								  0.5f, 1.0f, 		 -0.1f  };	// Upper Right | 3
 		
 		for(int i = 0; i < ChroData._2D_VERTEX_COMPONENTS; i++)
 			textureVertices[i] = texVerts[i];
@@ -325,7 +325,8 @@ public abstract class ChroBar implements IChroBar {
 	}
 
 	/**
-	 * General drawing preparation that needs to happen no matter what is being drawn.
+	 * This method draws this ChroBar and its constituent parts,
+	 *  including the number and the bar edges.
 	 * 
 	 * @param drawSurface
 	 */
@@ -339,19 +340,20 @@ public abstract class ChroBar implements IChroBar {
 		
 			setUpCulling_EnableStates(drawSurface);
 			
-			if(drawNumber)
-				drawTexture(drawSurface);
-			
 			if(barType.is3D()) {
 				setColorMaterials(drawSurface);
 				setLightBuffers(drawSurface);
 				setBarPointers(drawSurface);
 			}
 			
-			drawBar(drawSurface);
+			if(!wireframe)
+				drawBar(drawSurface);
 			
 			if(renderer.getBarEdgeSetting() != 0)
 				drawBarEdges(drawSurface);
+			
+			if(drawNumber)
+				drawTexture(drawSurface);
 			
 			disableStates(drawSurface);
 			
@@ -384,15 +386,18 @@ public abstract class ChroBar implements IChroBar {
 	 * @param drawSurface
 	 */
 	private void drawTexture(GL10 drawSurface) {
+		
+		//If something has gone awry, bail out.
+		if(!shouldDrawTexture())
+			return;
 
 		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
 		drawSurface.glDisableClientState(GL10.GL_COLOR_ARRAY);
 		
-		shouldDrawTexture();
-		
 		drawSurface.glEnable(GL10.GL_BLEND);
 		drawSurface.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		
+		//For this drawing phase we need to enable textures.
 		drawSurface.glEnable(GL10.GL_TEXTURE_2D);
 		
 //		DEBUG
@@ -409,17 +414,18 @@ public abstract class ChroBar implements IChroBar {
 		
 //		DEBUG
 //		ChroPrint.println("Calling glDrawElements for textures", System.out);
-		//Uses the same draw sequence as the 2D bars, to preserve polygon winding.
+		//Uses the same draw sequence as the 2D bars, to preserve polygon winding and conserve memory.
 		//Draw the number texture
 		drawSurface.glDrawElements(GL10.GL_TRIANGLES, ChroData._texture_vertexDrawSequence.length,
 									GL10.GL_UNSIGNED_SHORT, textureDrawSequenceBuffer);
+		//Alternate drawing method.
 //		drawSurface.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, textureVertices.length / 3);
 		
 		drawSurface.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		drawSurface.glDisable(GL10.GL_TEXTURE_2D);
 		drawSurface.glDisable(GL10.GL_BLEND);
 
-		//ChroPrint.println("Calling glDisableClientState for color array", System.out);
+		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
 		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 	}
 
@@ -451,10 +457,6 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	private void setBarPointers(GL10 drawSurface) {
 		
-		//Flush the vertex pointer since we used it for the texture.
-		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		
 		//ChroPrint.println("Calling glEnableClientState for normals array", System.out);
 		drawSurface.glEnableClientState(GL10.GL_NORMAL_ARRAY);
 		//load the buffer of normals into the OpenGL draw object.
@@ -484,6 +486,15 @@ public abstract class ChroBar implements IChroBar {
 	 * @param drawSurface
 	 */
 	private void drawBarEdges(GL10 drawSurface) {
+		
+		drawSurface.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+
+		//Tell openGL where the vertex data is and how to use it
+		//ChroPrint.println("Calling glVertexPointer", System.out);
+		drawSurface.glVertexPointer(ChroData._DIMENSIONS, GL10.GL_FLOAT,
+									ChroData._VERTEX_STRIDE, barVerticesBuffer);
+		
 		//Color buffer for the edges.
 		//ChroPrint.println("Calling glColorPointer for edges", System.out);
 		drawSurface.glColorPointer(ChroData._RGBA_COMPONENTS, GL10.GL_FLOAT,
@@ -524,11 +535,11 @@ public abstract class ChroBar implements IChroBar {
 
 	private void calculateTextureDimensions() {
 		//Set the left-side position of the texture plane to the edge of the bar.
-		textureVertices[0] = textureVertices[6] = barVertices[0];
+		textureVertices[0] = textureVertices[6] = barVertices[0] + 0.015f;
 		//Set the right-side vertices: The texture should be the width of the bar.
 		textureVertices[3] = textureVertices[9] = textureVertices[0] + barWidth;
-		//Set the bottom vertices to the top of the bar.
-		textureVertices[1] = textureVertices[4] = barVertices[1];
+		//Set the bottom vertices to the top of the bar, plus a small margin.
+		textureVertices[1] = textureVertices[4] = barVertices[1] + 0.01f;
 		//The texture should have the same height as it is width.
 		textureVertices[7] = textureVertices[10] = textureVertices[1] + barWidth;
 		//Refill the textureverticesbuffer with the new coordinates.
@@ -884,6 +895,15 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	private void setBarType(ChroType t) {
 		barType = t;
+	}
+
+	/**
+	 * Sets the wireframe property of this bar.
+	 * 
+	 * @param checked Whether or not to enable wireframe mode.
+	 */
+	public void setWireframe(boolean checked) {
+		wireframe = checked;
 	}
 	
 	/**

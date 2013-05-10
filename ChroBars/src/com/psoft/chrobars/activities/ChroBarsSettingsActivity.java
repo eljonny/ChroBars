@@ -194,6 +194,11 @@ public class ChroBarsSettingsActivity extends Activity
 		case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
 			settings.setPrefValue("twelveHourTime", tButton.isChecked());
 			break;
+		case R.id.chrobars_settings_general_tglWireframe:
+			settings.setPrefValue("wireframe", tButton.isChecked());
+			for(ChroBar bar : currentBars)
+				bar.setWireframe(tButton.isChecked());
+			break;
 		}
 	}
 
@@ -481,6 +486,10 @@ public class ChroBarsSettingsActivity extends Activity
 					break;
 				case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
 					((ToggleButton) touchable).setChecked(settings.usesTwelveHourTime());
+					break;
+				case R.id.chrobars_settings_general_tglWireframe:
+					((ToggleButton) touchable).setChecked(settings.wireframeEnabled());
+					break;
 				}
 				toggles.add((ToggleButton)touchable);
 			}

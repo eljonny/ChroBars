@@ -32,7 +32,7 @@ public final class ChroBarsSettings {
 	private int barMargin, edgeMargin;
 	private int settingsActivityLayout;
 	private boolean threeD, dynamicLighting;
-	private boolean twelveHourTime;
+	private boolean twelveHourTime, wireframe;
 	private LinkedHashMap<ChroType, Boolean> barsVisibility, numbersVisibility;
 	
 	//Colors
@@ -147,7 +147,7 @@ public final class ChroBarsSettings {
 		
 		if(prefsMap.isEmpty()) {
 			
-			System.out.println("Running first-run setup...");
+			System.out.println("Starting first-run setup...");
 			defaultInit();
 			return;
 		}
@@ -185,8 +185,9 @@ public final class ChroBarsSettings {
 				}
 			}
 			
-			//Set the 
-			for(String prefKey : preferenceKeys)
+			//Set all the other preferences.
+			//TODO find a more efficient way to do this.
+			for(String prefKey : preferenceKeys) {
 				if(prefKey.equals(pref.getName())) {
 					try { pref.set(this, prefsMap.get(prefKey)); }
 					//If the preference is not in the map, try to set it to default.
@@ -204,6 +205,7 @@ public final class ChroBarsSettings {
 					}
 					break;
 				}
+			}
 		}
 	}
 	
@@ -267,6 +269,7 @@ public final class ChroBarsSettings {
 		threeD = ChroData.threeD;
 		dynamicLighting = ChroData.dynamicLighting;
 		twelveHourTime = ChroData.twelveHourTime;
+		wireframe = ChroData.wireframe;
 	}
 
 	/**
@@ -337,6 +340,7 @@ public final class ChroBarsSettings {
 		putPreference("threeD", false);
 		putPreference("dynamicLighting", false);
 		putPreference("twelveHourTime", false);
+		putPreference("wireframe", false);
 		
 		for(int barVis = 0; barVis < barsVisibility.size(); barVis++) {
 			putVisibilityPreference("barsVisibility_" + barVis, barsVisibility.get(ChroType.valueByNumber(barVis)));
@@ -426,6 +430,15 @@ public final class ChroBarsSettings {
 	 */
 	public final boolean usesDynamicLighting() {
 		return dynamicLighting;
+	}
+
+	/**
+	 * Accessor for the wireframe setting.
+	 * 
+	 * @return Whether wireframe mode is enabled or not.
+	 */
+	public final boolean wireframeEnabled() {
+		return wireframe;
 	}
 
 	/**

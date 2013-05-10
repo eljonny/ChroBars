@@ -192,11 +192,12 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	 */
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		
-		if(loadLateTextures) {
-			loadLateTextures = false;
-			ChroTextures.loadTextures(gl, lates, ChroData._TEX_SIZE, chroBars);
-		}
+		//NOTE If there is ever a reason to load textures after ChroBars has started,
+		// we need to uncomment this.
+//		if(loadLateTextures) {
+//			loadLateTextures = false;
+//			ChroTextures.loadTextures(gl, lates, ChroData._TEX_SIZE, chroBars);
+//		}
 		
 		gl.glPushMatrix(); {
 		
@@ -352,19 +353,22 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 //			ChroPrint.println("Setting number visibility...", System.out);
 			current.setDrawNumber(numVis.get(t.getType()));
 //			DEBUG
+//			ChroPrint.println("Setting wireframe mode enabled...", System.out);
+			current.setWireframe(settings.wireframeEnabled());
+//			DEBUG
 //			ChroPrint.println("Setting bar color...", System.out);
 			ChroUtilities.changeChroBarColor(current, settings.getBarColor(t, false));
 		}
 	}
 	
 	/**
-	 * 
+	 * If you need to load texture after ChroBars has started, use this.
 	 * @param loadThese
 	 */
-	public void loadLateCache(ArrayList<ChroTexture> loadThese) {
-		lates = loadThese;
-		loadLateTextures = true;
-	}
+//	public void loadLateCache(ArrayList<ChroTexture> loadThese) {
+//		lates = loadThese;
+//		loadLateTextures = true;
+//	}
 	
 	/**
 	 * This should only be called if colors are indirectly changed,
@@ -561,8 +565,10 @@ public class BarsRenderer implements GLSurfaceView.Renderer {
 	private Context activityContext;
 	//Settings object reference.
 	private static ChroBarsSettings settings;
+	
+//	NOTE These variables can be used to trigger post-start texture loading.
 	//Whether or not late cache textures are ready to load.
-	private boolean loadLateTextures = false;
+//	private boolean loadLateTextures = false;
 	//Late cache textures to load.
-	private ArrayList<ChroTexture> lates;
+//	private ArrayList<ChroTexture> lates;
 }

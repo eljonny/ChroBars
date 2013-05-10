@@ -24,12 +24,14 @@ public class ChroPostStartLoadThread extends Thread
 	private static int maxProgress;
 	//Texture cache
 	private static ArrayList<ChroTexture> textures;
-	private static BarsRenderer callback;
+//	NOTE uncomment for late texture loading.
+//	private static BarsRenderer callback;
 	
 	public ChroPostStartLoadThread(ArrayList<ChroTexture> toLoad,
 							  BarsRenderer rend) {
 		textures = toLoad;
-		callback = rend;
+//		NOTE uncomment for late texture loading.
+//		callback = rend;
 		progress = 0;
 	}
 	
@@ -47,7 +49,8 @@ public class ChroPostStartLoadThread extends Thread
 		
 		ChroPrint.println("Done caching late-load textures.", System.out);
 		
-		callback.loadLateCache(loadThese);
+//		TODO Uncomment this if you need to load textures after ChroBars starts.
+//		callback.loadLateCache(loadThese);
 	}
 
 	/**

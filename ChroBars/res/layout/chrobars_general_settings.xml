@@ -10,6 +10,7 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:stretchColumns="0,1,2" >
+
 	    <TableRow
 	        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_background_changeColor"
 	        android:layout_width="wrap_content"
@@ -30,7 +31,7 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_marginLeft="1dp"
-	            android:layout_marginRight="5dp"
+	            android:layout_marginRight="2dp"
 	            android:layout_marginTop="5dp"
 	            android:text="@string/settings_colorPickerButton" />
 	
@@ -57,7 +58,7 @@
 	            android:layout_gravity="center_vertical"
 	            android:layout_marginBottom="0dp"
 	            android:layout_marginLeft="1dp"
-	            android:layout_marginRight="5dp"
+	            android:layout_marginRight="2dp"
 	            android:layout_marginTop="0dp"
 	            android:checked="true"
 	            android:gravity="top|center_horizontal"
@@ -87,7 +88,7 @@
 	            android:layout_gravity="center_vertical"
 	            android:layout_marginBottom="0dp"
 	            android:layout_marginLeft="1dp"
-	            android:layout_marginRight="5dp"
+	            android:layout_marginRight="2dp"
 	            android:layout_marginTop="0dp"
 	            android:checked="true"
 	            android:gravity="top|center_horizontal"
@@ -111,16 +112,42 @@
 	            android:gravity="center_vertical"
 	            android:text="@string/settings_general_edges"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
-	
+
 	        <Spinner
 	            android:id="@+id/chrobars_settings_general_cmbEdges"
-	            android:layout_width="match_parent"
-	            android:layout_height="60dp"
-	            android:layout_gravity="center_vertical"
+	            android:layout_width="50dp"
+	            android:layout_height="45dp"
 	            android:layout_marginBottom="0dp"
 	            android:layout_marginLeft="0dp"
-	            android:layout_marginRight="4dp"
+	            android:layout_marginRight="0dp"
 	            android:layout_marginTop="0dp" />
+	
+	    </TableRow>
+	    <TableRow
+	        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_wireframe"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content" >
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_general_lblWireframe"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="10dp"
+	            android:layout_marginRight="35dp"
+	            android:layout_marginTop="5dp"
+	            android:text="@string/settings_general_wireframe"
+	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	        <ToggleButton
+	            android:id="@+id/chrobars_settings_general_tglWireframe"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="1dp"
+	            android:layout_marginRight="2dp"
+	            android:layout_marginTop="0dp"
+	            android:checked="true"
+	            android:textOff="@string/disabled"
+	            android:textOn="@string/enabled" />
 	
 	    </TableRow>
 	    <TableRow
@@ -133,7 +160,7 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_marginLeft="10dp"
-	            android:layout_marginRight="95dp"
+	            android:layout_marginRight="35dp"
 	            android:layout_marginTop="5dp"
 	            android:text="@string/settings_general_dimensions"
 	            android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -143,7 +170,7 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_marginLeft="1dp"
-	            android:layout_marginRight="5dp"
+	            android:layout_marginRight="2dp"
 	            android:layout_marginTop="0dp"
 	            android:checked="true"
 	            android:textOff="@string/disabled"

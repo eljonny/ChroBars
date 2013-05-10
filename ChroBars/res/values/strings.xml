@@ -29,7 +29,8 @@
     <string name="settings_bars_toastMessage_colorPickerInfo">Touch the center of the color wheel to confirm your color choice.</string>
     <string name="settings_general_pickBackgroundColor">Change background color</string>
     <string name="settings_general_dimensions">3D Bars</string>
-    <string name="settings_general_edges">Pronounced Bar Edges</string>
+    <string name="settings_general_edges">Bar Wireframe Effect</string>
+    <string name="settings_general_wireframe">Wireframe Mode</string>
     <string name="settings_general_margin_bar">Bar Gap</string>
     <string name="settings_general_margin_edge">Edge Gap</string>
     <string name="settings_general_displayNumbers">Display numbers</string>
@@ -41,8 +42,8 @@
     <string name="settings_general_EnableDisableTwelveHourTime">12 Hour Time</string>
     <string-array name="settings_bars_edges_options">
         <item>Off</item>
-        <item>Lighter</item>
-        <item>Darker</item>
+        <item>Light</item>
+        <item>Dark</item>
     </string-array>
     
     <!-- About information strings -->
