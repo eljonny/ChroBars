@@ -184,8 +184,10 @@ public class ChroBarsSettingsActivity extends Activity
 		case R.id.chrobars_settings_general_tglToggle3D:
 			settings.setPrefValue("threeD", tButton.isChecked());
 			currentBars = renderer.refreshVisibleBars();
-			for(ChroBar bar : currentBars)
+			for(ChroBar bar : currentBars) {
 				bar.updateEdgeColor(settings.getBarEdgeSetting());
+				bar.setWireframe(settings.wireframeEnabled());
+			}
 			checkCheckBoxes();
 			break;
 		case R.id.chrobars_settings_general_tglToggleDynLighting:
