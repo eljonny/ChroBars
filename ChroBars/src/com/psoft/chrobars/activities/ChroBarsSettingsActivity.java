@@ -61,7 +61,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private static TableLayout settingsLayoutContainer;
 	private static int lastLayout;
 	
-	private static Toast noneChecked, colorPickerInfo;
+	private static Toast noneChecked, colorPickerInfo, forThreeD;
 	private static AlertDialog resetConfirmDialog;
 	
 	private static ChroBarsSettings settings;
@@ -109,6 +109,7 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		noneChecked = Toast.makeText(this, R.string.settings_bars_toastMessage_noneChecked, Toast.LENGTH_SHORT);
 		colorPickerInfo = Toast.makeText(this, R.string.settings_bars_toastMessage_colorPickerInfo, Toast.LENGTH_LONG);
+		forThreeD = Toast.makeText(this, R.string.settings_bars_toastMessage_for3D, Toast.LENGTH_LONG);
 		
 		AlertDialog.Builder resetDialogBuilder = new AlertDialog.Builder(this);
 		
@@ -182,14 +183,22 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		switch(tButton.getId()) {
 		case R.id.chrobars_settings_general_tglToggle3D:
+			tButton.setChecked(false);
+			forThreeD.show();
+			/* Only in Full/Pro versions
 			settings.setPrefValue("threeD", tButton.isChecked());
 			currentBars = renderer.refreshVisibleBars();
 			for(ChroBar bar : currentBars)
 				bar.updateEdgeColor(settings.getBarEdgeSetting());
 			checkCheckBoxes();
+			*/
 			break;
 		case R.id.chrobars_settings_general_tglToggleDynLighting:
+			tButton.setChecked(false);
+			forThreeD.show();
+			/* Only in Full/Pro versions
 			settings.setPrefValue("dynamicLighting", tButton.isChecked());
+			*/
 			break;
 		case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
 			settings.setPrefValue("twelveHourTime", tButton.isChecked());

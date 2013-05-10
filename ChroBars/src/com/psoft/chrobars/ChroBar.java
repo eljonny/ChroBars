@@ -376,7 +376,10 @@ public abstract class ChroBar implements IChroBar {
 		drawSurface.glEnable(GL10.GL_CULL_FACE);
 		//ChroPrint.println("Calling glCullFace", System.out);
 		drawSurface.glCullFace(GL10.GL_BACK);
+
 		
+		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
+		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		//Enable the OpenGL vertex array buffer space
 		//ChroPrint.println("Calling glEnableClientState for vertex array", System.out);
 		drawSurface.glEnableClientState(GL10.GL_VERTEX_ARRAY);
@@ -433,9 +436,6 @@ public abstract class ChroBar implements IChroBar {
 	 * @param drawSurface
 	 */
 	private void setColorMaterials(GL10 drawSurface) {
-		
-		//ChroPrint.println("Calling glEnableClientState for color array", System.out);
-		drawSurface.glEnableClientState(GL10.GL_COLOR_ARRAY);
 		
 		//Set general lighting buffers
 		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, renderer.getSpecularBuffer());

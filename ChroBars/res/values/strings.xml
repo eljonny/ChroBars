@@ -27,6 +27,7 @@
     <string name="settings_colorPickerButton">Pick Color</string>
     <string name="settings_bars_toastMessage_noneChecked">Please check at least one chrobar to display.</string>
     <string name="settings_bars_toastMessage_colorPickerInfo">Touch the center of the color wheel to confirm your color choice.</string>
+    <string name="settings_bars_toastMessage_for3D">For 3D functionality, purchase the Full or Pro version of ChroBars from the Play Store.</string>
     <string name="settings_general_pickBackgroundColor">Change background color</string>
     <string name="settings_general_dimensions">3D Bars</string>
     <string name="settings_general_edges">Bar Wireframe Effect</string>
@@ -53,7 +54,7 @@
     <string name="about_team_member_klittle">Keith Little\nTesting</string>
     <string name="about_team_member_zhaberman">Zachary Haberman\nProject Management - Alpha Phase</string>
     <string name="about_team_member_dpolage">Daniel Polage\nExecutive Producer</string>
-    <string name="about_version">Version</string>
+    <string name="about_version">Free Version</string>
     <string name="about_copyright">Copyright Daniel Polage, 2013</string>
     <string name="about_email">chrobars@gmail.com</string>
     <string name="about_email_description">To contact the team, please send us an email at:</string>
