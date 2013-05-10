@@ -83,10 +83,7 @@ public final class ChroBarsSettings {
 	 * @return
 	 */
 	public static final ChroBarsSettings getInstance(Context aC) {
-		if(aC.equals(instanceActivityContext))
-			return instanceObject;
-		else
-			return null;
+		return instanceObject;
 	}
 	
 	/**
@@ -96,15 +93,18 @@ public final class ChroBarsSettings {
 	 */
 	private ChroBarsSettings(Context aC) {
 		
-		memberFields.clear();
-		
 		barsVisibility = new LinkedHashMap<ChroType, Boolean>(visSize);
 		numbersVisibility = new LinkedHashMap<ChroType, Boolean>(visSize);
 		
-		for(Field setting : ChroBarsSettings.class.getDeclaredFields())
-			if(!Modifier.isFinal(setting.getModifiers()))
-				if(!Modifier.isStatic(setting.getModifiers()))
-					memberFields.add(setting);
+		synchronized(memberFields) {
+			
+			memberFields.clear();
+			
+			for(Field setting : ChroBarsSettings.class.getDeclaredFields())
+				if(!Modifier.isFinal(setting.getModifiers()))
+					if(!Modifier.isStatic(setting.getModifiers()))
+						memberFields.add(setting);
+		}
 		
 		initSettings(aC);
 		loadSavedPrefs();
@@ -219,12 +219,15 @@ public final class ChroBarsSettings {
 		for(String key : preferenceKeys)
 			if(key.startsWith(userDef)) {
 				try {
-					for(Field pref : memberFields)
-						if(pref.getName().equals(key))
-						{
-							pref.set(this, prefsMap.get(key));
-							break;
+					synchronized(memberFields) {
+						for(Field pref : memberFields) {
+							if(pref.getName().equals(key))
+							{
+								pref.set(this, prefsMap.get(key));
+								break;
+							}
 						}
+					}
 				}
 				catch (Exception unknownEx) { ChroUtilities.printExDetails(unknownEx); }
 			}

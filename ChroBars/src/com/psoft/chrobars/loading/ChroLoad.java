@@ -19,6 +19,8 @@ import com.psoft.chrobars.R;
 import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.threading.loading.ChroLoadThread;
+import com.psoft.chrobars.util.ChroPrint;
+import com.psoft.chrobars.util.ChroUtilities;
 
 /**
  * This class draws and handles the loading screen 
@@ -46,6 +48,11 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
     	super(context, attrs);
     	
     	mainActivity = (ChroBarsActivity) context;
+    	
+		initializeLoadScreenElements();
+    }
+
+	private void initializeLoadScreenElements() {
 		System.out.println("Loading logo bitmap...");
 		logo = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
 		
@@ -57,7 +64,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 		
 		loadingBarThread = new ChroLoadThread(getHolder(), this);
-    }
+	}
 
 	/**
 	 * 
@@ -132,7 +139,8 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
 	 */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-    	loadingBarThread.start();
+    	if(loadingBarThread.getState() == Thread.State.NEW)
+    		loadingBarThread.start();
     }
  
     /**
@@ -140,6 +148,7 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
      */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+    	destroyDrawingCache();
     	try {
 			loadingBarThread.join();
 		} catch (InterruptedException e) {
@@ -154,7 +163,19 @@ public class ChroLoad extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas loading) {
     	
-    	super.draw(loading);
+    	try { super.draw(loading); }
+    	catch(NullPointerException nullPEx) {
+    		ChroUtilities.printExDetails(nullPEx);
+    		ChroPrint.println("Error: Null canvas SurfaceView. Trying to recover...", System.err);
+    		destroyDrawingCache();
+    		try {
+				loadingBarThread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return;
+    	}
     	
     	int progress = mainActivity.getProgress();
     	float progPercent = (float)progress/(float)ChroData._max_prog;

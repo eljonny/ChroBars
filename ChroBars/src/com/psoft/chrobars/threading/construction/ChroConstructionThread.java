@@ -100,8 +100,13 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	private void postConstruction() {
 		setReturnData();
 		incProgress(2);
-		Looper.myLooper().quit();
-		incProgress(2);
+		if(Looper.myLooper().getThread().isAlive() &&
+				Looper.myLooper() != null) {
+			Looper.myLooper().quit();
+			incProgress(2);
+		}
+		else
+			incProgress(ChroData._max_prog - UIThread.getProgress());
 	}
 
 	/**
@@ -516,17 +521,17 @@ public class ChroConstructionThread extends AsyncTask<ChroConstructionParams,
 	 *  into the renderer.
 	 */
 	private void buildSurface() {
-//		ChroPrint looperp = new ChroPrint();
+		ChroPrint looperp = new ChroPrint();
 		incProgress(6);
-//		Looper.myLooper().setMessageLogging(looperp);
+		Looper.myLooper().setMessageLogging(looperp);
 		incProgress(11);
-//		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
+		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
 		incProgress(4);
 		time = new ChroSurface(UIThread); //Construct the surface and bars.
 		incProgress(17);
 		time.setSettingsInstance(settings); //Load the application settings into the renderer.
 		incProgress(21);
-//		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
+		Looper.myLooper().dump(looperp, "ChroBars-constr : ");
 		incProgress(4);
 	}
 

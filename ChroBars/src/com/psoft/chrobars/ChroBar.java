@@ -583,6 +583,8 @@ public abstract class ChroBar implements IChroBar {
 	 */
 	private ChroTexture getNumberTexture() {
 		int time = getCurrentBarTime();
+		if(renderer.usesTwelveHourTime() && time == 0)
+			time = 12;
 //		DEBUG
 //		ChroPrint.println("Get time for " + barType + ": " + time, System.out);
 		ChroTexture tex = textures.get(time);

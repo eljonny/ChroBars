@@ -160,7 +160,8 @@
 	            android:id="@+id/chrobars_settings_slidingDrawer_chkbxMilliseconds_numbers"
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:checked="false"
-	            android:longClickable="false" />
+	            android:longClickable="false"
+	            android:visibility="invisible" />
 	
 	        <Button
 	            android:id="@+id/chrobars_settings_slidingDrawer_btnMillisecondsColorPicker"

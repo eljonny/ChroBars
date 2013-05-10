@@ -8,6 +8,7 @@
         android:id="@+id/menu_about"
         android:title="@string/menu_about" />
     
+    <!-- This feature is slated for the pro version.
     <item 
         android:id="@+id/menu_modes"
         android:title="@string/menu_mode_switch">
@@ -20,5 +21,6 @@
                 android:title="@string/menu_mode_timer" />
         </menu>
     </item>
+    -->
     
 </menu>

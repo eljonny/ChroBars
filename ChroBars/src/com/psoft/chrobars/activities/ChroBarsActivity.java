@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ViewSwitcher;
@@ -18,9 +19,11 @@ import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.settings.ChroBarsSettings;
 import com.psoft.chrobars.threading.construction.ChroConstructionThread;
-import com.psoft.chrobars.threading.construction.ChroPostStartLoadThread;
-import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
+//NOTE Uncomment this import to use the late caching method.
+//import com.psoft.chrobars.threading.construction.ChroPostStartLoadThread;
+//DEBUG
+//import com.psoft.chrobars.util.ChroPrint;
 
 /**
  * This is the main application Activity.
@@ -94,6 +97,7 @@ public class ChroBarsActivity extends Activity {
 	
 	//For maintaining app startup progress
 	private Integer startupProgress = 0;
+	private Bundle instanceState;
 	
 	/**
 	 * Build and set all the necessary data for 
@@ -104,18 +108,19 @@ public class ChroBarsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
-		//Send the bundled data to the superclass,
+		//Remove the title bar if SDK version is below Honeycomb.
+		//If it is 0xB or higher, we need the title for access to the ActionBar.
+		if(Build.VERSION.SDK_INT < 0xB && instanceState == null)
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		//Save then send the bundled data to the superclass,
 		// which includes any necessary information 
 		// about the state of the previous instance.
+		instanceState = savedInstanceState;
 		super.onCreate(savedInstanceState);
 
 		wm = getWindowManager();
 		setDisplayMetrics();
-		
-		//Remove the title bar if SDK version is below Honeycomb.
-		//If it is 0xB or higher, we need the title for access to the ActionBar.
-		if(Build.VERSION.SDK_INT < 0xB)
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		setContentView(constructViewAnimator());
 		buildIntents();
@@ -215,6 +220,7 @@ public class ChroBarsActivity extends Activity {
 		//This being left in memory is very common between
 		// application runs, so set it back to default.
 		ChroData._max_prog = ChroData._BASE_MAX_PROGRESS;
+		kronos = null;
 	}
 
 	/**
@@ -294,13 +300,15 @@ public class ChroBarsActivity extends Activity {
 	}
 
 	/**
+	 * Method to trigger caching textures post-start.
 	 * 
+	 * Uncomment if you have textures that need to be loaded after ChroBars starts.
 	 */
-	private void cacheAndLoadLateTextures() {
-		//Load textures we don't need yet in the background.
-		ChroPrint.println("Starting background texture loading thread...", System.out);
-		(new ChroPostStartLoadThread(params.getTextures(), ChroSurface.getRenderer())).start();
-	}
+//	private void cacheAndLoadLateTextures() {
+//		//Load textures we don't need yet in the background.
+//		ChroPrint.println("Starting background texture loading thread...", System.out);
+//		(new ChroPostStartLoadThread(params.getTextures(), ChroSurface.getRenderer())).start();
+//	}
 	
 	/**
 	 * Accessor for the field holding the current progress of the loading thread.
@@ -319,7 +327,12 @@ public class ChroBarsActivity extends Activity {
 	private void switchToBars() {
 //		DEBUG
 //		System.out.println("Adding GLSurfaceView...");
-		loadToGL.addView(kronos, 1);
+		if(loadToGL.getChildAt(1) == null) {
+			try { loadToGL.addView(kronos, 1); }
+			catch(NullPointerException nullPEx) { housekeeping(); onCreate(instanceState); }
+			catch(Exception ex) { ChroUtilities.printExDetails(ex); }
+		}
+		
 //		DEBUG
 //		System.out.println("Showing bars...");
 		loadToGL.showNext();
@@ -371,5 +384,12 @@ public class ChroBarsActivity extends Activity {
 		else
 			throw new RuntimeException(new IllegalAccessException(
 				"Class not authorized to receive settings object reference."));
+	}
+
+	/**
+	 * Last-ditch effort for recovering from an error.
+	 */
+	public void recreate() {
+		onCreate(instanceState);
 	}
 }

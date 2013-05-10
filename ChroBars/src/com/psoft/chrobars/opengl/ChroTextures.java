@@ -44,7 +44,7 @@ public class ChroTextures {
 	 * @param numOfTextures The total number of possible textures to be cached.
 	 */
 	public ChroTextures(int numOfTextures) {
-		if(texCache == null) {
+		if(texCache == null || uniqueTextures == null) {
 			texCache = new HashMap<ChroType, ArrayList<ChroTexture>>(numOfTextures);
 			uniqueTextures = new ArrayList<ChroTexture>(numOfTextures);
 			//Initialize the internal lists in the map.

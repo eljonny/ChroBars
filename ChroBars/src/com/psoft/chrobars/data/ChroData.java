@@ -47,7 +47,7 @@ public final class ChroData {
 	public static final int hourBarColor = 0x00FF33; //Bright green hour bar
 	public static final int minuteBarColor = 0xF01767; //Raspberry minute bar
 	public static final int secondBarColor = 0x0004FF; //Bright blue hour bar
-	public static final int millisecondBarColor = 0xFF5757; // Light red millisecond bar
+	public static final int millisecondBarColor = 0xFF7300; // Deep orange millisecond bar
 	public static final boolean threeD = true; //Enable 3D
 	public static final boolean displayNumbers = true; //Display time numbers
 	public static final boolean dynamicLighting = false; //Disable dynamic lighting; very CPU intensive.
