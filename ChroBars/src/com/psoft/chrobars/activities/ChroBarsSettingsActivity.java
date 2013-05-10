@@ -188,8 +188,10 @@ public class ChroBarsSettingsActivity extends Activity
 			/* Only in Full/Pro versions
 			settings.setPrefValue("threeD", tButton.isChecked());
 			currentBars = renderer.refreshVisibleBars();
-			for(ChroBar bar : currentBars)
+			for(ChroBar bar : currentBars) {
 				bar.updateEdgeColor(settings.getBarEdgeSetting());
+				bar.setWireframe(settings.wireframeEnabled());
+			}
 			checkCheckBoxes();
 			*/
 			break;
