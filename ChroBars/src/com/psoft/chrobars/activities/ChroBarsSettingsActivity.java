@@ -220,7 +220,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private void pickColor(Button button) {
 
 		switch(button.getId()) {
-		
+		/* Only in full version
 		case R.id.chrobars_settings_slidingDrawer_btnHoursColorPicker:
 			changeBarColorWithPicker(currentBars[0]);
 			return;
@@ -233,8 +233,10 @@ public class ChroBarsSettingsActivity extends Activity
 		case R.id.chrobars_settings_slidingDrawer_btnMillisecondsColorPicker:
 			changeBarColorWithPicker(currentBars[3]);
 			return;
+		*/
 		case R.id.chrobars_settings_setBackgroundButton:
 			pickBackgroundColor();
+			return;
 		default:
 			switchSettings(button); //Not a colorPicker button
 		}
@@ -341,28 +343,17 @@ public class ChroBarsSettingsActivity extends Activity
 	 * 
 	 * @param barToChange
 	 */
+	/* Only in full version
 	private void changeBarColorWithPicker(final ChroBar barToChange) {
 		
 		colorPickerInfo.show();
 
-		/**
-		 * 
-		 */
 		listening =	new OnColorChangedListener() {
 							
-							/**
-							 * 
-							 */
 							private ChroBar bar = barToChange;
 							
-							/**
-							 * 
-							 */
 							private ChroBarsSettings settingsRef = settings;
 							
-							/**
-							 * 
-							 */
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
@@ -378,6 +369,7 @@ public class ChroBarsSettingsActivity extends Activity
 		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, barToChange.getBarColor());
 		 picker.show();
 	}
+    */
 
 	/**
 	 * 
