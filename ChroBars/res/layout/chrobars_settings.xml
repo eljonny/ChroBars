@@ -36,6 +36,14 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:text="@string/settings_number_visible"
 	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_slidingDrawer_lblColorPickColumnTitle"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:text="@string/settings_bars_pick_color"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
 	        
 	    </TableRow>
 	    <TableRow
@@ -63,6 +71,12 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:checked="false"
 	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnHoursColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
 	        
 	    </TableRow>
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_minutesBar_settings" >
@@ -87,6 +101,12 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:checked="false"
 	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnMinutesColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
 	        
 	    </TableRow>
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_secondsBar_settings" >
@@ -111,6 +131,12 @@
 	            android:layout_gravity="center_vertical|center_horizontal"
 	            android:checked="false"
 	            android:longClickable="false" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnSecondsColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
 	        
 	    </TableRow>
 	    <TableRow android:id="@+id/chrobars_settings_slidingDrawer_tableRow_millisecondsBar_settings" >
@@ -136,6 +162,13 @@
 	            android:checked="false"
 	            android:longClickable="false"
 	            android:visibility="invisible" />
+	
+	        <Button
+	            android:id="@+id/chrobars_settings_slidingDrawer_btnMillisecondsColorPicker"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:layout_marginBottom="0dp"
+	            android:longClickable="false"
+	            android:text="@string/settings_colorPickerButton" />
 	
 	    </TableRow>
 	    <TableLayout

@@ -61,7 +61,8 @@ public class ChroBarsSettingsActivity extends Activity
 	private static TableLayout settingsLayoutContainer;
 	private static int lastLayout;
 	
-	private static Toast noneChecked, colorPickerInfo, forThreeD;
+	private static Toast noneChecked, colorPickerInfo,
+								forThreeD, forColorChange;
 	private static AlertDialog resetConfirmDialog;
 	
 	private static ChroBarsSettings settings;
@@ -110,6 +111,7 @@ public class ChroBarsSettingsActivity extends Activity
 		noneChecked = Toast.makeText(this, R.string.settings_bars_toastMessage_noneChecked, Toast.LENGTH_SHORT);
 		colorPickerInfo = Toast.makeText(this, R.string.settings_bars_toastMessage_colorPickerInfo, Toast.LENGTH_LONG);
 		forThreeD = Toast.makeText(this, R.string.settings_bars_toastMessage_for3D, Toast.LENGTH_LONG);
+		forColorChange = Toast.makeText(this, R.string.settings_bars_toastMessage_forColorChange, Toast.LENGTH_LONG);
 		
 		AlertDialog.Builder resetDialogBuilder = new AlertDialog.Builder(this);
 		
@@ -220,20 +222,31 @@ public class ChroBarsSettingsActivity extends Activity
 	private void pickColor(Button button) {
 
 		switch(button.getId()) {
-		/* Only in full version
+		
 		case R.id.chrobars_settings_slidingDrawer_btnHoursColorPicker:
+			forColorChange.show();
+			/* Only in full version
 			changeBarColorWithPicker(currentBars[0]);
+			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnMinutesColorPicker:
+			forColorChange.show();
+			/* Only in full version
 			changeBarColorWithPicker(currentBars[1]);
+			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnSecondsColorPicker:
+			forColorChange.show();
+			/* Only in full version
 			changeBarColorWithPicker(currentBars[2]);
+			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnMillisecondsColorPicker:
+			forColorChange.show();
+			/* Only in full version
 			changeBarColorWithPicker(currentBars[3]);
+			*/
 			return;
-		*/
 		case R.id.chrobars_settings_setBackgroundButton:
 			pickBackgroundColor();
 			return;
@@ -343,7 +356,7 @@ public class ChroBarsSettingsActivity extends Activity
 	 * 
 	 * @param barToChange
 	 */
-	/* Only in full version
+	/* Only in Full version.
 	private void changeBarColorWithPicker(final ChroBar barToChange) {
 		
 		colorPickerInfo.show();
@@ -369,7 +382,7 @@ public class ChroBarsSettingsActivity extends Activity
 		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, barToChange.getBarColor());
 		 picker.show();
 	}
-    */
+	*/
 
 	/**
 	 * 
