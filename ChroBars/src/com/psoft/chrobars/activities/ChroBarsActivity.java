@@ -2,6 +2,7 @@ package com.psoft.chrobars.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -123,6 +124,8 @@ public class ChroBarsActivity extends Activity {
 		setDisplayMetrics();
 		
 		setContentView(constructViewAnimator());
+		//This request locks the screen to the current orientation.
+		setRequestedOrientation(getResources().getConfiguration().orientation);
 		buildIntents();
 		constructBarsAndSurface();
 	}
@@ -336,6 +339,9 @@ public class ChroBarsActivity extends Activity {
 //		DEBUG
 //		System.out.println("Showing bars...");
 		loadToGL.showNext();
+		
+		//Unlock the screen orientation
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 	}
 	
 	/**
