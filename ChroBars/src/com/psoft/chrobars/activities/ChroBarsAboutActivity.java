@@ -46,7 +46,7 @@ public class ChroBarsAboutActivity extends Activity{
 		
 		try {
 			PackageInfo chroInfo = getPackageManager().getPackageInfo(_chrobarsAppName, 0x0);
-			String versionName = chroInfo.versionCode + "." + chroInfo.versionName;
+			String versionName = chroInfo.versionName + "." + chroInfo.versionCode;
 			TextView versionTView = (TextView) findViewById(R.id.lblAboutVersion);
 			versionTView.setText(versionTView.getText() + " " + versionName);
 		}
