@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 
-import com.psoft.chrobars.R;
+import com.psoft.chrobars.free.R;
 import com.psoft.chrobars.util.ChroUtilities;
 
 /**

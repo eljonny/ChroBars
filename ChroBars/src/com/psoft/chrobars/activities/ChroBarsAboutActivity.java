@@ -10,7 +10,7 @@ import android.view.Window;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
-import com.psoft.chrobars.R;
+import com.psoft.chrobars.free.R;
 import com.psoft.chrobars.data.ChroBarsCredits;
 import com.psoft.chrobars.threading.about.ChroAboutTimerTask;
 import com.psoft.chrobars.util.ChroUtilities;

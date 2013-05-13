@@ -15,7 +15,7 @@ import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.psoft.chrobars.R;
+import com.psoft.chrobars.free.R;
 import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.threading.loading.ChroLoadThread;

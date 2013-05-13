@@ -27,7 +27,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.psoft.chrobars.ChroBar;
-import com.psoft.chrobars.R;
+import com.psoft.chrobars.free.R;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;

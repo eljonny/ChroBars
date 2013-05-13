@@ -11,7 +11,7 @@ import android.os.AsyncTask;
 import android.os.Looper;
 
 import com.psoft.chrobars.ChroType;
-import com.psoft.chrobars.R;
+import com.psoft.chrobars.free.R;
 import com.psoft.chrobars.activities.ChroBarsActivity;
 import com.psoft.chrobars.data.ChroConstructionParams;
 import com.psoft.chrobars.data.ChroData;
