@@ -23,7 +23,7 @@ import com.psoft.chrobars.util.ChroUtilities;
 public class ChroBarsAboutActivity extends Activity{
 
 	private static final short _switcher_period = 3500;
-	private static final String _chrobarsAppName = "com.psoft.chrobars";
+	private static final String _chrobarsAppName = "com.psoft.chrobars.free";
 	
 	private static ChroBarsCredits credits;
 	private static ChroAboutTimerTask textSwitcher;
