@@ -23,7 +23,6 @@ import com.psoft.chrobars.util.ChroUtilities;
 public class ChroBarsAboutActivity extends Activity{
 
 	private static final short _switcher_period = 3500;
-	private static final String _chrobarsAppName = "com.psoft.chrobars.free";
 	
 	private static ChroBarsCredits credits;
 	private static ChroAboutTimerTask textSwitcher;
@@ -45,8 +44,8 @@ public class ChroBarsAboutActivity extends Activity{
 		setContentView(R.layout.menu_about_chro_bars);
 		
 		try {
-			PackageInfo chroInfo = getPackageManager().getPackageInfo(_chrobarsAppName, 0x0);
-			String versionName = chroInfo.versionCode + "." + chroInfo.versionName;
+			PackageInfo chroInfo = getPackageManager().getPackageInfo(getPackageName(), 0x0);
+			String versionName = chroInfo.versionName + ":" + chroInfo.versionCode;
 			TextView versionTView = (TextView) findViewById(R.id.lblAboutVersion);
 			versionTView.setText(versionTView.getText() + " " + versionName);
 		}
