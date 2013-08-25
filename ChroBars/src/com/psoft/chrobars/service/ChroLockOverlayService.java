@@ -2,18 +2,17 @@
  * 
  */
 package com.psoft.chrobars.service;
-import com.psoft.chrobars.activities.ChroBarsActivity;
-import com.psoft.chrobars.data.ChroData;
-import com.psoft.chrobars.util.ChroPrint;
-import com.psoft.chrobars.util.ChroUtilities;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.psoft.chrobars.activities.ChroBarsActivity;
+import com.psoft.chrobars.data.ChroData;
+import com.psoft.chrobars.util.ChroPrint;
+import com.psoft.chrobars.util.ChroUtilities;
  
  
 public class ChroLockOverlayService extends Service {
@@ -53,7 +52,7 @@ public class ChroLockOverlayService extends Service {
             getBaseContext().startActivity(chroBarsLockscreenIntent);
         }
         else
-            Toast.makeText(getBaseContext(), "ChroBars Lockscreen Service started", Toast.LENGTH_LONG).show();
+            ChroPrint.println("ChroBars Lockscreen Service started", System.out);
     }
  
     @Override
