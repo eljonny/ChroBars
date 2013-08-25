@@ -488,6 +488,9 @@ public class ChroBarsSettingsActivity extends Activity
 				case R.id.chrobars_settings_general_tglToggle3D:
 					((CompoundButton) touchable).setChecked(settings.isThreeD());
 					break;
+				case R.id.chrobars_settings_general_tglToggleLockscreenService:
+					((CompoundButton) touchable).setChecked(settings.isLockscreenEnabled());
+					break;
 				case R.id.chrobars_settings_general_tglToggleDynLighting:
 					((CompoundButton) touchable).setChecked(settings.usesDynamicLighting());
 					break;
