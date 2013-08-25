@@ -447,6 +447,7 @@ public abstract class ChroBar implements IChroBar {
 	 * @param drawSurface
 	 */
 	private void setLightBuffers(GL10 drawSurface) {
+		
 		//Set the color material to the appropriate colors.
 		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, barsColorBuffer);
 		drawSurface.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, barsColorBuffer);
@@ -533,6 +534,9 @@ public abstract class ChroBar implements IChroBar {
 		calculateBarHeight();
 	}
 
+	/**
+	 * 
+	 */
 	private void calculateTextureDimensions() {
 		//Set the left-side position of the texture plane to the edge of the bar.
 		textureVertices[0] = textureVertices[6] = barVertices[0] + 0.015f;
