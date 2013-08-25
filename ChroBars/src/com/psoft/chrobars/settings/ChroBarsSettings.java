@@ -31,7 +31,7 @@ public final class ChroBarsSettings {
 	private int precision, barEdgeSetting;
 	private int barMargin, edgeMargin;
 	private int settingsActivityLayout;
-	private boolean threeD, dynamicLighting;
+	private boolean threeD, dynamicLighting, lockscreen;
 	private boolean twelveHourTime, wireframe;
 	private LinkedHashMap<ChroType, Boolean> barsVisibility, numbersVisibility;
 	
@@ -83,6 +83,7 @@ public final class ChroBarsSettings {
 	 * @return
 	 */
 	public static final ChroBarsSettings getInstance(Context aC) {
+		//TODO validation of aC
 		return instanceObject;
 	}
 	
@@ -119,12 +120,26 @@ public final class ChroBarsSettings {
 	 */
 	private void initSettings(Context activityContext) {
 
-		instanceActivityContext = activityContext;
+		setInstanceActivityContext(activityContext);
 		chroPrefs = activityContext.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
 //		DEBUG
 //		System.out.println("Preferences instance set to object reference " + chroPrefs + ".");
 	}
 	
+	/**
+	 * @return the instanceActivityContext
+	 */
+	public static Context getInstanceActivityContext() {
+		return instanceActivityContext;
+	}
+
+	/**
+	 * @param instanceActivityContext the instanceActivityContext to set
+	 */
+	private static void setInstanceActivityContext(Context instanceActivityContext) {
+		ChroBarsSettings.instanceActivityContext = instanceActivityContext;
+	}
+
 	/**
 	 * Setting instance to false ensures that we can recreate the settings object.
 	 */
@@ -203,6 +218,7 @@ public final class ChroBarsSettings {
 						System.err.println("Exception processing field " + pref.getName());
 						ChroUtilities.printExDetails(unknownEx);
 					}
+					
 					break;
 				}
 			}
@@ -263,6 +279,7 @@ public final class ChroBarsSettings {
 	 */
 	private void setGeneralDefaultSettings() {
 		
+		//TODO use reflection to set these fields instead of explicit access.
 		System.out.println("Setting general defaults...");
 		settingsActivityLayout = R.layout.chrobars_settings;
 		precision = ChroData.precision;
@@ -270,6 +287,7 @@ public final class ChroBarsSettings {
 		barMargin = ChroData.barMargin;
 		edgeMargin = ChroData.edgeMargin;
 		threeD = ChroData.threeD;
+		lockscreen = ChroData.lockscreen;
 		dynamicLighting = ChroData.dynamicLighting;
 		twelveHourTime = ChroData.twelveHourTime;
 		wireframe = ChroData.wireframe;
@@ -341,6 +359,7 @@ public final class ChroBarsSettings {
 		putPreference("edgeMargin", true);
 		putPreference("settingsActivityLayout", true);
 		putPreference("threeD", false);
+		putPreference("lockscreen", false);
 		putPreference("dynamicLighting", false);
 		putPreference("twelveHourTime", false);
 		putPreference("wireframe", false);
@@ -423,6 +442,18 @@ public final class ChroBarsSettings {
 		return threeD;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public final boolean isLockscreenEnabled() {
+		return lockscreen;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public final boolean usesTwelveHourTime() {
 		return twelveHourTime;
 	}

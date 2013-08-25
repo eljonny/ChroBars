@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.psoft.chrobars.free" android:versionCode="4"
+    package="com.psoft.chrobars" android:versionCode="4"
     android:versionName="1.0.11" android:installLocation="auto">
     
     <uses-feature android:glEsVersion="0x00020000"></uses-feature>
@@ -31,6 +31,12 @@
         <activity
             android:name="com.psoft.chrobars.activities.ChroBarsAboutActivity"
             android:label="@string/about_title" />
+        
+        <service android:name="com.psoft.chrobars.service.ChroLockOverlayService">
+            <intent-filter>
+                <action android:name="com.psoft.chrobars.service.ChroLockOverlayService" />
+            </intent-filter>
+        </service>
         
     </application>
 

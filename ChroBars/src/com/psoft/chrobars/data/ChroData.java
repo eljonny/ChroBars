@@ -49,6 +49,7 @@ public final class ChroData {
 	public static final int secondBarColor = 0x0004FF; //Bright blue hour bar
 	public static final int millisecondBarColor = 0xFF7300; // Deep orange millisecond bar
 	public static final boolean threeD = true; //Enable 3D
+	public static final boolean lockscreen = true;
 	public static final boolean displayNumbers = true; //Display time numbers
 	public static final boolean dynamicLighting = false; //Disable dynamic lighting; very CPU intensive.
 	public static final boolean twelveHourTime = true; //Enable 12-hour mode
@@ -129,6 +130,11 @@ public final class ChroData {
 	 */
 	@SuppressWarnings("unused")
 	private static int barsCreated = 0;
+	
+	/**
+	 * This indicates whether or not the service should start the activity.
+	 */
+	public static boolean activityDone = false;
 	
 	/**
 	 * Default max progress. This is modified

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ViewSwitcher;
@@ -20,11 +19,8 @@ import com.psoft.chrobars.loading.ChroLoad;
 import com.psoft.chrobars.opengl.ChroSurface;
 import com.psoft.chrobars.settings.ChroBarsSettings;
 import com.psoft.chrobars.threading.construction.ChroConstructionThread;
+import com.psoft.chrobars.util.ChroPrint;
 import com.psoft.chrobars.util.ChroUtilities;
-//NOTE Uncomment this import to use the late caching method.
-//import com.psoft.chrobars.threading.construction.ChroPostStartLoadThread;
-//DEBUG
-//import com.psoft.chrobars.util.ChroPrint;
 
 /**
  * This is the main application Activity.
@@ -122,11 +118,16 @@ public class ChroBarsActivity extends Activity {
 
 		wm = getWindowManager();
 		setDisplayMetrics();
-		
+
 		setContentView(constructViewAnimator());
+		
 		//This request locks the screen to the current orientation.
 		setRequestedOrientation(getResources().getConfiguration().orientation);
+		
 		buildIntents();
+		
+		ChroData.activityDone = false;
+		
 		constructBarsAndSurface();
 	}
 
@@ -136,6 +137,7 @@ public class ChroBarsActivity extends Activity {
 	 *  ChroBars application modes.
 	 */
 	private ViewSwitcher constructViewAnimator() {
+		
 		//We use these ViewAnimators to manage the multiple views.
 		loadToGL = new ViewSwitcher(this);
 		loadToGL.setInAnimation(this, android.R.anim.fade_in);
@@ -149,8 +151,12 @@ public class ChroBarsActivity extends Activity {
 	 *  sets its parameters to those of the current screen.
 	 */
 	private static DisplayMetrics setDisplayMetrics() {
-		screen = new DisplayMetrics();
+		
+		if(screen == null) {
+			screen = new DisplayMetrics();
+		}
 		wm.getDefaultDisplay().getMetrics(screen);
+		
 		return screen;
 	}
 	
@@ -168,6 +174,7 @@ public class ChroBarsActivity extends Activity {
 	 *  that builds the surface and bars data
 	 */
 	private void constructBarsAndSurface() {
+		
 		params = new ChroConstructionParams(this, kronos, settings);
 		new ChroConstructionThread().execute(params);
 	}
@@ -180,7 +187,9 @@ public class ChroBarsActivity extends Activity {
 	 *  @return Returns the ViewSwitcher with the loading screen.
 	 */
 	private ViewSwitcher setLoadingView() {
+		
 		loadToGL.addView(new ChroLoad(this, null),0);
+		
 		return loadToGL;
 	}
 
@@ -190,8 +199,8 @@ public class ChroBarsActivity extends Activity {
 	 */
 	private void buildIntents() {
 		
-		settingsIntent = new Intent(this, ChroBarsSettingsActivity.class);
-		aboutIntent = new Intent(this, ChroBarsAboutActivity.class);
+		settingsIntent = settingsIntent == null ? new Intent(this, ChroBarsSettingsActivity.class) : settingsIntent;
+		aboutIntent = aboutIntent == null ? new Intent(this, ChroBarsAboutActivity.class) : aboutIntent;
 		
 		instance = this;
 	}
@@ -201,9 +210,23 @@ public class ChroBarsActivity extends Activity {
 	 */
 	@Override
 	public void onBackPressed() {
+		
 		super.onBackPressed();
 		housekeeping();
-		finish();
+		if(settings.isLockscreenEnabled()) {
+			
+			ChroData.activityDone = true;
+			
+			if(moveTaskToBack(true))
+				ChroPrint.println("ChroBars successfully moved to the back of stack.", System.out);
+			else {
+				ChroPrint.println("ChroBars failed to move to the back of stack.", System.err);
+				finish();
+			}
+		}
+		else {
+			finish();
+		}
 	}
 	
 	/**
@@ -211,19 +234,26 @@ public class ChroBarsActivity extends Activity {
 	 */
 	@Override
 	public void onDestroy() {
+		
 		super.onDestroy();
 		housekeeping();
+		
+		if(settings.isLockscreenEnabled()) {
+			ChroData.activityDone = true;
+		}
 	}
 
 	/**
 	 * Perform standard exit cleaning routines.
 	 */
 	private void housekeeping() {
+		if(!settings.isLockscreenEnabled()) {
+			kronos = null;
+		}
 		ChroBarsSettings.clean();
 		//This being left in memory is very common between
 		// application runs, so set it back to default.
 		ChroData._max_prog = ChroData._BASE_MAX_PROGRESS;
-		kronos = null;
 	}
 
 	/**
@@ -288,6 +318,24 @@ public class ChroBarsActivity extends Activity {
 //			DEBUG
 //			System.out.println("Retrieving built objects...");
 			settings = params.getSettings();
+			
+			//If the lockscreen service is enabled, start it.
+			if(settings.isLockscreenEnabled()) {
+				this.getWindow().setFlags(
+						//Flags
+						(   WindowManager.LayoutParams.FLAG_FULLSCREEN | 
+							WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | 
+							WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | 
+							WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON		),
+			            //Mask
+			            (   WindowManager.LayoutParams.FLAG_FULLSCREEN | 
+					        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | 
+					        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | 
+				            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON		)	);
+				
+				startLockscreenService();
+			}
+			
 			kronos = params.getRenderSurface();
 //			DEBUg
 //			ChroPrint.println("Recieved textures " + params.getTextures() + "\nSize " + params.getTextures().size(), System.out);
@@ -390,6 +438,16 @@ public class ChroBarsActivity extends Activity {
 		else
 			throw new RuntimeException(new IllegalAccessException(
 				"Class not authorized to receive settings object reference."));
+	}
+	
+	/**
+	 * 
+	 */
+	private void startLockscreenService() {
+		
+        Intent lockscreenServiceIntent = new Intent();
+        lockscreenServiceIntent.setAction("com.psoft.chrobars.service.ChroLockOverlayService");
+        startService(lockscreenServiceIntent);
 	}
 
 	/**

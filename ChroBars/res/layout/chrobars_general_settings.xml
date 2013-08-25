@@ -177,6 +177,33 @@
 	            android:textOn="@string/enabled" />
 	
 	    </TableRow>
+	    <TableRow
+	        android:id="@+id/chrobars_settings_general_slidingDrawer_tableRow_lockscreen"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content" >
+	
+	        <TextView
+	            android:id="@+id/chrobars_settings_general_lblLockscreen"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="10dp"
+	            android:layout_marginRight="35dp"
+	            android:layout_marginTop="5dp"
+	            android:text="@string/settings_general_lockscreen"
+	            android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	        <ToggleButton
+	            android:id="@+id/chrobars_settings_general_tglToggleLockscreenService"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="1dp"
+	            android:layout_marginRight="2dp"
+	            android:layout_marginTop="0dp"
+	            android:checked="true"
+	            android:textOff="@string/disabled"
+	            android:textOn="@string/enabled" />
+	
+	    </TableRow>
 	
 	    <Button
 	        android:id="@+id/chrobars_settings_drawer_general_resetButton"

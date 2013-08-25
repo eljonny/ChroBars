@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -200,6 +201,10 @@ public class ChroBarsSettingsActivity extends Activity
 			settings.setPrefValue("wireframe", tButton.isChecked());
 			for(ChroBar bar : currentBars)
 				bar.setWireframe(tButton.isChecked());
+			break;
+		case R.id.chrobars_settings_general_tglToggleLockscreenService:
+			settings.setPrefValue("lockscreen", tButton.isChecked());
+			startLockscreenService();
 			break;
 		}
 	}
@@ -690,6 +695,16 @@ public class ChroBarsSettingsActivity extends Activity
 				++checkedBoxes;
 		
 		return (checkedBoxes > 0);
+	}
+	
+	/**
+	 * 
+	 */
+	private void startLockscreenService() {
+		
+        Intent lockscreenServiceIntent = new Intent();
+        lockscreenServiceIntent.setAction("com.psoft.chrobars.service.ChroLockOverlayService");
+        startService(lockscreenServiceIntent);
 	}
 
 	/**
