@@ -27,7 +27,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.psoft.chrobars.ChroBar;
-import com.psoft.chrobars.free.R;
+import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.opengl.BarsRenderer;
 import com.psoft.chrobars.opengl.ChroSurface;
@@ -61,8 +61,7 @@ public class ChroBarsSettingsActivity extends Activity
 	private static TableLayout settingsLayoutContainer;
 	private static int lastLayout;
 	
-	private static Toast noneChecked, colorPickerInfo,
-								forThreeD, forColorChange;
+	private static Toast noneChecked, colorPickerInfo;
 	private static AlertDialog resetConfirmDialog;
 	
 	private static ChroBarsSettings settings;
@@ -110,8 +109,6 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		noneChecked = Toast.makeText(this, R.string.settings_bars_toastMessage_noneChecked, Toast.LENGTH_SHORT);
 		colorPickerInfo = Toast.makeText(this, R.string.settings_bars_toastMessage_colorPickerInfo, Toast.LENGTH_LONG);
-		forThreeD = Toast.makeText(this, R.string.settings_bars_toastMessage_for3D, Toast.LENGTH_LONG);
-		forColorChange = Toast.makeText(this, R.string.settings_bars_toastMessage_forColorChange, Toast.LENGTH_LONG);
 		
 		AlertDialog.Builder resetDialogBuilder = new AlertDialog.Builder(this);
 		
@@ -185,9 +182,6 @@ public class ChroBarsSettingsActivity extends Activity
 		
 		switch(tButton.getId()) {
 		case R.id.chrobars_settings_general_tglToggle3D:
-			tButton.setChecked(false);
-			forThreeD.show();
-			/* Only in Full/Pro versions
 			settings.setPrefValue("threeD", tButton.isChecked());
 			currentBars = renderer.refreshVisibleBars();
 			for(ChroBar bar : currentBars) {
@@ -195,14 +189,9 @@ public class ChroBarsSettingsActivity extends Activity
 				bar.setWireframe(settings.wireframeEnabled());
 			}
 			checkCheckBoxes();
-			*/
 			break;
 		case R.id.chrobars_settings_general_tglToggleDynLighting:
-			tButton.setChecked(false);
-			forThreeD.show();
-			/* Only in Full/Pro versions
 			settings.setPrefValue("dynamicLighting", tButton.isChecked());
-			*/
 			break;
 		case R.id.chrobars_settings_general_tglToggleTwelveHourTime:
 			settings.setPrefValue("twelveHourTime", tButton.isChecked());
@@ -224,32 +213,19 @@ public class ChroBarsSettingsActivity extends Activity
 		switch(button.getId()) {
 		
 		case R.id.chrobars_settings_slidingDrawer_btnHoursColorPicker:
-			forColorChange.show();
-			/* Only in full version
 			changeBarColorWithPicker(currentBars[0]);
-			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnMinutesColorPicker:
-			forColorChange.show();
-			/* Only in full version
 			changeBarColorWithPicker(currentBars[1]);
-			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnSecondsColorPicker:
-			forColorChange.show();
-			/* Only in full version
 			changeBarColorWithPicker(currentBars[2]);
-			*/
 			return;
 		case R.id.chrobars_settings_slidingDrawer_btnMillisecondsColorPicker:
-			forColorChange.show();
-			/* Only in full version
 			changeBarColorWithPicker(currentBars[3]);
-			*/
 			return;
 		case R.id.chrobars_settings_setBackgroundButton:
 			pickBackgroundColor();
-			return;
 		default:
 			switchSettings(button); //Not a colorPicker button
 		}
@@ -356,17 +332,28 @@ public class ChroBarsSettingsActivity extends Activity
 	 * 
 	 * @param barToChange
 	 */
-	/* Only in Full version.
 	private void changeBarColorWithPicker(final ChroBar barToChange) {
 		
 		colorPickerInfo.show();
 
+		/**
+		 * 
+		 */
 		listening =	new OnColorChangedListener() {
 							
+							/**
+							 * 
+							 */
 							private ChroBar bar = barToChange;
 							
+							/**
+							 * 
+							 */
 							private ChroBarsSettings settingsRef = settings;
 							
+							/**
+							 * 
+							 */
 							@Override
 							public void colorChanged(int alpha, int rgb) {
 								
@@ -382,7 +369,6 @@ public class ChroBarsSettingsActivity extends Activity
 		 ColorPickerDialog picker = new ColorPickerDialog(this, listening, barToChange.getBarColor());
 		 picker.show();
 	}
-	*/
 
 	/**
 	 * 

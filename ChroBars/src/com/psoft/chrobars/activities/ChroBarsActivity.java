@@ -13,7 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ViewSwitcher;
 
-import com.psoft.chrobars.free.R;
+import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroConstructionParams;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.loading.ChroLoad;

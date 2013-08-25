@@ -15,7 +15,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 
 import com.psoft.chrobars.ChroType;
-import com.psoft.chrobars.free.R;
+import com.psoft.chrobars.R;
 import com.psoft.chrobars.data.ChroData;
 import com.psoft.chrobars.util.ChroUtilities;
 
